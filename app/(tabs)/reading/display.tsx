@@ -10,7 +10,7 @@ export default function DisplayScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const [items, setItems] = useState<string[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(-1);
   const [color, setColor] = useState<string>('#000');
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
@@ -67,15 +67,17 @@ export default function DisplayScreen() {
     }
   }, [currentIndex, items.length, router]);
 
-  if (items.length === 0 || currentIndex >= items.length) {
+  if (items.length === 0) {
     return <ThemedView style={styles.container} />;
   }
 
   return (
     <ThemedView style={styles.container}>
-      <AutoSizeText color={color} maxLength={maxTextLength}>
-        {items[currentIndex]}
-      </AutoSizeText>
+      {currentIndex >= 0 && currentIndex < items.length && (
+        <AutoSizeText color={color} maxLength={maxTextLength}>
+          {items[currentIndex]}
+        </AutoSizeText>
+      )}
     </ThemedView>
   );
 }
