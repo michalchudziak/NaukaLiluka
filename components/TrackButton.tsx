@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    minHeight: 200,
-    maxHeight: 200,
+    minHeight: 100,
+    maxHeight: 150,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

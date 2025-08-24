@@ -5,7 +5,10 @@
   },
   "reading": {
     "bookTrack": "Ścieka książkowa",
-    "noRepeatTrack": "Ścieka bez powtórzeń"
+    "noRepeatTrack": "Ścieka bez powtórzeń",
+    "selectColor": "Wybierz kolor",
+    "wordsTrack": "Słowa",
+    "sentencesTrack": "Zdania"
   },
   "noRep": {
     "words": "Słowa",

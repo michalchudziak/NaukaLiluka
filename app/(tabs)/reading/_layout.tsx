@@ -16,10 +16,7 @@ export default function ReadingLayout() {
       />
       <Stack.Screen 
         name="display" 
-        options={{ 
-          title: t('noRep.title'),
-          headerBackTitle: t('noRep.back')
-        }} 
+        options={{ headerShown: false }}
       />
     </Stack>
   );

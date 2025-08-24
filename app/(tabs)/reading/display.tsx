@@ -1,13 +1,21 @@
-import { StyleSheet, ScrollView, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
-import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { AutoSizeText } from '@/components/AutoSizeText';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState, useRef, useMemo } from 'react';
+import { DefaultSettings } from '@/services/default-settings';
 
 export default function DisplayScreen() {
   const params = useLocalSearchParams();
+  const router = useRouter();
   const [items, setItems] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [color, setColor] = useState<string>('#000');
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  
+  const maxTextLength = useMemo(() => {
+    return Math.max(...items.map(item => item.length), 0);
+  }, [items]);
 
   useEffect(() => {
     if (params.items) {
@@ -21,19 +29,40 @@ export default function DisplayScreen() {
     if (params.color) {
       setColor(params.color as string);
     }
-  }, [params]);
+  }, [params.items, params.color]);
+
+  useEffect(() => {
+    if (items.length === 0) return;
+
+    intervalRef.current = setInterval(() => {
+      setCurrentIndex((prevIndex) => prevIndex + 1);
+    }, DefaultSettings.reading.interval);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [items]);
+
+  useEffect(() => {
+    if (currentIndex >= items.length && items.length > 0) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      router.back();
+    }
+  }, [currentIndex, items.length, router]);
+
+  if (items.length === 0 || currentIndex >= items.length) {
+    return <ThemedView style={styles.container} />;
+  }
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {items.map((item, index) => (
-          <View key={index} style={styles.itemContainer}>
-            <ThemedText style={[styles.itemText, { color }]}>
-              {item}
-            </ThemedText>
-          </View>
-        ))}
-      </ScrollView>
+      <AutoSizeText color={color} maxLength={maxTextLength}>
+        {items[currentIndex]}
+      </AutoSizeText>
     </ThemedView>
   );
 }
@@ -41,20 +70,8 @@ export default function DisplayScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-  },
-  scrollContent: {
-    paddingVertical: 20,
-  },
-  itemContainer: {
-    marginBottom: 20,
-    padding: 15,
-    borderRadius: 8,
-    backgroundColor: 'rgba(0,0,0,0.05)',
-  },
-  itemText: {
-    fontSize: 24,
-    textAlign: 'center',
-    fontWeight: '600',
+    paddingHorizontal: '10%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
