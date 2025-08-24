@@ -51,3 +51,18 @@ npm run reset-project
 ### Testing & Code Quality
 - ESLint configured with `eslint-config-expo`
 - No test runner currently configured - testing approach should be determined based on project needs
+
+### Internationalization (i18n)
+- **Translation system**: Uses `i18next` and `react-i18next`
+- **Current language**: Polish (pl) - only available language
+- **Configuration**: `i18n/i18n.ts` with compatibility mode v4
+- **Translations location**: `i18n/locales/pl.json`
+- **Usage in components**: 
+  ```typescript
+  import { useTranslation } from '@/hooks/useTranslation';
+  
+  const { t } = useTranslation();
+  const translatedText = t('tabs.reading');
+  ```
+- **Adding new translations**: Add keys to `i18n/locales/pl.json`
+- **Adding new languages**: Create new locale file in `i18n/locales/` and add to resources in `i18n/i18n.ts`

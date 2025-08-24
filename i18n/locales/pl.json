@@ -2,5 +2,13 @@
   "tabs": {
     "reading": "Czytanie",
     "pictures": "Obrazki"
+  },
+  "reading": {
+    "bookTrack": "Ścieka książkowa",
+    "noRepeatTrack": "Ścieka bez powtórzeń"
+  },
+  "noRep": {
+    "words": "Słowa",
+    "sentences": "Zdania"
   }
 }

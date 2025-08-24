@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
 
-export default function ReadingScreen() {
+export default function NoRepScreen() {
   const { width, height } = useWindowDimensions();
   const isHorizontal = width > height;
   const { t } = useTranslation();
@@ -12,12 +12,12 @@ export default function ReadingScreen() {
     <ThemedView style={styles.container}>
       <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
         <TrackButton 
-          title={t('reading.bookTrack')}
+          title={t('noRep.words')}
           isCompleted={false}
         />
         
         <TrackButton 
-          title={t('reading.noRepeatTrack')}
+          title={t('noRep.sentences')}
           isCompleted={false}
         />
       </ThemedView>
