@@ -4,6 +4,7 @@ import { TrackButton } from '@/components/TrackButton';
 import sentencesData from '@/content/sentences.json';
 import wordsData from '@/content/words.json';
 import { useTranslation } from '@/hooks/useTranslation';
+import { DefaultSettings } from '@/services/default-settings';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
@@ -21,7 +22,7 @@ export default function NoRepScreen() {
   const [selectedColor, setSelectedColor] = useState('#000000');
 
   const handleWordsPress = () => {
-    const randomWords = getRandomItems(wordsData, 3);
+    const randomWords = getRandomItems(wordsData, DefaultSettings.reading.noRep.words);
     router.push({
       pathname: '/reading/display',
       params: {
@@ -32,7 +33,7 @@ export default function NoRepScreen() {
   };
 
   const handleSentencesPress = () => {
-    const randomSentences = getRandomItems(sentencesData, 3);
+    const randomSentences = getRandomItems(sentencesData, DefaultSettings.reading.noRep.sentences);
     router.push({
       pathname: '/reading/display',
       params: {

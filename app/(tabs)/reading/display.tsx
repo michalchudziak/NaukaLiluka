@@ -1,17 +1,30 @@
 import { StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { AutoSizeText } from '@/components/AutoSizeText';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useLocalSearchParams, useRouter, useNavigation } from 'expo-router';
+import { useEffect, useState, useRef, useMemo, useLayoutEffect } from 'react';
 import { DefaultSettings } from '@/services/default-settings';
 
 export default function DisplayScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
+  const navigation = useNavigation();
   const [items, setItems] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [color, setColor] = useState<string>('#000');
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  
+  useLayoutEffect(() => {
+    navigation.getParent()?.setOptions({
+      tabBarStyle: { display: 'none' }
+    });
+    
+    return () => {
+      navigation.getParent()?.setOptions({
+        tabBarStyle: undefined
+      });
+    };
+  }, [navigation]);
   
   const maxTextLength = useMemo(() => {
     return Math.max(...items.map(item => item.length), 0);
