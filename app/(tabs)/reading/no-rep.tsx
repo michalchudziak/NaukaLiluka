@@ -4,20 +4,14 @@ import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import sentencesData from '@/content/sentences.json';
 import wordsData from '@/content/words.json';
+import { chooseAndMarkSentences, chooseAndMarkWords } from '@/core/no-rep';
 import { useTranslation } from '@/hooks/useTranslation';
-import { DefaultSettings } from '@/services/default-settings';
 import { StorageService } from '@/services/storage';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
-
-function getRandomItems<T>(array: T[], count: number, exclude: T[] = []): T[] {
-  const available = array.filter(item => !exclude.includes(item));
-  const shuffled = [...available].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
-}
+import { Alert, StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function NoRepScreen() {
   const { width, height } = useWindowDimensions();
@@ -52,74 +46,44 @@ export default function NoRepScreen() {
   );
 
   const handleWordsPress = async () => {
-    const randomWords = getRandomItems(wordsData, DefaultSettings.reading.noRep.words, displayedWords);
-    
+    const randomWords = await chooseAndMarkWords();
+
     if (randomWords.length === 0) {
-      await StorageService.clearDisplayedWords();
-      setDisplayedWords([]);
-      const freshWords = getRandomItems(wordsData, DefaultSettings.reading.noRep.words);
-      await StorageService.addDisplayedWords(freshWords);
-      setDisplayedWords(freshWords);
-      
-      router.push({
-        pathname: '/display',
-        params: {
-          items: JSON.stringify(freshWords),
-          color: selectedColor,
-          type: 'words',
-        },
-      });
-    } else {
-      await StorageService.addDisplayedWords(randomWords);
-      setDisplayedWords([...displayedWords, ...randomWords]);
-      
-      router.push({
-        pathname: '/display',
-        params: {
-          items: JSON.stringify(randomWords),
-          color: selectedColor,
-          type: 'words',
-        },
-      });
+      Alert.alert(t('noRep.noMoreWords'));
+      return;
     }
-    
-    await StorageService.markWordsCompleted();
+
+    router.push({
+      pathname: '/display',
+      params: {
+        items: JSON.stringify(randomWords),
+        color: selectedColor,
+        type: 'words',
+      },
+    });
+
+    setDisplayedWords(randomWords);
     setWordsCompletedToday(true);
   };
 
   const handleSentencesPress = async () => {
-    const randomSentences = getRandomItems(sentencesData, DefaultSettings.reading.noRep.sentences, displayedSentences);
-    
+    const randomSentences = await chooseAndMarkSentences();
+
     if (randomSentences.length === 0) {
-      await StorageService.clearDisplayedSentences();
-      setDisplayedSentences([]);
-      const freshSentences = getRandomItems(sentencesData, DefaultSettings.reading.noRep.sentences);
-      await StorageService.addDisplayedSentences(freshSentences);
-      setDisplayedSentences(freshSentences);
-      
-      router.push({
-        pathname: '/display',
-        params: {
-          items: JSON.stringify(freshSentences),
-          color: selectedColor,
-          type: 'sentences',
-        },
-      });
-    } else {
-      await StorageService.addDisplayedSentences(randomSentences);
-      setDisplayedSentences([...displayedSentences, ...randomSentences]);
-      
-      router.push({
-        pathname: '/display',
-        params: {
-          items: JSON.stringify(randomSentences),
-          color: selectedColor,
-          type: 'sentences',
-        },
-      });
+      Alert.alert(t('noRep.noMoreSentences'));
+      return;
     }
-    
-    await StorageService.markSentencesCompleted();
+
+    router.push({
+      pathname: '/display',
+      params: {
+        items: JSON.stringify(randomSentences),
+        color: selectedColor,
+        type: 'sentences',
+      },
+    });
+
+    setDisplayedSentences(randomSentences);
     setSentencesCompletedToday(true);
   };
 

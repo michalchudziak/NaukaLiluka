@@ -1,14 +1,29 @@
-import { StyleSheet, useWindowDimensions } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { StorageService } from '@/services/storage';
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function ReadingScreen() {
   const { width, height } = useWindowDimensions();
   const isHorizontal = width > height;
   const { t } = useTranslation();
   const router = useRouter();
+  const [isNoRepPathCompleted, setIsNoRepPathCompleted] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      const load = async () => {
+        const isCompleted = await StorageService.isNoRepPathCompletedToday();
+        setIsNoRepPathCompleted(isCompleted);
+      }
+      load();
+      return () => {};
+    }, [])
+  );
 
   return (
     <ThemedView style={styles.container}>
@@ -20,7 +35,7 @@ export default function ReadingScreen() {
         
         <TrackButton 
           title={t('reading.noRepeatTrack')}
-          isCompleted={false}
+          isCompleted={isNoRepPathCompleted}
           onPress={() => router.push('/reading/no-rep')}
         />
       </ThemedView>

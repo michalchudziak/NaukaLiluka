@@ -16,6 +16,8 @@
     "title": "Ścieka bez powtórzeń",
     "back": "Wróć",
     "knownWordsCount": "{{count}} z {{total}} znanych słów",
-    "knownSentencesCount": "{{count}} z {{total}} znanych zdań"
+    "knownSentencesCount": "{{count}} z {{total}} znanych zdań",
+    "noMoreWords": "Przerobione wszystkie słowa",
+    "noMoreSentences": "Przerobione wszystkie zdania"
   }
 }
