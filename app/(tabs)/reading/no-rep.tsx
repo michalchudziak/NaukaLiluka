@@ -7,9 +7,10 @@ import wordsData from '@/content/words.json';
 import { useTranslation } from '@/hooks/useTranslation';
 import { DefaultSettings } from '@/services/default-settings';
 import { StorageService } from '@/services/storage';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 
 function getRandomItems<T>(array: T[], count: number, exclude: T[] = []): T[] {
@@ -26,19 +27,22 @@ export default function NoRepScreen() {
   const [selectedColor, setSelectedColor] = useState('#000000');
   const [displayedWords, setDisplayedWords] = useState<string[]>([]);
   const [displayedSentences, setDisplayedSentences] = useState<string[]>([]);
+  const [wordsCompletedToday, setWordsCompletedToday] = useState(false);
+  const [sentencesCompletedToday, setSentencesCompletedToday] = useState(false);
+  const tabBarHeight = useBottomTabBarHeight();
 
   const loadDisplayedItems = useCallback(async () => {
-    const [words, sentences] = await Promise.all([
+    const [words, sentences, wordsCompleted, sentencesCompleted] = await Promise.all([
       StorageService.getDisplayedWords(),
       StorageService.getDisplayedSentences(),
+      StorageService.isWordsCompletedToday(),
+      StorageService.isSentencesCompletedToday(),
     ]);
     setDisplayedWords(words);
     setDisplayedSentences(sentences);
+    setWordsCompletedToday(wordsCompleted);
+    setSentencesCompletedToday(sentencesCompleted);
   }, []);
-
-  useEffect(() => {
-    loadDisplayedItems();
-  }, [loadDisplayedItems]);
 
   useFocusEffect(
     useCallback(() => {
@@ -58,7 +62,7 @@ export default function NoRepScreen() {
       setDisplayedWords(freshWords);
       
       router.push({
-        pathname: '/reading/display',
+        pathname: '/display',
         params: {
           items: JSON.stringify(freshWords),
           color: selectedColor,
@@ -70,7 +74,7 @@ export default function NoRepScreen() {
       setDisplayedWords([...displayedWords, ...randomWords]);
       
       router.push({
-        pathname: '/reading/display',
+        pathname: '/display',
         params: {
           items: JSON.stringify(randomWords),
           color: selectedColor,
@@ -78,6 +82,9 @@ export default function NoRepScreen() {
         },
       });
     }
+    
+    await StorageService.markWordsCompleted();
+    setWordsCompletedToday(true);
   };
 
   const handleSentencesPress = async () => {
@@ -91,7 +98,7 @@ export default function NoRepScreen() {
       setDisplayedSentences(freshSentences);
       
       router.push({
-        pathname: '/reading/display',
+        pathname: '/display',
         params: {
           items: JSON.stringify(freshSentences),
           color: selectedColor,
@@ -103,7 +110,7 @@ export default function NoRepScreen() {
       setDisplayedSentences([...displayedSentences, ...randomSentences]);
       
       router.push({
-        pathname: '/reading/display',
+        pathname: '/display',
         params: {
           items: JSON.stringify(randomSentences),
           color: selectedColor,
@@ -111,10 +118,13 @@ export default function NoRepScreen() {
         },
       });
     }
+    
+    await StorageService.markSentencesCompleted();
+    setSentencesCompletedToday(true);
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { marginBottom: tabBarHeight }]}>
       <ThemedView style={styles.textContainer}>
         <ThemedText style={styles.counter}>
           {t('noRep.knownWordsCount', { count: displayedWords.length, total: wordsData.length })}
@@ -124,17 +134,16 @@ export default function NoRepScreen() {
         </ThemedText>
       </ThemedView>
 
-
       <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
         <TrackButton 
           title={t('noRep.words')}
-          isCompleted={false}
+          isCompleted={wordsCompletedToday}
           onPress={handleWordsPress}
         />
       
         <TrackButton 
           title={t('noRep.sentences')}
-          isCompleted={false}
+          isCompleted={sentencesCompletedToday}
           onPress={handleSentencesPress}
         />
       </ThemedView>

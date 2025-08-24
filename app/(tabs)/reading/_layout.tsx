@@ -14,10 +14,6 @@ export default function ReadingLayout() {
           headerBackTitle: t('noRep.back')
         }} 
       />
-      <Stack.Screen 
-        name="display" 
-        options={{ headerShown: false }}
-      />
     </Stack>
   );
 }
