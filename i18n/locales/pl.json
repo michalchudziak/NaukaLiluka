@@ -9,6 +9,8 @@
   },
   "noRep": {
     "words": "Słowa",
-    "sentences": "Zdania"
+    "sentences": "Zdania",
+    "title": "Ścieka bez powtórzeń",
+    "back": "Wróć"
   }
 }

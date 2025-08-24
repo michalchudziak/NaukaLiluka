@@ -3,48 +3,25 @@ import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useRouter } from 'expo-router';
-import wordsData from '@/content/words.json';
-import sentencesData from '@/content/sentences.json';
 
-export default function NoRepScreen() {
+export default function ReadingScreen() {
   const { width, height } = useWindowDimensions();
   const isHorizontal = width > height;
   const { t } = useTranslation();
   const router = useRouter();
 
-  const handleWordsPress = () => {
-    router.push({
-      pathname: '/reading/display',
-      params: {
-        items: JSON.stringify(wordsData),
-        color: '#007AFF'
-      }
-    });
-  };
-
-  const handleSentencesPress = () => {
-    router.push({
-      pathname: '/reading/display',
-      params: {
-        items: JSON.stringify(sentencesData.sentences),
-        color: '#34C759'
-      }
-    });
-  };
-
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
         <TrackButton 
-          title={t('noRep.words')}
+          title={t('reading.bookTrack')}
           isCompleted={false}
-          onPress={handleWordsPress}
         />
         
         <TrackButton 
-          title={t('noRep.sentences')}
+          title={t('reading.noRepeatTrack')}
           isCompleted={false}
-          onPress={handleSentencesPress}
+          onPress={() => router.push('/reading/no-rep')}
         />
       </ThemedView>
     </ThemedView>
