@@ -1,47 +1,51 @@
-{
-    "book": {
-        "title": "Rodzina",
-        "pages": [
+import { Book } from '@/types/book';
+
+const rodzina: Book = {
+    book: {
+        title: "Rodzina",
+        pages: [
             {
-                "sentences": [
+                sentences: [
                     "To jest Karol."
                 ],
-                "image": "karol.jpg"
+                image: require('./karol.jpg')
             },
             {
-                "sentences": [
+                sentences: [
                     "To jest Karolcia."
                 ],
-                "image": "karolcia.jpg"
+                image: require('./karolcia.jpg')
             },
             {
-                "sentences": [
+                sentences: [
                     "To jest mama."
                 ],
-                "image": "mama.jpg"
+                image: require('./mama.jpg')
             },
             {
-                "sentences": [
+                sentences: [
                     "To jest tata."
                 ],
-                "image": "tata.jpg"
+                image: require('./tata.jpg')
             },
             {
-                "sentences": [
+                sentences: [
                     "To jest Lora."
                 ],
-                "image": "lora.jpg"
+                image: require('./lora.jpg')
             }
         ]
     },
-    "words": [
+    words: [
         ["brudna", "jest", "Karol"],
         ["Lora", "mama", "Gdzie"],
         ["To", "tata", "Karolcia"]
     ],
-    "sentences": [
+    sentences: [
         [],
         ["Gdzie jest mama?", "Gdzie jest Karol?", "Gdzie jest Lora?"],
         ["Karolcia jest brudna.", "Lora jest brudna.", "Gdzie jest tata?"]
     ]
-}
+};
+
+export default rodzina;

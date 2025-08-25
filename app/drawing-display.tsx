@@ -30,7 +30,6 @@ export default function DrawingDisplayScreen() {
     }
   }, [imageSet, router]);
 
-  // Mark presentation once on mount
   useEffect(() => {
     if (imageSet && !hasMarkedRef.current) {
       hasMarkedRef.current = true;
@@ -38,21 +37,13 @@ export default function DrawingDisplayScreen() {
     }
   }, [imageSet, drawingsStore]);
 
-  // Handle image rotation
   useEffect(() => {
     if (!imageSet) {
       return;
     }
     
     intervalRef.current = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => {
-        const nextIndex = prevIndex + 1;
-        if (nextIndex >= imageSet.images.length) {
-          router.back();
-          return prevIndex;
-        }
-        return nextIndex;
-      });
+      setCurrentImageIndex((prevIndex) => prevIndex + 1);
     }, DefaultSettings.drawings.interval);
     
     return () => {
@@ -61,32 +52,26 @@ export default function DrawingDisplayScreen() {
       }
     };
   }, [imageSet, router]);
+
+  useEffect(() => {
+    if (!imageSet) {
+      return;
+    }
+
+    if (currentImageIndex >= imageSet.images.length) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      router.back();
+    }
+  }, [currentImageIndex]);
   
-  if (!imageSet) {
+  if (!imageSet || currentImageIndex >= imageSet.images.length) {
     return null;
   }
   
   const handlePress = () => {
     router.back();
-  };
-  
-  const getImageSource = (imageName: string) => {
-    const imageMap: { [key: string]: any } = {
-      'animals1/boar-track.png': require('@/content/drawings/animals1/boar-track.png'),
-      'animals1/bull-track.png': require('@/content/drawings/animals1/bull-track.png'),
-      'animals1/fox-track.png': require('@/content/drawings/animals1/fox-track.png'),
-      'animals1/monkey-track.png': require('@/content/drawings/animals1/monkey-track.png'),
-      'animals1/mouse-track.png': require('@/content/drawings/animals1/mouse-track.png'),
-      'animals1/rhino-track.png': require('@/content/drawings/animals1/rhino-track.png'),
-      'animals2/badger-track.png': require('@/content/drawings/animals2/badger-track.png'),
-      'animals2/frog-track.png': require('@/content/drawings/animals2/frog-track.png'),
-      'animals2/hare-track.png': require('@/content/drawings/animals2/hare-track.png'),
-      'animals2/horse-track.png': require('@/content/drawings/animals2/horse-track.png'),
-      'animals2/polecat-track.png': require('@/content/drawings/animals2/polecat-track.png'),
-      'animals2/wolf-track.png': require('@/content/drawings/animals2/wolf-track.png'),
-    };
-    
-    return imageMap[imageName];
   };
   
   if (currentImageIndex === -1) {
@@ -103,7 +88,7 @@ export default function DrawingDisplayScreen() {
     <Pressable onPress={handlePress} style={styles.container}>
       <ThemedView style={styles.content}>
         <Image
-          source={getImageSource(currentImage.image)}
+          source={currentImage.image}
           style={[styles.image, { width: imageWidth }]}
           resizeMode="contain"
         />

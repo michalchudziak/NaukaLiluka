@@ -1,6 +1,8 @@
+import { ImageSourcePropType } from 'react-native';
+
 export interface BookPage {
   sentences: string[];
-  image: string;
+  image: ImageSourcePropType;
 }
 
 export interface BookContent {

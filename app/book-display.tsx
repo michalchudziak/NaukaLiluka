@@ -71,30 +71,10 @@ export default function BookDisplayScreen() {
     }
     
     if (displayState === 'image') {
-      // Map image filename to require statement
-      const getImageSource = (imageName: string) => {
-        const imageMap: { [key: string]: any } = {
-          'karol.jpg': require('@/content/books/rodzina/karol.jpg'),
-          'karolcia.jpg': require('@/content/books/rodzina/karolcia.jpg'),
-          'mama.jpg': require('@/content/books/rodzina/mama.jpg'),
-          'tata.jpg': require('@/content/books/rodzina/tata.jpg'),
-          'lora.jpg': require('@/content/books/rodzina/lora.jpg'),
-        };
-        return imageMap[imageName] || null;
-      };
-      
-      const imageSource = getImageSource(currentPage.image);
-      
-      if (!imageSource) {
-        // If image not found, move to next page
-        handlePress();
-        return null;
-      }
-      
       return (
         <ThemedView style={styles.imageContainer}>
           <Image 
-            source={imageSource}
+            source={currentPage.image}
             style={styles.image}
             resizeMode="contain"
           />
