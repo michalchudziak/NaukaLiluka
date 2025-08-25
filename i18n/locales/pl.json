@@ -1,7 +1,13 @@
 {
   "tabs": {
     "reading": "Czytanie",
-    "pictures": "Obrazki"
+    "pictures": "Obrazki",
+    "settings": "Ustawienia"
+  },
+  "common": {
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "ok": "OK"
   },
   "reading": {
     "bookTrack": "Ścieka książkowa",
@@ -37,5 +43,67 @@
     "selectColor": "Wybierz kolor",
     "loading": "Ładowanie planu dnia...",
     "noContent": "Brak dostępnych książek do treningu"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "storage": {
+      "sectionTitle": "Zarządzanie danymi"
+    },
+    "clearStorage": {
+      "title": "Wyczyść dane",
+      "subtitle": "Usuń zapisane postępy i dane aplikacji",
+      "warning": "Uwaga!",
+      "warningDescription": "Usunięcie danych jest nieodwracalne. Wszystkie twoje postępy zostaną utracone.",
+      "selectiveTitle": "Wybiórcze czyszczenie",
+      "completeTitle": "Całkowite czyszczenie",
+      "clearBooks": "Wyczyść postępy książek",
+      "clearNoRep": "Wyczyść ściekę bez powtórzeń",
+      "clearAll": "Wyczyść wszystkie dane",
+      "confirmTitle": "Potwierdzenie",
+      "confirmMessage": "Czy na pewno chcesz usunąć wszystkie dane aplikacji? Ta operacja jest nieodwracalna.",
+      "confirmBookTitle": "Usunąć postępy książek?",
+      "confirmBookMessage": "Wszystkie postępy w książkach zostaną utracone.",
+      "confirmNoRepTitle": "Usunąć dane bez powtórzeń?",
+      "confirmNoRepMessage": "Wszystkie postępy w ściece bez powtórzeń zostaną utracone.",
+      "successTitle": "Sukces",
+      "successMessage": "Wszystkie dane zostały usunięte.",
+      "bookClearedMessage": "Postępy książek zostały usunięte.",
+      "noRepClearedMessage": "Dane ścieki bez powtórzeń zostały usunięte.",
+      "errorTitle": "Błąd",
+      "errorMessage": "Wystąpił błąd podczas usuwania danych."
+    },
+    "viewStorage": {
+      "title": "Podgląd danych",
+      "subtitle": "Zobacz zapisane dane aplikacji",
+      "bookProgressTitle": "Postępy książek",
+      "dailyPlanTitle": "Plan dzienny",
+      "noRepProgressTitle": "Ścieka bez powtórzeń",
+      "routinesTitle": "Aktywność dzienna",
+      "storageInfo": "Informacje o pamięci",
+      "noBookProgress": "Brak postępów w książkach",
+      "wordsProgress": "Ukończone słowa",
+      "sentencesProgress": "Ukończone zdania",
+      "triples": "trójek",
+      "completed": "Ukończono",
+      "noDailyPlan": "Brak aktywnego planu dziennego",
+      "planDate": "Data planu",
+      "today": "Dzisiaj",
+      "book": "Książka",
+      "words": "Słowa",
+      "sentences": "Zdania",
+      "wordsCompleted": "Ukończonych słów",
+      "sentencesCompleted": "Ukończonych zdań",
+      "recentWords": "Ostatnie słowa",
+      "recentSentences": "Ostatnie zdania",
+      "todayWords": "Dzisiejsze słowa",
+      "todaySentences": "Dzisiejsze zdania",
+      "lastWordCompletion": "Ostatnie słowa",
+      "lastSentenceCompletion": "Ostatnie zdania",
+      "totalCompletions": "Łącznie ukończeń",
+      "totalKeys": "Liczba kluczy",
+      "completedWords": "Ukończone słowa",
+      "completedSentences": "Ukończone zdania",
+      "andMore": "i {{count}} więcej"
+    }
   }
 }
