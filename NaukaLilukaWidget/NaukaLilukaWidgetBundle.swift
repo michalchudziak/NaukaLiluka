@@ -2,8 +2,8 @@ import WidgetKit
 import SwiftUI
 
 @main
-struct HelloWorldWidgetBundle: WidgetBundle {
+struct NaukaLilukaWidgetBundle: WidgetBundle {
     var body: some Widget {
-        HelloWorldWidget()
+        RoutineWidget()
     }
 }

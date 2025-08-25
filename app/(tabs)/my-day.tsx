@@ -4,10 +4,11 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
 import { useDrawingsStore } from '@/store/drawings-store';
 import { useNoRepStore } from '@/store/no-rep-store';
+import { widgetService } from '@/services/widgetService';
 import { isToday } from 'date-fns';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Platform } from 'react-native';
 
 export default function MyDayScreen() {
   const { t } = useTranslation();
@@ -23,34 +24,94 @@ export default function MyDayScreen() {
   const [isDrawingsCompleted, setIsDrawingsCompleted] = useState(false);
 
   useEffect(() => {
-    const checkCompletions = () => {
-      setIsNoRepCompleted(isNoRepPathCompletedToday());
+    // Initialize widget service on mount
+    if (Platform.OS === 'ios') {
+      widgetService.initialize();
+    }
+
+    const checkCompletions = async () => {
+      const routine1 = isNoRepPathCompletedToday();
+      setIsNoRepCompleted(routine1);
 
       const todayCompletions = bookStore.bookTrackSessionCompletions.filter(c => isToday(c.timestamp));
       const plan = bookStore.dailyPlan;
+
+      let routine2 = false;
+      let routine3 = false;
+      let routine4 = false;
 
       if (plan && isToday(plan.timestamp)) {
         const session1WordsCompleted = todayCompletions.some(c => c.session === 'session1' && c.type === 'words');
         const session1SentencesNeeded = plan.sessions.session1.sentences.length > 0;
         const session1SentencesCompleted = !session1SentencesNeeded || todayCompletions.some(c => c.session === 'session1' && c.type === 'sentences');
-        setIsSession1Completed(session1WordsCompleted && session1SentencesCompleted);
+        routine2 = session1WordsCompleted && session1SentencesCompleted;
+        setIsSession1Completed(routine2);
 
         const session2WordsCompleted = todayCompletions.some(c => c.session === 'session2' && c.type === 'words');
         const session2SentencesNeeded = plan.sessions.session2.sentences.length > 0;
         const session2SentencesCompleted = !session2SentencesNeeded || todayCompletions.some(c => c.session === 'session2' && c.type === 'sentences');
-        setIsSession2Completed(session2WordsCompleted && session2SentencesCompleted);
+        routine3 = session2WordsCompleted && session2SentencesCompleted;
+        setIsSession2Completed(routine3);
 
         const session3WordsCompleted = todayCompletions.some(c => c.session === 'session3' && c.type === 'words');
         const session3SentencesNeeded = plan.sessions.session3.sentences.length > 0;
         const session3SentencesCompleted = !session3SentencesNeeded || todayCompletions.some(c => c.session === 'session3' && c.type === 'sentences');
-        setIsSession3Completed(session3WordsCompleted && session3SentencesCompleted);
+        routine4 = session3WordsCompleted && session3SentencesCompleted;
+        setIsSession3Completed(routine4);
       } else {
         setIsSession1Completed(false);
         setIsSession2Completed(false);
         setIsSession3Completed(false);
       }
 
-      setIsDrawingsCompleted(drawingsStore.getTodayPresentationCount() > 0);
+      const routine5 = drawingsStore.getTodayPresentationCount() > 0;
+      setIsDrawingsCompleted(routine5);
+
+      // Update widget on iOS
+      if (Platform.OS === 'ios') {
+        try {
+          // Update each routine state in the widget
+          const currentState = await widgetService.getRoutineState();
+          
+          if (currentState.routine1 !== routine1) {
+            if (routine1) {
+              await widgetService.completeRoutine(1);
+            } else {
+              await widgetService.resetRoutine(1);
+            }
+          }
+          if (currentState.routine2 !== routine2) {
+            if (routine2) {
+              await widgetService.completeRoutine(2);
+            } else {
+              await widgetService.resetRoutine(2);
+            }
+          }
+          if (currentState.routine3 !== routine3) {
+            if (routine3) {
+              await widgetService.completeRoutine(3);
+            } else {
+              await widgetService.resetRoutine(3);
+            }
+          }
+          if (currentState.routine4 !== routine4) {
+            if (routine4) {
+              await widgetService.completeRoutine(4);
+            } else {
+              await widgetService.resetRoutine(4);
+            }
+          }
+          if (currentState.routine5 !== routine5) {
+            if (routine5) {
+              await widgetService.completeRoutine(5);
+            } else {
+              await widgetService.resetRoutine(5);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to update widget:', error);
+        }
+      }
     };
 
     checkCompletions();
