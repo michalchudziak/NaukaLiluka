@@ -4,7 +4,9 @@ import { ThemedView } from '@/components/ThemedView';
 import { useTranslation } from '@/hooks/useTranslation';
 import { AsyncStorageService } from '@/services/async-storage';
 import { useBookStore } from '@/store/book-store';
+import { useDrawingsStore } from '@/store/drawings-store';
 import { useNoRepStore } from '@/store/no-rep-store';
+import { useSettingsStore } from '@/store/settings-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -17,6 +19,8 @@ export default function ClearStorageScreen() {
   
   const bookStore = useBookStore();
   const noRepStore = useNoRepStore();
+  const drawingsStore = useDrawingsStore();
+  const settingsStore = useSettingsStore();
 
   const handleClearAll = async () => {
     Alert.alert(
@@ -33,18 +37,19 @@ export default function ClearStorageScreen() {
           onPress: async () => {
             setIsClearing(true);
             try {
-              // Clear all AsyncStorage
+              // Clear all AsyncStorage - this wipes everything
               await AsyncStorage.clear();
               
-              // Reset all stores to initial state
-              bookStore.clearDailyPlan();
-              noRepStore.clearAll();
-              
-              // Reinitialize stores
+              // Reinitialize all stores with default values
               await Promise.all([
                 bookStore.hydrate(),
                 noRepStore.hydrate(),
+                drawingsStore.hydrate(),
+                settingsStore.hydrate()
               ]);
+              
+              // Reset stores to ensure clean state
+              bookStore.initializeBookProgress();
               
               Alert.alert(
                 t('settings.clearStorage.successTitle'),
@@ -81,13 +86,98 @@ export default function ClearStorageScreen() {
           onPress: async () => {
             setIsClearing(true);
             try {
-              bookStore.clearDailyPlan();
+              // Clear all book-related storage keys
               await AsyncStorageService.clear('progress.books');
+              await AsyncStorageService.clear('progress.books.daily-plan');
+              await AsyncStorageService.clear('routines.reading.book-track.sessions');
+              
+              // Reinitialize book store
               await bookStore.hydrate();
+              bookStore.initializeBookProgress();
               
               Alert.alert(
                 t('settings.clearStorage.successTitle'),
                 t('settings.clearStorage.bookClearedMessage')
+              );
+            } catch (error) {
+              console.error('Error clearing storage:', error);
+              Alert.alert(
+                t('settings.clearStorage.errorTitle'),
+                t('settings.clearStorage.errorMessage')
+              );
+            } finally {
+              setIsClearing(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleClearDrawings = async () => {
+    Alert.alert(
+      t('settings.clearStorage.confirmDrawingsTitle'),
+      t('settings.clearStorage.confirmDrawingsMessage'),
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('common.confirm'),
+          style: 'destructive',
+          onPress: async () => {
+            setIsClearing(true);
+            try {
+              // Clear drawings storage
+              await AsyncStorageService.clear('progress.drawings.presentations');
+              
+              // Reinitialize drawings store
+              await drawingsStore.hydrate();
+              
+              Alert.alert(
+                t('settings.clearStorage.successTitle'),
+                t('settings.clearStorage.drawingsClearedMessage')
+              );
+            } catch (error) {
+              console.error('Error clearing storage:', error);
+              Alert.alert(
+                t('settings.clearStorage.errorTitle'),
+                t('settings.clearStorage.errorMessage')
+              );
+            } finally {
+              setIsClearing(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleClearSettings = async () => {
+    Alert.alert(
+      t('settings.clearStorage.confirmSettingsTitle'),
+      t('settings.clearStorage.confirmSettingsMessage'),
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('common.confirm'),
+          style: 'destructive',
+          onPress: async () => {
+            setIsClearing(true);
+            try {
+              // Clear settings storage
+              await AsyncStorageService.clear('settings');
+              
+              // Reinitialize settings store with defaults
+              await settingsStore.hydrate();
+              
+              Alert.alert(
+                t('settings.clearStorage.successTitle'),
+                t('settings.clearStorage.settingsClearedMessage')
               );
             } catch (error) {
               console.error('Error clearing storage:', error);
@@ -119,9 +209,13 @@ export default function ClearStorageScreen() {
           onPress: async () => {
             setIsClearing(true);
             try {
-              noRepStore.clearAll();
+              // Clear all no-rep related storage keys
+              await AsyncStorageService.clear('progress.reading.no-rep.words');
+              await AsyncStorageService.clear('progress.reading.no-rep.sentences');
               await AsyncStorageService.clear('routines.reading.no-rep.words');
               await AsyncStorageService.clear('routines.reading.no-rep.sentences');
+              
+              // Reinitialize no-rep store
               await noRepStore.hydrate();
               
               Alert.alert(
@@ -171,6 +265,20 @@ export default function ClearStorageScreen() {
             <Button
               title={t('settings.clearStorage.clearNoRep')}
               onPress={handleClearNoRep}
+              disabled={isClearing}
+              style={styles.button}
+            />
+            
+            <Button
+              title={t('settings.clearStorage.clearDrawings')}
+              onPress={handleClearDrawings}
+              disabled={isClearing}
+              style={styles.button}
+            />
+            
+            <Button
+              title={t('settings.clearStorage.clearSettings')}
+              onPress={handleClearSettings}
               disabled={isClearing}
               style={styles.button}
             />
