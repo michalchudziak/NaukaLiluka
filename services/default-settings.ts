@@ -11,5 +11,8 @@ export const DefaultSettings = {
         books: {
             allowAllBooks: true,
         }
-    }  
+    },
+    drawings: {
+        showCaptions: true,
+    }
 }

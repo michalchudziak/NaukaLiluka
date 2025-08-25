@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useBookStore } from './book-store';
+import { useDrawingsStore } from './drawings-store';
 import { useNoRepStore } from './no-rep-store';
 import { useRoutinesStore } from './routines-store';
 
@@ -11,7 +12,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       await Promise.all([
         useNoRepStore.getState().hydrate(),
         useRoutinesStore.getState().hydrate(),
-        useBookStore.getState().hydrate()
+        useBookStore.getState().hydrate(),
+        useDrawingsStore.getState().hydrate()
       ]);
       setIsHydrated(true);
     };

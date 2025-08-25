@@ -110,5 +110,9 @@
       "completedSentences": "Ukończone zdania",
       "andMore": "i {{count}} więcej"
     }
+  },
+  "drawings": {
+    "totalToday": "Prezentacje dzisiaj: {{count}}",
+    "presentedToday": "Pokazane dzisiaj: {{count}} razy"
   }
 }
