@@ -17,12 +17,11 @@ export default function BooksDailyScreen() {
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [isLoading, setIsLoading] = useState(true);
   
-  const { dailyPlan, getDailyContent, markSessionItemCompleted, hydrate } = useBookStore();
+  const { dailyPlan, getDailyContent, markSessionItemCompleted } = useBookStore();
 
   useEffect(() => {
     const initializeDaily = async () => {
       setIsLoading(true);
-      await hydrate();
       await getDailyContent();
       setIsLoading(false);
     };

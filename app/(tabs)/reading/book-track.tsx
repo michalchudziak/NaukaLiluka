@@ -21,8 +21,7 @@ export default function BookTrackScreen() {
   };
 
   const handleBooksPress = () => {
-    // TODO: Implement books functionality
-
+    router.push('/reading/books-list');
   };
 
   return (

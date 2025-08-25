@@ -28,6 +28,13 @@ export default function ReadingLayout() {
           headerBackTitle: t('booksDaily.back')
         }} 
       />
+      <Stack.Screen 
+        name="books-list" 
+        options={{ 
+          title: t('booksList.title'),
+          headerBackTitle: t('booksList.back')
+        }} 
+      />
     </Stack>
   );
 }

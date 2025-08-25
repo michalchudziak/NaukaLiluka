@@ -12,6 +12,7 @@
   "reading": {
     "bookTrack": "Ścieka książkowa",
     "noRepeatTrack": "Ścieka bez powtórzeń",
+    "booksList": "Lista książek",
     "selectColor": "Wybierz kolor",
     "wordsTrack": "Słowa",
     "sentencesTrack": "Zdania"
@@ -43,6 +44,10 @@
     "selectColor": "Wybierz kolor",
     "loading": "Ładowanie planu dnia...",
     "noContent": "Brak dostępnych książek do treningu"
+  },
+  "booksList": {
+    "title": "Lista książek",
+    "back": "Wróć"
   },
   "settings": {
     "title": "Ustawienia",
