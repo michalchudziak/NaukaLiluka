@@ -19,12 +19,13 @@ export default function ReadingScreen() {
         <TrackButton 
           title={t('reading.bookTrack')}
           isCompleted={false}
+          onPress={() => router.push('/reading/book-track')}
         />
         
         <TrackButton 
           title={t('reading.noRepeatTrack')}
           isCompleted={isNoRepPathCompleted}
-          onPress={() => router.push('/reading/no-rep')}
+          onPress={() => router.push('/reading/no-rep-track')}
         />
       </ThemedView>
     </ThemedView>

@@ -8,7 +8,7 @@ export default function ReadingLayout() {
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen 
-        name="no-rep" 
+        name="no-rep-track" 
         options={{ 
           title: t('noRep.title'),
           headerBackTitle: t('noRep.back')

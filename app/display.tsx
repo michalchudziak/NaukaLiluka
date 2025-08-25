@@ -23,7 +23,7 @@ export default function DisplayScreen() {
     if (parsedItems.length === 0) return;
 
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prevIndex) => {console.log(prevIndex + 1); return prevIndex + 1});
+      setCurrentIndex((prevIndex) =>  prevIndex + 1);
     }, DefaultSettings.reading.interval[params.type as 'words' | 'sentences']);
 
     return () => {

@@ -21,7 +21,7 @@ export default function BookTrackScreen() {
 
   const handleBooksPress = () => {
     // TODO: Implement books functionality
-    console.log('Books pressed');
+
   };
 
   return (
