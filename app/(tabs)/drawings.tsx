@@ -3,15 +3,20 @@ import { ThemedView } from '@/components/ThemedView';
 import drawingsData from '@/content/drawings/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useDrawingsStore } from '@/store/drawings-store';
+import { useRouter } from 'expo-router';
 import { FlatList, Pressable, SafeAreaView, StyleSheet } from 'react-native';
 
 export default function DrawingsScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const drawingsStore = useDrawingsStore();
   const todayTotal = drawingsStore.getTodayPresentationCount();
 
   const handleSetPress = (setTitle: string) => {
-    drawingsStore.markSetPresented(setTitle);
+    router.push({
+      pathname: '/drawing-display',
+      params: { setId: setTitle }
+    });
   };
 
   const renderItem = ({ item }: { item: typeof drawingsData[0] }) => {
