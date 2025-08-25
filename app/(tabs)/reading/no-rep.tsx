@@ -4,13 +4,12 @@ import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import sentencesData from '@/content/no-rep/sentences.json';
 import wordsData from '@/content/no-rep/words.json';
-import { chooseAndMarkSentences, chooseAndMarkWords } from '@/core/no-rep';
 import { useTranslation } from '@/hooks/useTranslation';
-import { StorageService } from '@/services/storage';
+import { useNoRepStore } from '@/store/no-rep-store';
+import { useRoutinesStore } from '@/store/routines-store';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import { Alert, StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function NoRepScreen() {
@@ -19,31 +18,15 @@ export default function NoRepScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState('#000000');
-  const [displayedWords, setDisplayedWords] = useState<string[]>([]);
-  const [displayedSentences, setDisplayedSentences] = useState<string[]>([]);
-  const [wordsCompletedToday, setWordsCompletedToday] = useState(false);
-  const [sentencesCompletedToday, setSentencesCompletedToday] = useState(false);
+  const displayedWords = useNoRepStore(state => state.displayedWords);
+  const displayedSentences = useNoRepStore(state => state.displayedSentences);
+  const chooseAndMarkWords = useNoRepStore(state => state.chooseAndMarkWords);
+  const chooseAndMarkSentences = useNoRepStore(state => state.chooseAndMarkSentences);
+  const isWordsCompletedToday = useRoutinesStore(state => state.isWordsCompletedToday);
+  const isSentencesCompletedToday = useRoutinesStore(state => state.isSentencesCompletedToday);
+  const wordsCompletedToday = isWordsCompletedToday();
+  const sentencesCompletedToday = isSentencesCompletedToday();
   const tabBarHeight = useBottomTabBarHeight();
-
-  const loadDisplayedItems = useCallback(async () => {
-    const [words, sentences, wordsCompleted, sentencesCompleted] = await Promise.all([
-      StorageService.getDisplayedWords(),
-      StorageService.getDisplayedSentences(),
-      StorageService.isWordsCompletedToday(),
-      StorageService.isSentencesCompletedToday(),
-    ]);
-    setDisplayedWords(words);
-    setDisplayedSentences(sentences);
-    setWordsCompletedToday(wordsCompleted);
-    setSentencesCompletedToday(sentencesCompleted);
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadDisplayedItems();
-      return () => {};
-    }, [loadDisplayedItems])
-  );
 
   const handleWordsPress = async () => {
     const randomWords = await chooseAndMarkWords();
@@ -61,9 +44,6 @@ export default function NoRepScreen() {
         type: 'words',
       },
     });
-
-    setDisplayedWords(randomWords);
-    setWordsCompletedToday(true);
   };
 
   const handleSentencesPress = async () => {
@@ -82,9 +62,6 @@ export default function NoRepScreen() {
         type: 'sentences',
       },
     });
-
-    setDisplayedSentences(randomSentences);
-    setSentencesCompletedToday(true);
   };
 
   return (

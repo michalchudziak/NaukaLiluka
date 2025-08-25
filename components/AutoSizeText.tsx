@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Text, View, StyleSheet, Dimensions, TextProps } from 'react-native';
+import { Dimensions, StyleSheet, Text, TextProps, View } from 'react-native';
 
 interface AutoSizeTextProps extends Omit<TextProps, 'style'> {
   children: string;
@@ -8,28 +8,23 @@ interface AutoSizeTextProps extends Omit<TextProps, 'style'> {
   maxLength?: number;
 }
 
-const getFontSizeForText = (text: string, screenWidth: number): number => {
-  const length = text.length;
-  const baseWidth = screenWidth * 0.8;
-  
-  if (length <= 5) {
-    return Math.min(120, baseWidth / 3);
-  } else if (length <= 10) {
-    return Math.min(90, baseWidth / 5);
-  } else if (length <= 15) {
-    return Math.min(70, baseWidth / 7);
-  } else if (length <= 25) {
-    return Math.min(50, baseWidth / 10);
-  } else if (length <= 40) {
-    return Math.min(36, baseWidth / 15);
-  } else if (length <= 60) {
-    return Math.min(28, baseWidth / 20);
-  } else if (length <= 80) {
-    return Math.min(22, baseWidth / 25);
-  } else if (length <= 100) {
-    return Math.min(18, baseWidth / 30);
+const getFontSizeForText = (text: string, screenWidth: number): number => {  
+  if (screenWidth < 448) {
+    return 80;
+  } else if (screenWidth > 448 && screenWidth < 768) {
+    return 100;
+  } else if (screenWidth > 768 && screenWidth < 1024) {
+    return 120;
+  } else if (screenWidth > 1024 && screenWidth < 1280) {
+    return 140;
+  } else if (screenWidth > 1280 && screenWidth < 1536) {  
+    return 160;
+  } else if (screenWidth > 1536 && screenWidth < 1920) {
+    return 180;
+  } else if (screenWidth > 1920 && screenWidth < 2560) {
+    return 200;
   } else {
-    return Math.min(14, baseWidth / 40);
+    return 220;
   }
 };
 

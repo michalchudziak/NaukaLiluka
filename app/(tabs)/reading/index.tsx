@@ -1,10 +1,8 @@
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
-import { StorageService } from '@/services/storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useRoutinesStore } from '@/store/routines-store';
 import { useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function ReadingScreen() {
@@ -12,18 +10,8 @@ export default function ReadingScreen() {
   const isHorizontal = width > height;
   const { t } = useTranslation();
   const router = useRouter();
-  const [isNoRepPathCompleted, setIsNoRepPathCompleted] = useState(false);
-
-  useFocusEffect(
-    useCallback(() => {
-      const load = async () => {
-        const isCompleted = await StorageService.isNoRepPathCompletedToday();
-        setIsNoRepPathCompleted(isCompleted);
-      }
-      load();
-      return () => {};
-    }, [])
-  );
+  const isNoRepPathCompletedToday = useRoutinesStore(state => state.isNoRepPathCompletedToday);
+  const isNoRepPathCompleted = isNoRepPathCompletedToday();
 
   return (
     <ThemedView style={styles.container}>
