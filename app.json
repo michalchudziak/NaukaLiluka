@@ -4,7 +4,7 @@
     "slug": "NaukaLiluka",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/app-icon.png",
     "scheme": "naukaliluka",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -30,10 +30,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/splash-screen.jpg",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#d303fc"
         }
       ]
     ],
