@@ -14,14 +14,14 @@ interface BookProgress {
   isCompleted: boolean;
 }
 
-interface SessionContent {
+export interface SessionContent {
   words: string[];
   sentences: string[];
   isWordsCompleted: boolean;
   isSentencesCompleted: boolean;
 }
 
-interface DailyPlan {
+export interface DailyPlan {
   date: string;
   bookId: string;
   selectedWordTripleIndex: number;

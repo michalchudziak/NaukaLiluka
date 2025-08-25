@@ -10,15 +10,16 @@ export default function ReadingScreen() {
   const isHorizontal = width > height;
   const { t } = useTranslation();
   const router = useRouter();
-  const isNoRepPathCompletedToday = useRoutinesStore(state => state.isNoRepPathCompletedToday);
-  const isNoRepPathCompleted = isNoRepPathCompletedToday();
+  const routinesStore = useRoutinesStore();
+  const isNoRepPathCompleted = routinesStore.isNoRepPathCompletedToday();
+  const isBookTrackCompleted = routinesStore.isBookTrackCompletedToday();
 
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
         <TrackButton 
           title={t('reading.bookTrack')}
-          isCompleted={false}
+          isCompleted={isBookTrackCompleted}
           onPress={() => router.push('/reading/book-track')}
         />
         

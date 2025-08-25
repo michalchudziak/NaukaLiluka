@@ -2,6 +2,7 @@ import { Button } from '@/components/Button';
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useRoutinesStore } from '@/store/routines-store';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { StyleSheet, useWindowDimensions } from 'react-native';
@@ -12,6 +13,8 @@ export default function BookTrackScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
+  const isBookTrackCompletedToday = useRoutinesStore(state => state.isBookTrackCompletedToday);
+  const isTrainingCompleted = isBookTrackCompletedToday();
 
   const handleTrainingPress = () => {
     router.push('/reading/books-daily');
@@ -27,7 +30,7 @@ export default function BookTrackScreen() {
       <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
         <TrackButton 
           title={t('bookTrack.training')}
-          isCompleted={false}
+          isCompleted={isTrainingCompleted}
           onPress={handleTrainingPress}
         />
       
