@@ -35,24 +35,13 @@
         ]
     },
     "words": [
-        "To",
-        "jest",
-        "Karol",
-        "Karolcia",
-        "mama",
-        "tata",
-        "Lora",
-        "brudna",
-        "Gdzie"
+        ["brudna", "jest", "Karol"],
+        ["Lora", "mama", "Gdzie"],
+        ["To", "tata", "Karolcia"]
     ],
     "sentences": [
-        "Gdzie jest mama?",
-        "Gdzie jest tata?",
-        "Gdzie jest Karol?",
-        "Gdzie jest Karolcia?",
-        "Gdzie jest Lora?",
-        "To jest brudna mama.",
-        "To jest brudny tata.",
-        "To jest brudna Karolcia."
+        ["Gdzie jest mama?", "Gdzie jest Karol?", "Gdzie jest Lora?"],
+        ["Karolcia jest brudna.", "Lora jest brudna.", "To jest brudna mama."],
+        ["Gdzie jest tata?", "To jest brudna Karolcia.", "To jest brudna Lora."]
     ]
 }

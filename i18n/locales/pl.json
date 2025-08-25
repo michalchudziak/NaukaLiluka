@@ -34,6 +34,8 @@
     "session3": "Sesja 3",
     "words": "Słowa",
     "sentences": "Zdania",
-    "selectColor": "Wybierz kolor"
+    "selectColor": "Wybierz kolor",
+    "loading": "Ładowanie planu dnia...",
+    "noContent": "Brak dostępnych książek do treningu"
   }
 }
