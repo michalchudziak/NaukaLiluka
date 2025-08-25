@@ -1,5 +1,5 @@
-import sentencesData from '@/content/sentences.json';
-import wordsData from '@/content/words.json';
+import sentencesData from '@/content/no-rep/sentences.json';
+import wordsData from '@/content/no-rep/words.json';
 import { DefaultSettings } from '@/services/default-settings';
 import { StorageService } from '@/services/storage';
 

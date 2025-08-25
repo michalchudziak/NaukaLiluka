@@ -1,0 +1,58 @@
+{
+    "book": {
+        "title": "Rodzina",
+        "pages": [
+            {
+                "sentences": [
+                    "To jest Karol."
+                ],
+                "image": ""
+            },
+            {
+                "sentences": [
+                    "To jest Karolcia."
+                ],
+                "image": ""
+            },
+            {
+                "sentences": [
+                    "To jest mama."
+                ],
+                "image": ""
+            },
+            {
+                "sentences": [
+                    "To jest tata."
+                ],
+                "image": ""
+            },
+            {
+                "sentences": [
+                    "To jest Lora."
+                ],
+                "image": ""
+            }
+        ]
+    },
+    "words": [
+        "To",
+        "jest",
+        "Karol",
+        "Karolcia",
+        "mama",
+        "tata",
+        "Lora",
+        "brudna",
+        "Gdzie"
+    ],
+    "sentences": [
+        "Gdzie jest mama?",
+        "Gdzie jest tata?",
+        "Gdzie jest Karol?",
+        "Gdzie jest Karolcia?",
+        "Gdzie jest Lora?",
+        "To jest brudna mama.",
+        "To jest brudny tata.",
+        "To jest brudna Karolcia."
+    ]
+}

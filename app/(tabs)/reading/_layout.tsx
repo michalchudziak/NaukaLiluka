@@ -14,6 +14,20 @@ export default function ReadingLayout() {
           headerBackTitle: t('noRep.back')
         }} 
       />
+      <Stack.Screen 
+        name="book-track" 
+        options={{ 
+          title: t('bookTrack.title'),
+          headerBackTitle: t('bookTrack.back')
+        }} 
+      />
+      <Stack.Screen 
+        name="books-daily" 
+        options={{ 
+          title: t('booksDaily.title'),
+          headerBackTitle: t('booksDaily.back')
+        }} 
+      />
     </Stack>
   );
 }

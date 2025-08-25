@@ -10,6 +10,7 @@ export default function DisplayScreen() {
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  
 
   const parsedItems = useMemo(() => JSON.parse(params.items as string) as string[], [params.items]);
   const color = params.color as string;
@@ -23,7 +24,7 @@ export default function DisplayScreen() {
 
     intervalRef.current = setInterval(() => {
       setCurrentIndex((prevIndex) => {console.log(prevIndex + 1); return prevIndex + 1});
-    }, DefaultSettings.reading.interval);
+    }, DefaultSettings.reading.interval[params.type as 'words' | 'sentences']);
 
     return () => {
       if (intervalRef.current) {

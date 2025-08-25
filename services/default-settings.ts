@@ -4,6 +4,9 @@ export const DefaultSettings = {
             words: 3,
             sentences: 3,
         },
-        interval: 1000
+        interval: {
+            words: 1500,
+            sentences: 3000,
+        }
     }  
 }

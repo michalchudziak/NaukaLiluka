@@ -19,5 +19,15 @@
     "knownSentencesCount": "{{count}} z {{total}} znanych zdań",
     "noMoreWords": "Przerobione wszystkie słowa",
     "noMoreSentences": "Przerobione wszystkie zdania"
+  },
+  "bookTrack": {
+    "title": "Ścieka książkowa",
+    "training": "Trening",
+    "books": "Książki",
+    "back": "Wróć"
+  },
+  "booksDaily": {
+    "title": "Codzienny trening",
+    "back": "Wróć"
   }
 }
