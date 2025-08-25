@@ -8,7 +8,8 @@
   "common": {
     "cancel": "Anuluj",
     "confirm": "Potwierdź",
-    "ok": "OK"
+    "ok": "OK",
+    "enable": "Włącz"
   },
   "reading": {
     "bookTrack": "Ścieka książkowa",
@@ -83,6 +84,17 @@
     },
     "storage": {
       "sectionTitle": "Zarządzanie danymi"
+    },
+    "cloudData": {
+      "menuTitle": "Dane w chmurze",
+      "menuSubtitle": "Synchronizuj dane z bazą danych",
+      "title": "Synchronizacja w chmurze",
+      "description": "Włącz synchronizację danych z bazą danych Supabase",
+      "enableTitle": "Włączyć synchronizację?",
+      "enableMessage": "Twoje dane zostaną zsynchronizowane z bazą danych w chmurze. Możesz to wyłączyć w każdej chwili.",
+      "infoTitle": "Informacje",
+      "infoText": "Gdy synchronizacja jest włączona, wszystkie postępy i ustawienia są automatycznie zapisywane w bazie danych. Dane lokalne są nadal zachowywane jako kopia zapasowa.",
+      "statusConnected": "Połączono z bazą danych"
     },
     "clearStorage": {
       "title": "Wyczyść dane",

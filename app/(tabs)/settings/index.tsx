@@ -102,6 +102,15 @@ export default function SettingsScreen() {
           
           <View style={styles.sectionContent}>
             <SettingItem
+              title={t('settings.cloudData.menuTitle')}
+              subtitle={t('settings.cloudData.menuSubtitle')}
+              icon="cloud-outline"
+              onPress={() => router.push('/(tabs)/settings/cloud-data')}
+            />
+            
+            <View style={styles.separator} />
+            
+            <SettingItem
               title={t('settings.clearStorage.title')}
               subtitle={t('settings.clearStorage.subtitle')}
               icon="trash-outline"

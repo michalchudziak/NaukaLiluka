@@ -61,6 +61,14 @@ export default function SettingsLayout() {
           presentation: 'modal'
         }} 
       />
+      <Stack.Screen 
+        name="cloud-data" 
+        options={{ 
+          title: t('settings.drawings.settings'),
+          headerShown: true,
+          presentation: 'modal'
+        }} 
+      />
     </Stack>
   );
 }

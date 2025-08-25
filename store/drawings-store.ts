@@ -1,4 +1,4 @@
-import { AsyncStorageService } from '@/services/async-storage';
+import { HybridStorageService } from '@/services/hybrid-storage';
 import { isToday } from 'date-fns';
 import { create } from 'zustand';
 
@@ -33,7 +33,7 @@ export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
     };
     const newPresentations = [...get().presentations, newPresentation];
     set({ presentations: newPresentations });
-    AsyncStorageService.write(STORAGE_KEYS.DRAWINGS_PRESENTATIONS, newPresentations);
+    HybridStorageService.writeDrawingPresentations(STORAGE_KEYS.DRAWINGS_PRESENTATIONS, newPresentations);
   },
   
   getTodayPresentations: () => {
@@ -50,11 +50,12 @@ export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
   
   clearAll: () => {
     set({ presentations: [] });
-    AsyncStorageService.clear(STORAGE_KEYS.DRAWINGS_PRESENTATIONS);
+    HybridStorageService.clear(STORAGE_KEYS.DRAWINGS_PRESENTATIONS);
   },
   
   hydrate: async () => {
-    const storedPresentations = await AsyncStorageService.read(STORAGE_KEYS.DRAWINGS_PRESENTATIONS);
+    await HybridStorageService.initialize();
+    const storedPresentations = await HybridStorageService.readDrawingPresentations(STORAGE_KEYS.DRAWINGS_PRESENTATIONS);
     
     set({
       presentations: storedPresentations || []

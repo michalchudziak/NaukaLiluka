@@ -1,5 +1,6 @@
 import sentencesData from '@/content/no-rep/sentences.json';
 import wordsData from '@/content/no-rep/words.json';
+import { HybridStorageService } from '@/services/hybrid-storage';
 import { AsyncStorageService } from '@/services/async-storage';
 import { useSettingsStore } from '@/store/settings-store';
 import { isToday } from 'date-fns';
@@ -53,7 +54,7 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
       displayedWords: Array.from(new Set([...get().displayedWords, ...words]))
     };
     set(newState);
-    AsyncStorageService.write(STORAGE_KEYS.PROGRESS_NO_REP_WORDS, newState.displayedWords);
+    HybridStorageService.writeNoRepWords(STORAGE_KEYS.PROGRESS_NO_REP_WORDS, newState.displayedWords);
   },
   
   addDisplayedSentences: (sentences: string[]) => {
@@ -61,23 +62,23 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
       displayedSentences: Array.from(new Set([...get().displayedSentences, ...sentences]))
     };
     set(newState);
-    AsyncStorageService.write(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES, newState.displayedSentences);
+    HybridStorageService.writeNoRepSentences(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES, newState.displayedSentences);
   },
   
   clearDisplayedWords: () => {
     set({ displayedWords: [] });
-    AsyncStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_WORDS);
+    HybridStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_WORDS);
   },
   
   clearDisplayedSentences: () => {
     set({ displayedSentences: [] });
-    AsyncStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES);
+    HybridStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES);
   },
   
   clearAll: () => {
     set({ displayedWords: [], displayedSentences: [] });
-    AsyncStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_WORDS);
-    AsyncStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES);
+    HybridStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_WORDS);
+    HybridStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES);
   },
   
   chooseAndMarkWords: async () => {
@@ -113,13 +114,13 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   markWordsCompleted: () => {
     const newTimestamps = [...get().wordCompletionTimestamps, Date.now()];
     set({ wordCompletionTimestamps: newTimestamps });
-    AsyncStorageService.write(STORAGE_KEYS.ROUTINES_NO_REP_WORDS, newTimestamps);
+    HybridStorageService.writeNoRepWordCompletions(STORAGE_KEYS.ROUTINES_NO_REP_WORDS, newTimestamps);
   },
   
   markSentencesCompleted: () => {
     const newTimestamps = [...get().sentenceCompletionTimestamps, Date.now()];
     set({ sentenceCompletionTimestamps: newTimestamps });
-    AsyncStorageService.write(STORAGE_KEYS.ROUTINES_NO_REP_SENTENCES, newTimestamps);
+    HybridStorageService.writeNoRepSentenceCompletions(STORAGE_KEYS.ROUTINES_NO_REP_SENTENCES, newTimestamps);
   },
   
   isWordsCompletedToday: () => {
@@ -137,11 +138,12 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   },
   
   hydrate: async () => {
+    await HybridStorageService.initialize();
     const [storedWords, storedSentences, storedWordTimestamps, storedSentenceTimestamps] = await Promise.all([
-      AsyncStorageService.read(STORAGE_KEYS.PROGRESS_NO_REP_WORDS),
-      AsyncStorageService.read(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES),
-      AsyncStorageService.read(STORAGE_KEYS.ROUTINES_NO_REP_WORDS),
-      AsyncStorageService.read(STORAGE_KEYS.ROUTINES_NO_REP_SENTENCES)
+      HybridStorageService.readNoRepWords(STORAGE_KEYS.PROGRESS_NO_REP_WORDS),
+      HybridStorageService.readNoRepSentences(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES),
+      HybridStorageService.readNoRepWordCompletions(STORAGE_KEYS.ROUTINES_NO_REP_WORDS),
+      HybridStorageService.readNoRepSentenceCompletions(STORAGE_KEYS.ROUTINES_NO_REP_SENTENCES)
     ]);
     
     set({

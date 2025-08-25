@@ -1,5 +1,5 @@
 import { books } from '@/content/books';
-import { AsyncStorageService } from '@/services/async-storage';
+import { HybridStorageService } from '@/services/hybrid-storage';
 import { isToday } from 'date-fns';
 import { create } from 'zustand';
 
@@ -106,7 +106,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
     });
     
     set({ bookProgress: updatedProgress });
-    AsyncStorageService.write(STORAGE_KEYS.BOOK_PROGRESS, updatedProgress);
+    HybridStorageService.writeBookProgress(STORAGE_KEYS.BOOK_PROGRESS, updatedProgress);
   },
   
   updateBookProgress: (bookId: string, wordTripleIndex: number, sentenceTripleIndex: number) => {
@@ -138,7 +138,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
     });
     
     set({ bookProgress: updatedProgress });
-    AsyncStorageService.write(STORAGE_KEYS.BOOK_PROGRESS, updatedProgress);
+    HybridStorageService.writeBookProgress(STORAGE_KEYS.BOOK_PROGRESS, updatedProgress);
   },
   
   getDailyContent: async () => {
@@ -231,7 +231,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
     state.updateBookProgress(activeBookProgress.bookId, selectedWordTripleIndex, selectedSentenceTripleIndex);
     
     set({ dailyPlan });
-    AsyncStorageService.write(STORAGE_KEYS.DAILY_PLAN, dailyPlan);
+    HybridStorageService.writeDailyPlan(STORAGE_KEYS.DAILY_PLAN, dailyPlan);
     
     return dailyPlan;
   },
@@ -252,7 +252,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
     };
     
     set({ dailyPlan: updatedPlan });
-    AsyncStorageService.write(STORAGE_KEYS.DAILY_PLAN, updatedPlan);
+    HybridStorageService.writeDailyPlan(STORAGE_KEYS.DAILY_PLAN, updatedPlan);
     
     // Mark completion with timestamp
     get().markBookTrackSessionCompleted(session, type);
@@ -266,7 +266,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
     };
     const newCompletions = [...get().bookTrackSessionCompletions, newCompletion];
     set({ bookTrackSessionCompletions: newCompletions });
-    AsyncStorageService.write(STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS, newCompletions);
+    HybridStorageService.writeBookTrackSessions(STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS, newCompletions);
   },
   
   isDailyPlanCompleted: () => {
@@ -310,10 +310,11 @@ export const useBookStore = create<BookStore>((set, get) => ({
   },
   
   hydrate: async () => {
+    await HybridStorageService.initialize();
     const [storedProgress, storedPlan, storedBookTrackSessions] = await Promise.all([
-      AsyncStorageService.read(STORAGE_KEYS.BOOK_PROGRESS),
-      AsyncStorageService.read(STORAGE_KEYS.DAILY_PLAN),
-      AsyncStorageService.read(STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS)
+      HybridStorageService.readBookProgress(STORAGE_KEYS.BOOK_PROGRESS),
+      HybridStorageService.readDailyPlan(STORAGE_KEYS.DAILY_PLAN),
+      HybridStorageService.readBookTrackSessions(STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS)
     ]);
     
     const state: Partial<BookStore> = {};
@@ -344,6 +345,6 @@ export const useBookStore = create<BookStore>((set, get) => ({
   
   clearDailyPlan: () => {
     set({ dailyPlan: null });
-    AsyncStorageService.clear(STORAGE_KEYS.DAILY_PLAN);
+    HybridStorageService.clear(STORAGE_KEYS.DAILY_PLAN);
   },
 }));

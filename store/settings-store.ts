@@ -1,4 +1,4 @@
-import { AsyncStorageService } from '@/services/async-storage';
+import { HybridStorageService } from '@/services/hybrid-storage';
 import { create } from 'zustand';
 
 const STORAGE_KEY = 'settings';
@@ -21,6 +21,7 @@ interface SettingsState {
     showCaptions: boolean;
     interval: number;
   };
+  useCloudData: boolean;
   
   updateReadingNoRepWords: (value: number) => void;
   updateReadingNoRepSentences: (value: number) => void;
@@ -29,6 +30,7 @@ interface SettingsState {
   updateReadingBooksAllowAll: (value: boolean) => void;
   updateDrawingsShowCaptions: (value: boolean) => void;
   updateDrawingsInterval: (value: number) => void;
+  updateUseCloudData: (value: boolean) => void;
   hydrate: () => Promise<void>;
 }
 
@@ -49,7 +51,8 @@ const defaultSettings = {
   drawings: {
     showCaptions: true,
     interval: 1500,
-  }
+  },
+  useCloudData: false,
 };
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -67,7 +70,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           }
         }
       };
-      AsyncStorageService.write(STORAGE_KEY, {
+      HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings
       });
@@ -87,7 +90,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           }
         }
       };
-      AsyncStorageService.write(STORAGE_KEY, {
+      HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings
       });
@@ -107,7 +110,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           }
         }
       };
-      AsyncStorageService.write(STORAGE_KEY, {
+      HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings
       });
@@ -127,7 +130,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           }
         }
       };
-      AsyncStorageService.write(STORAGE_KEY, {
+      HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings
       });
@@ -147,7 +150,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           }
         }
       };
-      AsyncStorageService.write(STORAGE_KEY, {
+      HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings
       });
@@ -164,7 +167,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           showCaptions: value
         }
       };
-      AsyncStorageService.write(STORAGE_KEY, {
+      HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings
       });
@@ -181,7 +184,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           interval: value
         }
       };
-      AsyncStorageService.write(STORAGE_KEY, {
+      HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings
       });
@@ -189,13 +192,27 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     });
   },
   
+  updateUseCloudData: async (value: boolean) => {
+    await HybridStorageService.setUseCloudData(value);
+    set({ useCloudData: value });
+    // Re-hydrate from cloud if enabled
+    if (value) {
+      get().hydrate();
+    }
+  },
+  
   hydrate: async () => {
-    const stored = await AsyncStorageService.read(STORAGE_KEY);
+    await HybridStorageService.initialize();
+    const useCloudData = await HybridStorageService.getUseCloudData();
+    const stored = await HybridStorageService.readSettings(STORAGE_KEY);
     if (stored) {
       set({
         reading: stored.reading || defaultSettings.reading,
-        drawings: stored.drawings || defaultSettings.drawings
+        drawings: stored.drawings || defaultSettings.drawings,
+        useCloudData
       });
+    } else {
+      set({ useCloudData });
     }
   }
 }));
