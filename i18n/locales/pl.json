@@ -2,7 +2,8 @@
   "tabs": {
     "reading": "Czytanie",
     "pictures": "Obrazki",
-    "settings": "Ustawienia"
+    "settings": "Ustawienia",
+    "myDay": "Mój dzień"
   },
   "common": {
     "cancel": "Anuluj",
@@ -51,6 +52,35 @@
   },
   "settings": {
     "title": "Ustawienia",
+    "back": "Wróć",
+    "reading": {
+      "sectionTitle": "Ustawienia czytania",
+      "noRepSettings": "Ścieka bez powtórzeń",
+      "noRepSettingsSubtitle": "Ilość elementów na sesję",
+      "noRepDescription": "Ustaw ilość słów i zdań wyświetlanych w każdej sesji ścieki bez powtórzeń.",
+      "intervalSettings": "Interwały czasowe",
+      "intervalSettingsSubtitle": "Czas wyświetlania elementów",
+      "intervalDescription": "Ustaw czas wyświetlania słów i zdań w milisekundach.",
+      "intervalHint": "1000 ms = 1 sekunda",
+      "booksSettings": "Ustawienia książek",
+      "booksSettingsSubtitle": "Konfiguracja wyboru książek",
+      "booksDescription": "Zarządzaj ustawieniami związanymi z książkami.",
+      "wordsPerSession": "Słów na sesję",
+      "sentencesPerSession": "Zdań na sesję",
+      "wordsInterval": "Czas wyświetlania słów",
+      "sentencesInterval": "Czas wyświetlania zdań",
+      "allowAllBooks": "Pokaż wszystkie książki",
+      "allowAllBooksDescription": "Gdy włączone, wszystkie książki będą dostępne do wyboru."
+    },
+    "drawings": {
+      "sectionTitle": "Ustawienia obrazków",
+      "settings": "Obrazki i podpisy",
+      "settingsSubtitle": "Konfiguracja wyświetlania",
+      "description": "Zarządzaj ustawieniami wyświetlania obrazków.",
+      "showCaptions": "Pokaż podpisy",
+      "showCaptionsDescription": "Wyświetlaj podpisy pod obrazkami.",
+      "interval": "Czas wyświetlania"
+    },
     "storage": {
       "sectionTitle": "Zarządzanie danymi"
     },
@@ -114,5 +144,13 @@
   "drawings": {
     "totalToday": "Prezentacje dzisiaj: {{count}}",
     "presentedToday": "Pokazane dzisiaj: {{count}} razy"
+  },
+  "myDay": {
+    "title": "Dziejsze rutyny",
+    "routine1": "Ścieżka bez Powtórzeń",
+    "routine2": "Książki - Sesja 1",
+    "routine3": "Książki - Sesja 2",
+    "routine4": "Książki - Sesja 3",
+    "routine5": "Prezentacja Obrazków"
   }
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useBookStore } from './book-store';
 import { useDrawingsStore } from './drawings-store';
 import { useNoRepStore } from './no-rep-store';
+import { useSettingsStore } from './settings-store';
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
@@ -11,7 +12,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       await Promise.all([
         useNoRepStore.getState().hydrate(),
         useBookStore.getState().hydrate(),
-        useDrawingsStore.getState().hydrate()
+        useDrawingsStore.getState().hydrate(),
+        useSettingsStore.getState().hydrate()
       ]);
       setIsHydrated(true);
     };

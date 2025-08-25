@@ -1,8 +1,8 @@
 import { AutoSizeText } from '@/components/AutoSizeText';
 import { ThemedView } from '@/components/ThemedView';
 import drawingSets from '@/content/drawings';
-import { DefaultSettings } from '@/services/default-settings';
 import { useDrawingsStore } from '@/store/drawings-store';
+import { useSettingsStore } from '@/store/settings-store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Dimensions, Image, Pressable, StyleSheet } from 'react-native';
@@ -11,6 +11,7 @@ export default function DrawingDisplayScreen() {
   const { setId } = useLocalSearchParams<{ setId: string }>();
   const router = useRouter();
   const drawingsStore = useDrawingsStore();
+  const settings = useSettingsStore();
   
   const [currentImageIndex, setCurrentImageIndex] = useState(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -44,14 +45,14 @@ export default function DrawingDisplayScreen() {
     
     intervalRef.current = setInterval(() => {
       setCurrentImageIndex((prevIndex) => prevIndex + 1);
-    }, DefaultSettings.drawings.interval);
+    }, settings.drawings.interval);
     
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [imageSet, router]);
+  }, [imageSet, settings.drawings.interval]);
 
   useEffect(() => {
     if (!imageSet) {
@@ -92,7 +93,7 @@ export default function DrawingDisplayScreen() {
           style={[styles.image, { width: imageWidth }]}
           resizeMode="contain"
         />
-        {DefaultSettings.drawings.showCaptions && (
+        {settings.drawings.showCaptions && (
           <ThemedView style={styles.captionContainer}>
             <AutoSizeText color="#000000" style={styles.captionText}>
               {currentImage.description}

@@ -1,7 +1,7 @@
 import sentencesData from '@/content/no-rep/sentences.json';
 import wordsData from '@/content/no-rep/words.json';
 import { AsyncStorageService } from '@/services/async-storage';
-import { DefaultSettings } from '@/services/default-settings';
+import { useSettingsStore } from '@/store/settings-store';
 import { isToday } from 'date-fns';
 import { create } from 'zustand';
 
@@ -82,7 +82,8 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   
   chooseAndMarkWords: async () => {
     const state = get();
-    const randomWords = getRandomItems(wordsData, DefaultSettings.reading.noRep.words, state.displayedWords);
+    const settings = useSettingsStore.getState();
+    const randomWords = getRandomItems(wordsData, settings.reading.noRep.words, state.displayedWords);
     
     if (randomWords.length === 0) {
       return [];
@@ -96,7 +97,8 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   
   chooseAndMarkSentences: async () => {
     const state = get();
-    const randomSentences = getRandomItems(sentencesData, DefaultSettings.reading.noRep.sentences, state.displayedSentences);
+    const settings = useSettingsStore.getState();
+    const randomSentences = getRandomItems(sentencesData, settings.reading.noRep.sentences, state.displayedSentences);
     
     if (randomSentences.length === 0) {
       return [];

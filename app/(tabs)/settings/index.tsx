@@ -49,6 +49,54 @@ export default function SettingsScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>
+            {t('settings.reading.sectionTitle')}
+          </ThemedText>
+          
+          <View style={styles.sectionContent}>
+            <SettingItem
+              title={t('settings.reading.noRepSettings')}
+              subtitle={t('settings.reading.noRepSettingsSubtitle')}
+              icon="repeat-outline"
+              onPress={() => router.push('/(tabs)/settings/reading-norep')}
+            />
+            
+            <View style={styles.separator} />
+            
+            <SettingItem
+              title={t('settings.reading.intervalSettings')}
+              subtitle={t('settings.reading.intervalSettingsSubtitle')}
+              icon="timer-outline"
+              onPress={() => router.push('/(tabs)/settings/reading-interval')}
+            />
+            
+            <View style={styles.separator} />
+            
+            <SettingItem
+              title={t('settings.reading.booksSettings')}
+              subtitle={t('settings.reading.booksSettingsSubtitle')}
+              icon="book-outline"
+              onPress={() => router.push('/(tabs)/settings/reading-books')}
+            />
+          </View>
+        </View>
+        
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>
+            {t('settings.drawings.sectionTitle')}
+          </ThemedText>
+          
+          <View style={styles.sectionContent}>
+            <SettingItem
+              title={t('settings.drawings.settings')}
+              subtitle={t('settings.drawings.settingsSubtitle')}
+              icon="image-outline"
+              onPress={() => router.push('/(tabs)/settings/drawings')}
+            />
+          </View>
+        </View>
+        
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>
             {t('settings.storage.sectionTitle')}
           </ThemedText>
           

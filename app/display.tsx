@@ -1,6 +1,6 @@
 import { AutoSizeText } from '@/components/AutoSizeText';
 import { ThemedView } from '@/components/ThemedView';
-import { DefaultSettings } from '@/services/default-settings';
+import { useSettingsStore } from '@/store/settings-store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
@@ -8,6 +8,7 @@ import { StyleSheet } from 'react-native';
 export default function DisplayScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
+  const settings = useSettingsStore();
   const [currentIndex, setCurrentIndex] = useState(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   
@@ -24,7 +25,7 @@ export default function DisplayScreen() {
 
     intervalRef.current = setInterval(() => {
       setCurrentIndex((prevIndex) =>  prevIndex + 1);
-    }, DefaultSettings.reading.interval[params.type as 'words' | 'sentences']);
+    }, settings.reading.interval[params.type as 'words' | 'sentences']);
 
     return () => {
       if (intervalRef.current) {

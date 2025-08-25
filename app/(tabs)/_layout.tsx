@@ -13,7 +13,7 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      initialRouteName="reading"
+      initialRouteName="my-day"
       screenOptions={{
         tabBarActiveTintColor: Colors.light.tint,
         headerShown: false,
@@ -29,6 +29,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="my-day"
+        options={{
+          title: t('tabs.myDay'),
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="today" color={color} />,
+        }}
       />
       <Tabs.Screen
         name="reading"
