@@ -40,8 +40,8 @@
         ["To", "tata", "Karolcia"]
     ],
     "sentences": [
+        [],
         ["Gdzie jest mama?", "Gdzie jest Karol?", "Gdzie jest Lora?"],
-        ["Karolcia jest brudna.", "Lora jest brudna.", "To jest brudna mama."],
-        ["Gdzie jest tata?", "To jest brudna Karolcia.", "To jest brudna Lora."]
+        ["Karolcia jest brudna.", "Lora jest brudna.", "Gdzie jest tata?"]
     ]
 }

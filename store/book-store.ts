@@ -1,6 +1,9 @@
 import { books } from '@/content/books';
 import { AsyncStorageService } from '@/services/async-storage';
+import { isToday } from 'date-fns';
 import { create } from 'zustand';
+import { useRoutinesStore } from './routines-store';
+
 
 const STORAGE_KEYS = {
   BOOK_PROGRESS: 'progress.books',
@@ -22,7 +25,7 @@ export interface SessionContent {
 }
 
 export interface DailyPlan {
-  date: string;
+  timestamp: number;
   bookId: string;
   selectedWordTripleIndex: number;
   selectedSentenceTripleIndex: number;
@@ -70,10 +73,6 @@ function getUniquePermutations<T>(array: T[]): T[][] {
   
   // Randomly shuffle which permutation goes to which session
   return shuffleArray(permutations);
-}
-
-function getToday(): string {
-  return new Date().toISOString().split('T')[0];
 }
 
 export const useBookStore = create<BookStore>((set, get) => ({
@@ -133,10 +132,9 @@ export const useBookStore = create<BookStore>((set, get) => ({
   
   getDailyContent: async () => {
     const state = get();
-    const today = getToday();
     
     // Check if we already have a plan for today
-    if (state.dailyPlan && state.dailyPlan.date === today) {
+    if (state.dailyPlan && isToday(state.dailyPlan.timestamp)) {
       return state.dailyPlan;
     }
     
@@ -192,7 +190,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
     const session3Words = wordPermutations[2];
     
     const dailyPlan: DailyPlan = {
-      date: today,
+      timestamp: Date.now(),
       bookId: activeBookProgress.bookId,
       selectedWordTripleIndex,
       selectedSentenceTripleIndex,
@@ -244,6 +242,9 @@ export const useBookStore = create<BookStore>((set, get) => ({
     
     set({ dailyPlan: updatedPlan });
     AsyncStorageService.write(STORAGE_KEYS.DAILY_PLAN, updatedPlan);
+    
+    // Mark completion in routines store with timestamp
+    useRoutinesStore.getState().markBookTrackSessionCompleted(session, type);
   },
   
   hydrate: async () => {
@@ -262,11 +263,11 @@ export const useBookStore = create<BookStore>((set, get) => ({
     }
     
     if (storedPlan) {
-      const today = getToday();
       // Only use stored plan if it's for today
-      if (storedPlan.date === today) {
+      if (isToday(storedPlan.timestamp)) {
         state.dailyPlan = storedPlan;
       }
+      // If plan is from a previous day, don't load it - getDailyContent will generate a new one
     }
     
     if (Object.keys(state).length > 0) {
