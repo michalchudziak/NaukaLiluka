@@ -2,12 +2,14 @@ import sentencesData from '@/content/no-rep/sentences.json';
 import wordsData from '@/content/no-rep/words.json';
 import { AsyncStorageService } from '@/services/async-storage';
 import { DefaultSettings } from '@/services/default-settings';
+import { isToday } from 'date-fns';
 import { create } from 'zustand';
-import { useRoutinesStore } from './routines-store';
 
 const STORAGE_KEYS = {
   PROGRESS_NO_REP_WORDS: 'progress.reading.no-rep.words',
   PROGRESS_NO_REP_SENTENCES: 'progress.reading.no-rep.sentences',
+  ROUTINES_NO_REP_WORDS: 'routines.reading.no-rep.words',
+  ROUTINES_NO_REP_SENTENCES: 'routines.reading.no-rep.sentences',
 } as const;
 
 function getRandomItems<T>(array: T[], count: number, exclude: T[] = []): T[] {
@@ -19,6 +21,8 @@ function getRandomItems<T>(array: T[], count: number, exclude: T[] = []): T[] {
 interface NoRepStore {
   displayedWords: string[];
   displayedSentences: string[];
+  wordCompletionTimestamps: number[];
+  sentenceCompletionTimestamps: number[];
   
   addDisplayedWords: (words: string[]) => void;
   addDisplayedSentences: (sentences: string[]) => void;
@@ -29,12 +33,20 @@ interface NoRepStore {
   chooseAndMarkWords: () => Promise<string[]>;
   chooseAndMarkSentences: () => Promise<string[]>;
   
+  markWordsCompleted: () => void;
+  markSentencesCompleted: () => void;
+  isWordsCompletedToday: () => boolean;
+  isSentencesCompletedToday: () => boolean;
+  isNoRepPathCompletedToday: () => boolean;
+  
   hydrate: () => Promise<void>;
 }
 
 export const useNoRepStore = create<NoRepStore>((set, get) => ({
   displayedWords: [],
   displayedSentences: [],
+  wordCompletionTimestamps: [],
+  sentenceCompletionTimestamps: [],
   
   addDisplayedWords: (words: string[]) => {
     const newState = {
@@ -77,7 +89,7 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
     }
     
     state.addDisplayedWords(randomWords);
-    useRoutinesStore.getState().markWordsCompleted();
+    state.markWordsCompleted();
     
     return randomWords;
   },
@@ -91,20 +103,50 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
     }
     
     state.addDisplayedSentences(randomSentences);
-    useRoutinesStore.getState().markSentencesCompleted();
+    state.markSentencesCompleted();
     
     return randomSentences;
   },
   
+  markWordsCompleted: () => {
+    const newTimestamps = [...get().wordCompletionTimestamps, Date.now()];
+    set({ wordCompletionTimestamps: newTimestamps });
+    AsyncStorageService.write(STORAGE_KEYS.ROUTINES_NO_REP_WORDS, newTimestamps);
+  },
+  
+  markSentencesCompleted: () => {
+    const newTimestamps = [...get().sentenceCompletionTimestamps, Date.now()];
+    set({ sentenceCompletionTimestamps: newTimestamps });
+    AsyncStorageService.write(STORAGE_KEYS.ROUTINES_NO_REP_SENTENCES, newTimestamps);
+  },
+  
+  isWordsCompletedToday: () => {
+    return get().wordCompletionTimestamps.some(timestamp => isToday(timestamp));
+  },
+  
+  isSentencesCompletedToday: () => {
+    return get().sentenceCompletionTimestamps.some(timestamp => isToday(timestamp));
+  },
+  
+  isNoRepPathCompletedToday: () => {
+    const wordsCompleted = get().isWordsCompletedToday();
+    const sentencesCompleted = get().isSentencesCompletedToday();
+    return wordsCompleted && sentencesCompleted;
+  },
+  
   hydrate: async () => {
-    const [storedWords, storedSentences] = await Promise.all([
+    const [storedWords, storedSentences, storedWordTimestamps, storedSentenceTimestamps] = await Promise.all([
       AsyncStorageService.read(STORAGE_KEYS.PROGRESS_NO_REP_WORDS),
-      AsyncStorageService.read(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES)
+      AsyncStorageService.read(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES),
+      AsyncStorageService.read(STORAGE_KEYS.ROUTINES_NO_REP_WORDS),
+      AsyncStorageService.read(STORAGE_KEYS.ROUTINES_NO_REP_SENTENCES)
     ]);
     
     set({
       displayedWords: storedWords || [],
-      displayedSentences: storedSentences || []
+      displayedSentences: storedSentences || [],
+      wordCompletionTimestamps: storedWordTimestamps || [],
+      sentenceCompletionTimestamps: storedSentenceTimestamps || []
     });
   }
 }));

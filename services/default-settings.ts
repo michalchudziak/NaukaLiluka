@@ -14,5 +14,6 @@ export const DefaultSettings = {
     },
     drawings: {
         showCaptions: true,
+        interval: 1500,
     }
 }

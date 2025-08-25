@@ -2,12 +2,12 @@ import { books } from '@/content/books';
 import { AsyncStorageService } from '@/services/async-storage';
 import { isToday } from 'date-fns';
 import { create } from 'zustand';
-import { useRoutinesStore } from './routines-store';
 
 
 const STORAGE_KEYS = {
   BOOK_PROGRESS: 'progress.books',
   DAILY_PLAN: 'progress.books.daily-plan',
+  ROUTINES_BOOK_TRACK_SESSIONS: 'routines.reading.book-track.sessions',
 } as const;
 
 interface BookProgress {
@@ -15,6 +15,12 @@ interface BookProgress {
   completedWordTriples: number[]; // indices of completed word triples
   completedSentenceTriples: number[]; // indices of completed sentence triples
   isCompleted: boolean;
+}
+
+interface BookTrackSessionCompletion {
+  session: 'session1' | 'session2' | 'session3';
+  type: 'words' | 'sentences';
+  timestamp: number;
 }
 
 export interface SessionContent {
@@ -39,11 +45,15 @@ export interface DailyPlan {
 interface BookStore {
   bookProgress: BookProgress[];
   dailyPlan: DailyPlan | null;
+  bookTrackSessionCompletions: BookTrackSessionCompletion[];
   
   initializeBookProgress: () => void;
   updateBookProgress: (bookId: string, wordTripleIndex: number, sentenceTripleIndex: number) => void;
   getDailyContent: () => Promise<DailyPlan | null>;
   markSessionItemCompleted: (session: 'session1' | 'session2' | 'session3', type: 'words' | 'sentences') => void;
+  markBookTrackSessionCompleted: (session: 'session1' | 'session2' | 'session3', type: 'words' | 'sentences') => void;
+  isDailyPlanCompleted: () => boolean;
+  isBookTrackCompletedToday: () => boolean;
   hydrate: () => Promise<void>;
   clearDailyPlan: () => void;
 }
@@ -78,6 +88,7 @@ function getUniquePermutations<T>(array: T[]): T[][] {
 export const useBookStore = create<BookStore>((set, get) => ({
   bookProgress: [],
   dailyPlan: null,
+  bookTrackSessionCompletions: [],
   
   initializeBookProgress: () => {
     const currentProgress = get().bookProgress;
@@ -243,14 +254,66 @@ export const useBookStore = create<BookStore>((set, get) => ({
     set({ dailyPlan: updatedPlan });
     AsyncStorageService.write(STORAGE_KEYS.DAILY_PLAN, updatedPlan);
     
-    // Mark completion in routines store with timestamp
-    useRoutinesStore.getState().markBookTrackSessionCompleted(session, type);
+    // Mark completion with timestamp
+    get().markBookTrackSessionCompleted(session, type);
+  },
+  
+  markBookTrackSessionCompleted: (session: 'session1' | 'session2' | 'session3', type: 'words' | 'sentences') => {
+    const newCompletion: BookTrackSessionCompletion = {
+      session,
+      type,
+      timestamp: Date.now()
+    };
+    const newCompletions = [...get().bookTrackSessionCompletions, newCompletion];
+    set({ bookTrackSessionCompletions: newCompletions });
+    AsyncStorageService.write(STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS, newCompletions);
+  },
+  
+  isDailyPlanCompleted: () => {
+    const state = get();
+    const plan = state.dailyPlan;
+    if (!plan) return false;
+    
+    const { session1, session2, session3 } = plan.sessions;
+    const todayCompletions = state.bookTrackSessionCompletions.filter(c => isToday(c.timestamp));
+    
+    // Check if all required items in each session are completed today
+    const isSessionItemCompleted = (session: 'session1' | 'session2' | 'session3', type: 'words' | 'sentences') => {
+      return todayCompletions.some(c => c.session === session && c.type === type);
+    };
+    
+    const session1Complete = 
+      (session1.words.length === 0 || isSessionItemCompleted('session1', 'words')) &&
+      (session1.sentences.length === 0 || isSessionItemCompleted('session1', 'sentences'));
+    
+    const session2Complete = 
+      (session2.words.length === 0 || isSessionItemCompleted('session2', 'words')) &&
+      (session2.sentences.length === 0 || isSessionItemCompleted('session2', 'sentences'));
+    
+    const session3Complete = 
+      (session3.words.length === 0 || isSessionItemCompleted('session3', 'words')) &&
+      (session3.sentences.length === 0 || isSessionItemCompleted('session3', 'sentences'));
+    
+    return session1Complete && session2Complete && session3Complete;
+  },
+  
+  isBookTrackCompletedToday: () => {
+    const state = get();
+    const plan = state.dailyPlan;
+    if (!plan) return false;
+    
+    // Check if the plan is for today
+    if (!isToday(plan.timestamp)) return false;
+    
+    // Check if all sessions are completed
+    return state.isDailyPlanCompleted();
   },
   
   hydrate: async () => {
-    const [storedProgress, storedPlan] = await Promise.all([
+    const [storedProgress, storedPlan, storedBookTrackSessions] = await Promise.all([
       AsyncStorageService.read(STORAGE_KEYS.BOOK_PROGRESS),
       AsyncStorageService.read(STORAGE_KEYS.DAILY_PLAN),
+      AsyncStorageService.read(STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS)
     ]);
     
     const state: Partial<BookStore> = {};
@@ -268,6 +331,10 @@ export const useBookStore = create<BookStore>((set, get) => ({
         state.dailyPlan = storedPlan;
       }
       // If plan is from a previous day, don't load it - getDailyContent will generate a new one
+    }
+    
+    if (storedBookTrackSessions) {
+      state.bookTrackSessionCompletions = storedBookTrackSessions;
     }
     
     if (Object.keys(state).length > 0) {

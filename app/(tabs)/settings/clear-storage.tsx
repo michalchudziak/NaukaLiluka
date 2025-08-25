@@ -5,7 +5,6 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { AsyncStorageService } from '@/services/async-storage';
 import { useBookStore } from '@/store/book-store';
 import { useNoRepStore } from '@/store/no-rep-store';
-import { useRoutinesStore } from '@/store/routines-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -18,7 +17,6 @@ export default function ClearStorageScreen() {
   
   const bookStore = useBookStore();
   const noRepStore = useNoRepStore();
-  const routinesStore = useRoutinesStore();
 
   const handleClearAll = async () => {
     Alert.alert(
@@ -46,7 +44,6 @@ export default function ClearStorageScreen() {
               await Promise.all([
                 bookStore.hydrate(),
                 noRepStore.hydrate(),
-                routinesStore.hydrate(),
               ]);
               
               Alert.alert(
@@ -125,10 +122,7 @@ export default function ClearStorageScreen() {
               noRepStore.clearAll();
               await AsyncStorageService.clear('routines.reading.no-rep.words');
               await AsyncStorageService.clear('routines.reading.no-rep.sentences');
-              await Promise.all([
-                noRepStore.hydrate(),
-                routinesStore.hydrate(),
-              ]);
+              await noRepStore.hydrate();
               
               Alert.alert(
                 t('settings.clearStorage.successTitle'),

@@ -6,7 +6,6 @@ import sentencesData from '@/content/no-rep/sentences.json';
 import wordsData from '@/content/no-rep/words.json';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useNoRepStore } from '@/store/no-rep-store';
-import { useRoutinesStore } from '@/store/routines-store';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -22,8 +21,8 @@ export default function NoRepScreen() {
   const displayedSentences = useNoRepStore(state => state.displayedSentences);
   const chooseAndMarkWords = useNoRepStore(state => state.chooseAndMarkWords);
   const chooseAndMarkSentences = useNoRepStore(state => state.chooseAndMarkSentences);
-  const isWordsCompletedToday = useRoutinesStore(state => state.isWordsCompletedToday);
-  const isSentencesCompletedToday = useRoutinesStore(state => state.isSentencesCompletedToday);
+  const isWordsCompletedToday = useNoRepStore(state => state.isWordsCompletedToday);
+  const isSentencesCompletedToday = useNoRepStore(state => state.isSentencesCompletedToday);
   const wordsCompletedToday = isWordsCompletedToday();
   const sentencesCompletedToday = isSentencesCompletedToday();
   const tabBarHeight = useBottomTabBarHeight();
