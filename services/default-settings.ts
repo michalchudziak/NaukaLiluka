@@ -7,6 +7,9 @@ export const DefaultSettings = {
         interval: {
             words: 1500,
             sentences: 2500,
+        },
+        books: {
+            allowAllBooks: true,
         }
     }  
 }

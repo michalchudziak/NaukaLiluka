@@ -7,38 +7,44 @@ import { Pressable, StyleSheet } from 'react-native';
 interface BookListItemProps {
   book: Book;
   isCompleted: boolean;
+  isAccessible: boolean;
   onPress: () => void;
 }
 
-export function BookListItem({ book, isCompleted, onPress }: BookListItemProps) {
+export function BookListItem({ book, isCompleted, isAccessible, onPress }: BookListItemProps) {
+  const canInteract = isCompleted || isAccessible;
+  
   return (
     <Pressable
       style={({ pressed }) => [
         styles.bookItem,
         { 
-          backgroundColor: pressed 
+          backgroundColor: pressed && canInteract
             ? '#f0f0f0'
             : '#ffffff',
           borderColor: '#e0e0e0',
+          opacity: canInteract ? 1 : 0.4,
         }
       ]}
-      onPress={onPress}
+      onPress={canInteract ? onPress : undefined}
+      disabled={!canInteract}
     >
       <ThemedView style={styles.bookContent}>
-        <ThemedText style={styles.bookTitle}>{book.book.title}</ThemedText>
+        <ThemedText style={[styles.bookTitle, !canInteract && styles.disabledText]}>
+          {book.book.title}
+        </ThemedText>
         <ThemedView style={styles.bookStats}>
-          <ThemedText style={styles.bookInfo}>
+          <ThemedText style={[styles.bookInfo, !canInteract && styles.disabledText]}>
             {book.book.pages.length} stron
           </ThemedText>
-          <ThemedText style={styles.bookInfo}>
+          <ThemedText style={[styles.bookInfo, !canInteract && styles.disabledText]}>
             {book.words.length} zestawów słów
           </ThemedText>
-          <ThemedText style={styles.bookInfo}>
+          <ThemedText style={[styles.bookInfo, !canInteract && styles.disabledText]}>
             {book.sentences.length} zestawów zdań
           </ThemedText>
         </ThemedView>
       </ThemedView>
-      {isCompleted && (<ThemedText style={styles.checkmark}>✅</ThemedText>)}
     </Pressable>
   );
 }
@@ -69,8 +75,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     opacity: 0.7,
   },
-  checkmark: {
-    fontSize: 24,
-    padding: 10,
+  disabledText: {
+    opacity: 0.6,
   },
 });
