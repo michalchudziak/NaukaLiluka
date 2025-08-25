@@ -4,13 +4,14 @@
     "slug": "NaukaLiluka",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/app-icon.png",
+    "icon": "./assets/images/app-icon.png",
     "scheme": "naukaliluka",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.michalchudziak.NaukaLiluka"
+      "bundleIdentifier": "com.michalchudziak.NaukaLiluka",
+      "deploymentTarget": "17.0"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,10 +31,17 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-screen.jpg",
+          "image": "./assets/images/app-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#d303fc"
+        }
+      ],
+      [
+        "react-native-widget-extension",
+        {
+          "widgetsFolder": "NaukaLilukaWidget",
+          "deploymentTarget": "17.0"
         }
       ]
     ],

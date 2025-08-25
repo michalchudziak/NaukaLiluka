@@ -2,6 +2,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -43,10 +44,11 @@ function SettingItem({ title, subtitle, icon, onPress, destructive }: SettingIte
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const tabBarHeight = useBottomTabBarHeight();
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingBottom: tabBarHeight }} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>
             {t('settings.reading.sectionTitle')}
@@ -94,7 +96,7 @@ export default function SettingsScreen() {
             />
           </View>
         </View>
-        
+
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>
             {t('settings.storage.sectionTitle')}
