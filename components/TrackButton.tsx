@@ -1,6 +1,5 @@
-import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Button } from './Button';
 
 interface TrackButtonProps {
   title: string;
@@ -10,57 +9,10 @@ interface TrackButtonProps {
 
 export function TrackButton({ title, isCompleted = false, onPress }: TrackButtonProps) {
   const buttonColor = isCompleted 
-    ? '#9CA3AF' 
+    ? '#9CA3AF'
     : Colors.light.tint;
 
   return (
-    <TouchableOpacity
-      style={[
-        styles.button,
-        { backgroundColor: buttonColor }
-      ]}
-      activeOpacity={0.8}
-      onPress={onPress}
-    >
-      <View style={styles.buttonContent}>
-        <ThemedText type="title" style={styles.buttonText}>
-          {title} {isCompleted ? '✅' : '⏳'}
-        </ThemedText>
-      </View>
-    </TouchableOpacity>
+    <Button title={`${title} ${isCompleted ? '✅' : '⏳'}`} onPress={onPress} style={{ backgroundColor: buttonColor }} />
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    flex: 1,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    minHeight: 100,
-    maxHeight: 150,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  icon: {
-    marginTop: 2,
-  },
-});

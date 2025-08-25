@@ -1,10 +1,9 @@
-import { ColorPicker } from '@/components/ColorPicker';
+import { Button } from '@/components/Button';
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function BookTrackScreen() {
@@ -12,7 +11,6 @@ export default function BookTrackScreen() {
   const isHorizontal = width > height;
   const { t } = useTranslation();
   const router = useRouter();
-  const [selectedColor, setSelectedColor] = useState('#000000');
   const tabBarHeight = useBottomTabBarHeight();
 
   const handleTrainingPress = () => {
@@ -33,18 +31,11 @@ export default function BookTrackScreen() {
           onPress={handleTrainingPress}
         />
       
-        <TrackButton 
+        <Button 
           title={t('bookTrack.books')}
-          isCompleted={false}
           onPress={handleBooksPress}
         />
       </ThemedView>
-
-      <ColorPicker
-        selectedColor={selectedColor}
-        onColorSelect={setSelectedColor}
-        label={t('reading.selectColor')}
-      />
     </ThemedView>
   );
 }

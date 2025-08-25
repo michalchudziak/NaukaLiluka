@@ -1,7 +1,7 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { WordColors } from '@/constants/WordColors';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 interface ColorPickerProps {
   selectedColor: string;
@@ -33,6 +33,10 @@ export function ColorPicker({ selectedColor, onColorSelect, label }: ColorPicker
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
   },
   label: {
     fontSize: 18,
@@ -51,6 +55,14 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     borderWidth: 2,
     borderColor: 'transparent',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   selectedSwatch: {
     borderColor: '#007AFF',

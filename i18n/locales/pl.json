@@ -28,6 +28,12 @@
   },
   "booksDaily": {
     "title": "Codzienny trening",
-    "back": "Wróć"
+    "back": "Wróć",
+    "session1": "Sesja 1",
+    "session2": "Sesja 2",
+    "session3": "Sesja 3",
+    "words": "Słowa",
+    "sentences": "Zdania",
+    "selectColor": "Wybierz kolor"
   }
 }
