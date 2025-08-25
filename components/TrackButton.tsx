@@ -1,6 +1,5 @@
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 interface TrackButtonProps {
@@ -10,10 +9,9 @@ interface TrackButtonProps {
 }
 
 export function TrackButton({ title, isCompleted = false, onPress }: TrackButtonProps) {
-  const colorScheme = useColorScheme();
   const buttonColor = isCompleted 
     ? '#9CA3AF' 
-    : Colors[colorScheme ?? 'light'].tint;
+    : Colors.light.tint;
 
   return (
     <TouchableOpacity
