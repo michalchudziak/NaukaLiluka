@@ -2,7 +2,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { books } from '@/content/books';
 import { useTranslation } from '@/hooks/useTranslation';
-import { AsyncStorageService } from '@/services/async-storage';
+import { HybridStorageService } from '@/services/hybrid-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -14,6 +14,7 @@ interface StorageData {
   bookStore: {
     bookProgress: any;
     dailyPlan: any;
+    trackSessions: any;
   };
   noRepStore: {
     displayedWords: string[];
@@ -23,7 +24,9 @@ interface StorageData {
     wordTimestamps: number[];
     sentenceTimestamps: number[];
   };
+  drawingPresentations: any[];
   allKeys: readonly string[];
+  isCloudEnabled: boolean;
 }
 
 function formatDate(timestamp: number): string {
@@ -67,18 +70,24 @@ export default function ViewStorageScreen() {
       const [
         bookProgress,
         dailyPlan,
+        trackSessions,
         noRepWords,
         noRepSentences,
         routineWords,
         routineSentences,
+        drawingPresentations,
+        isCloudEnabled,
         allKeys
       ] = await Promise.all([
-        AsyncStorageService.read('progress.books'),
-        AsyncStorageService.read('progress.books.daily-plan'),
-        AsyncStorageService.read('progress.reading.no-rep.words'),
-        AsyncStorageService.read('progress.reading.no-rep.sentences'),
-        AsyncStorageService.read('routines.reading.no-rep.words'),
-        AsyncStorageService.read('routines.reading.no-rep.sentences'),
+        HybridStorageService.readBookProgress('progress.books'),
+        HybridStorageService.readDailyPlan('progress.books.daily-plan'),
+        HybridStorageService.readBookTrackSessions('progress.books.track'),
+        HybridStorageService.readNoRepWords('progress.reading.no-rep.words'),
+        HybridStorageService.readNoRepSentences('progress.reading.no-rep.sentences'),
+        HybridStorageService.readNoRepWordCompletions('routines.reading.no-rep.words'),
+        HybridStorageService.readNoRepSentenceCompletions('routines.reading.no-rep.sentences'),
+        HybridStorageService.readDrawingPresentations('progress.drawings.presentations'),
+        HybridStorageService.getUseCloudData(),
         AsyncStorage.getAllKeys()
       ]);
 
@@ -86,6 +95,7 @@ export default function ViewStorageScreen() {
         bookStore: {
           bookProgress: bookProgress || null,
           dailyPlan: dailyPlan || null,
+          trackSessions: trackSessions || null,
         },
         noRepStore: {
           displayedWords: noRepWords || [],
@@ -95,7 +105,9 @@ export default function ViewStorageScreen() {
           wordTimestamps: routineWords || [],
           sentenceTimestamps: routineSentences || [],
         },
-        allKeys: allKeys || []
+        drawingPresentations: drawingPresentations || [],
+        allKeys: allKeys || [],
+        isCloudEnabled: isCloudEnabled
       });
     } catch (error) {
       console.error('Error loading storage data:', error);
@@ -338,6 +350,37 @@ export default function ViewStorageScreen() {
     );
   };
 
+  const renderDrawingPresentations = () => {
+    const presentations = data?.drawingPresentations || [];
+    
+    if (presentations.length === 0) {
+      return <ThemedText style={styles.emptyText}>Brak wyświetlonych zestawów rysunków</ThemedText>;
+    }
+
+    return (
+      <View>
+        <View style={styles.statsGrid}>
+          <View style={styles.statBox}>
+            <ThemedText style={styles.statNumber}>{presentations.length}</ThemedText>
+            <ThemedText style={styles.statLabel}>Wyświetlonych zestawów</ThemedText>
+          </View>
+        </View>
+        
+        <View style={styles.recentItems}>
+          <ThemedText style={styles.recentTitle}>Ostatnio wyświetlone zestawy:</ThemedText>
+          <View style={styles.itemsList}>
+            {presentations.slice(-10).reverse().map((presentation, index) => (
+              <View key={index} style={styles.dataRow}>
+                <ThemedText style={styles.listItem}>• {presentation.setTitle}</ThemedText>
+                <ThemedText style={styles.dataValue}>{formatDate(presentation.timestamp)}</ThemedText>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <ThemedView style={[styles.container, { marginBottom: tabBarHeight }]}>
       <ScrollView
@@ -347,6 +390,15 @@ export default function ViewStorageScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        {/* Cloud Status Indicator */}
+        <View style={styles.cloudStatusContainer}>
+          <View style={[styles.cloudStatusBadge, data?.isCloudEnabled ? styles.cloudEnabledBadge : styles.localStorageBadge]}>
+            <ThemedText style={styles.cloudStatusText}>
+              {data?.isCloudEnabled ? '☁️ Dane z chmury' : '📱 Dane lokalne'}
+            </ThemedText>
+          </View>
+        </View>
+
         <InfoCard title={t('settings.viewStorage.bookProgressTitle')}>
           {renderBookProgress()}
         </InfoCard>
@@ -363,10 +415,19 @@ export default function ViewStorageScreen() {
           {renderRoutines()}
         </InfoCard>
 
+        <InfoCard title="Rysunki">
+          {renderDrawingPresentations()}
+        </InfoCard>
+
         <InfoCard title={t('settings.viewStorage.storageInfo')}>
           <DataRow 
             label={t('settings.viewStorage.totalKeys')} 
             value={data?.allKeys.length || 0}
+          />
+          <DataRow 
+            label="Źródło danych" 
+            value={data?.isCloudEnabled ? 'Chmura' : 'Lokalne'}
+            valueStyle={data?.isCloudEnabled ? styles.activeText : undefined}
           />
         </InfoCard>
       </ScrollView>
@@ -555,5 +616,28 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     paddingLeft: 8,
     marginTop: 2,
+  },
+  cloudStatusContainer: {
+    alignItems: 'center',
+    marginVertical: 12,
+  },
+  cloudStatusBadge: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  cloudEnabledBadge: {
+    backgroundColor: '#E3F2FD',
+    borderColor: '#2196F3',
+  },
+  localStorageBadge: {
+    backgroundColor: '#F5F5F5',
+    borderColor: '#9E9E9E',
+  },
+  cloudStatusText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#000',
   },
 });

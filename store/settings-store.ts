@@ -20,6 +20,7 @@ interface SettingsState {
   drawings: {
     showCaptions: boolean;
     interval: number;
+    randomOrder: boolean;
   };
   useCloudData: boolean;
   
@@ -30,6 +31,7 @@ interface SettingsState {
   updateReadingBooksAllowAll: (value: boolean) => void;
   updateDrawingsShowCaptions: (value: boolean) => void;
   updateDrawingsInterval: (value: number) => void;
+  updateDrawingsRandomOrder: (value: boolean) => void;
   updateUseCloudData: (value: boolean) => void;
   hydrate: () => Promise<void>;
 }
@@ -51,6 +53,7 @@ const defaultSettings = {
   drawings: {
     showCaptions: true,
     interval: 1500,
+    randomOrder: false,
   },
   useCloudData: false,
 };
@@ -182,6 +185,23 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         drawings: {
           ...state.drawings,
           interval: value
+        }
+      };
+      HybridStorageService.writeSettings(STORAGE_KEY, {
+        reading: newState.reading,
+        drawings: newState.drawings
+      });
+      return newState;
+    });
+  },
+  
+  updateDrawingsRandomOrder: (value: boolean) => {
+    set((state) => {
+      const newState = {
+        ...state,
+        drawings: {
+          ...state.drawings,
+          randomOrder: value
         }
       };
       HybridStorageService.writeSettings(STORAGE_KEY, {

@@ -22,7 +22,6 @@ export default function BooksListScreen() {
   const renderBook = ({ item, index }: { item: Book; index: number }) => {
     const progress = bookProgress.find(p => p.bookId === item.book.title);
     const isCompleted = progress?.isCompleted ?? false;
-    console.log('isCompleted', isCompleted);
     const allowAllBooks = settings.reading.books.allowAllBooks;
     const isAccessible = allowAllBooks || isCompleted;
     

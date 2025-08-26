@@ -103,6 +103,7 @@ export default function DrawingsSettingsScreen() {
     drawings,
     updateDrawingsShowCaptions,
     updateDrawingsInterval,
+    updateDrawingsRandomOrder,
     hydrate
   } = useSettingsStore();
 
@@ -124,6 +125,15 @@ export default function DrawingsSettingsScreen() {
               description={t('settings.drawings.showCaptionsDescription')}
               value={drawings.showCaptions}
               onValueChange={updateDrawingsShowCaptions}
+            />
+            
+            <View style={styles.separator} />
+            
+            <SwitchSetting
+              label={t('settings.drawings.randomOrder')}
+              description={t('settings.drawings.randomOrderDescription')}
+              value={drawings.randomOrder}
+              onValueChange={updateDrawingsRandomOrder}
             />
             
             <View style={styles.separator} />

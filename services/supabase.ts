@@ -48,6 +48,7 @@ export class SupabaseService {
         drawings: {
           showCaptions: settings.drawings_show_captions,
           interval: settings.drawings_interval,
+          randomOrder: settings.drawings_random_order,
         }
       };
     }
@@ -71,6 +72,7 @@ export class SupabaseService {
       drawings: {
         showCaptions: settings.drawings_show_captions,
         interval: settings.drawings_interval,
+        randomOrder: settings.drawings_random_order,
       }
     };
   }
@@ -86,6 +88,7 @@ export class SupabaseService {
         reading_allow_all_books: settings.reading.books.allowAllBooks,
         drawings_show_captions: settings.drawings.showCaptions,
         drawings_interval: settings.drawings.interval,
+        drawings_random_order: settings.drawings.randomOrder,
       })
       .eq('id', 1);
     

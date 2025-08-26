@@ -22,6 +22,7 @@ export default function DrawingDisplayScreen() {
   const settings = useSettingsStore();
   
   const [currentImageIndex, setCurrentImageIndex] = useState(-1);
+  const [imageOrder, setImageOrder] = useState<number[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasMarkedRef = useRef(false);
   
@@ -41,6 +42,25 @@ export default function DrawingDisplayScreen() {
       drawingsStore.markSetPresented(imageSet.title);
     }
   }, [imageSet, drawingsStore]);
+
+  useEffect(() => {
+    if (!imageSet) {
+      return;
+    }
+    
+    const indices = Array.from({ length: imageSet.images.length }, (_, i) => i);
+    
+    if (settings.drawings.randomOrder) {
+      const shuffled = [...indices];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      setImageOrder(shuffled);
+    } else {
+      setImageOrder(indices);
+    }
+  }, [imageSet, settings.drawings.randomOrder]);
 
   const fadeTransition = (callback: () => void) => {
     'worklet';
@@ -69,19 +89,19 @@ export default function DrawingDisplayScreen() {
   }, [imageSet, settings.drawings.interval]);
 
   useEffect(() => {
-    if (!imageSet) {
+    if (!imageSet || imageOrder.length === 0) {
       return;
     }
 
-    if (currentImageIndex >= imageSet.images.length) {
+    if (currentImageIndex >= imageOrder.length) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
       router.back();
     }
-  }, [currentImageIndex]);
+  }, [currentImageIndex, imageOrder]);
   
-  if (!imageSet || currentImageIndex >= imageSet.images.length) {
+  if (!imageSet || imageOrder.length === 0 || currentImageIndex >= imageOrder.length) {
     return null;
   }
   
@@ -97,7 +117,7 @@ export default function DrawingDisplayScreen() {
     );
   }
   
-  const currentImage = imageSet.images[currentImageIndex];
+  const currentImage = imageSet.images[imageOrder[currentImageIndex]];
   
   return (
     <Pressable onPress={handlePress} style={styles.container}>
