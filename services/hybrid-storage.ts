@@ -62,7 +62,8 @@ export class HybridStorageService {
     if (this.useCloudData) {
       try {
         const cloudData = await SupabaseService.getBookProgress();
-        if (cloudData && cloudData.length > 0) {
+        // Use cloud data even if empty - empty is a valid state
+        if (cloudData !== null && cloudData !== undefined) {
           return cloudData;
         }
       } catch (error) {
@@ -122,7 +123,8 @@ export class HybridStorageService {
     if (this.useCloudData) {
       try {
         const cloudData = await SupabaseService.getBookTrackSessions();
-        if (cloudData && cloudData.length > 0) {
+        // Use cloud data even if empty - empty is a valid state
+        if (cloudData !== null && cloudData !== undefined) {
           return cloudData;
         }
       } catch (error) {
@@ -152,7 +154,8 @@ export class HybridStorageService {
     if (this.useCloudData) {
       try {
         const cloudData = await SupabaseService.getNoRepProgress('words');
-        if (cloudData && cloudData.length > 0) {
+        // Use cloud data even if empty - empty is a valid state
+        if (cloudData !== null && cloudData !== undefined) {
           return cloudData;
         }
       } catch (error) {
@@ -182,7 +185,8 @@ export class HybridStorageService {
     if (this.useCloudData) {
       try {
         const cloudData = await SupabaseService.getNoRepProgress('sentences');
-        if (cloudData && cloudData.length > 0) {
+        // Use cloud data even if empty - empty is a valid state
+        if (cloudData !== null && cloudData !== undefined) {
           return cloudData;
         }
       } catch (error) {
@@ -212,7 +216,8 @@ export class HybridStorageService {
     if (this.useCloudData) {
       try {
         const cloudData = await SupabaseService.getNoRepCompletions('words');
-        if (cloudData && cloudData.length > 0) {
+        // Use cloud data even if empty - empty is a valid state
+        if (cloudData !== null && cloudData !== undefined) {
           return cloudData;
         }
       } catch (error) {
@@ -242,7 +247,8 @@ export class HybridStorageService {
     if (this.useCloudData) {
       try {
         const cloudData = await SupabaseService.getNoRepCompletions('sentences');
-        if (cloudData && cloudData.length > 0) {
+        // Use cloud data even if empty - empty is a valid state
+        if (cloudData !== null && cloudData !== undefined) {
           return cloudData;
         }
       } catch (error) {
@@ -272,7 +278,8 @@ export class HybridStorageService {
     if (this.useCloudData) {
       try {
         const cloudData = await SupabaseService.getDrawingPresentations();
-        if (cloudData && cloudData.length > 0) {
+        // Use cloud data even if empty - empty is a valid state
+        if (cloudData !== null && cloudData !== undefined) {
           return cloudData;
         }
       } catch (error) {

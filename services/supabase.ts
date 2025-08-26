@@ -12,31 +12,65 @@ export class SupabaseService {
     const { data, error } = await supabase
       .from('settings')
       .select('*')
-      .eq('id', 1)
-      .single();
+      .eq('id', 1);
     
     if (error) {
       console.error('Error fetching settings from Supabase:', error);
       return null;
     }
     
+    if (!data || data.length === 0) {
+      // Settings not found, create default settings
+      const { data: newSettings, error: insertError } = await supabase
+        .from('settings')
+        .insert({ id: 1 })
+        .select();
+      
+      if (insertError || !newSettings || newSettings.length === 0) {
+        return null;
+      }
+      
+      const settings = newSettings[0];
+      return {
+        reading: {
+          noRep: {
+            words: settings.reading_no_rep_words,
+            sentences: settings.reading_no_rep_sentences,
+          },
+          interval: {
+            words: settings.reading_interval_words,
+            sentences: settings.reading_interval_sentences,
+          },
+          books: {
+            allowAllBooks: settings.reading_allow_all_books,
+          }
+        },
+        drawings: {
+          showCaptions: settings.drawings_show_captions,
+          interval: settings.drawings_interval,
+        }
+      };
+    }
+    
+    const settings = data[0];
+    
     return {
       reading: {
         noRep: {
-          words: data.reading_no_rep_words,
-          sentences: data.reading_no_rep_sentences,
+          words: settings.reading_no_rep_words,
+          sentences: settings.reading_no_rep_sentences,
         },
         interval: {
-          words: data.reading_interval_words,
-          sentences: data.reading_interval_sentences,
+          words: settings.reading_interval_words,
+          sentences: settings.reading_interval_sentences,
         },
         books: {
-          allowAllBooks: data.reading_allow_all_books,
+          allowAllBooks: settings.reading_allow_all_books,
         }
       },
       drawings: {
-        showCaptions: data.drawings_show_captions,
-        interval: data.drawings_interval,
+        showCaptions: settings.drawings_show_captions,
+        interval: settings.drawings_interval,
       }
     };
   }
@@ -104,27 +138,31 @@ export class SupabaseService {
       .from('daily_plans')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
     
     if (error) {
       console.error('Error fetching daily plan from Supabase:', error);
       return null;
     }
     
-    if (!data || !isToday(new Date(data.created_at))) {
+    if (!data || data.length === 0) {
+      return null;
+    }
+    
+    const plan = data[0];
+    if (!isToday(new Date(plan.created_at))) {
       return null;
     }
     
     return {
-      timestamp: new Date(data.created_at).getTime(),
-      bookId: data.book_id,
-      selectedWordTripleIndex: data.selected_word_triple_index,
-      selectedSentenceTripleIndex: data.selected_sentence_triple_index,
+      timestamp: new Date(plan.created_at).getTime(),
+      bookId: plan.book_id,
+      selectedWordTripleIndex: plan.selected_word_triple_index,
+      selectedSentenceTripleIndex: plan.selected_sentence_triple_index,
       sessions: {
-        session1: data.session1_content,
-        session2: data.session2_content,
-        session3: data.session3_content,
+        session1: plan.session1_content,
+        session2: plan.session2_content,
+        session3: plan.session3_content,
       },
     };
   }
@@ -193,15 +231,28 @@ export class SupabaseService {
     const { data, error } = await supabase
       .from('no_rep_progress')
       .select('*')
-      .eq('id', id)
-      .single();
+      .eq('id', id);
     
     if (error) {
       console.error('Error fetching no-rep progress from Supabase:', error);
       return [];
     }
     
-    return data?.displayed_items || [];
+    if (!data || data.length === 0) {
+      // Create the row if it doesn't exist
+      const { data: newProgress, error: insertError } = await supabase
+        .from('no_rep_progress')
+        .insert({ id, content_type: contentType, displayed_items: [] })
+        .select();
+      
+      if (insertError || !newProgress || newProgress.length === 0) {
+        return [];
+      }
+      
+      return newProgress[0].displayed_items || [];
+    }
+    
+    return data[0]?.displayed_items || [];
   }
   
   static async updateNoRepProgress(contentType: 'words' | 'sentences', items: string[]) {
