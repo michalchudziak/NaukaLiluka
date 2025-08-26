@@ -2,6 +2,8 @@ You are the child reading teaching expert.
 
 You are tasked with creating the content for books for learning reading.
 
+Carefully consider all the rules, after preparing the response make sure that it's compliant with all the rules. Keep iterating after all rules are met.
+
 Each book consists of words, sentences and book.
 
 All the words, sentences and books should be in polish.
@@ -12,7 +14,7 @@ Rules for creating books:
 - To construct a book can use the words from previous books + up to 9 new words.
 - The story should follow some theme. I will provide the theme for the next book later in this prompt.
 - The complexity of the book, including number of sentences per book page will be defined later in this prompt.
-- You can skip images in the book for now.
+- Every sentence in book should be Polish sentence respecting Polish grammar.
 
 All the words used in the book should be included in the "words" section. 
 
@@ -37,7 +39,8 @@ Rules for creating sentences:
         ["Kto ma psa?", "Karol ma psa.", "Karolcia ma psa."],
         ["Kto chce psa?", "Karol chce kota.", "Karolcia ma pięknego kota."],
         ["Kto ma buty?", "Karolcia ma psa.", "On chce lody."]
-- Sentences need to be unique form sentences used in the current book. Repetitions are not allowed
+- Sentences need to be unique form sentences used in the current book. Repetitions are not allowed. This means that if sentence is used in book.pages.sentences it cant be included in this sentence pool.
+- Every sentence should be Polish sentence respecting Polish grammar.
 
 Response shape example:
 ```ts
@@ -51,31 +54,26 @@ const rodzina: Book = {
                 sentences: [
                     "To jest Karol."
                 ],
-                image: require('./karol.jpg')
             },
             {
                 sentences: [
                     "To jest Karolcia."
                 ],
-                image: require('./karolcia.jpg')
             },
             {
                 sentences: [
                     "To jest mama."
                 ],
-                image: require('./mama.jpg')
             },
             {
                 sentences: [
                     "To jest tata."
                 ],
-                image: require('./tata.jpg')
             },
             {
                 sentences: [
                     "To jest Lora."
                 ],
-                image: require('./lora.jpg')
             }
         ]
     },
@@ -97,8 +95,29 @@ export default rodzina;
 BOOK INFO:
 Complexity: simple
 Number of sentences per page in book: 1
-Theme: Dom
+Theme: Zakupy
 Words known from previous books:
 ["brudna", "jest", "Karol"],
 ["Lora", "mama", "Gdzie"],
-["To", "tata", "Karolcia"]
+["To", "tata", "Karolcia"],
+["w", "domu", "siedzi"],
+["na", "kanapie", "gotuje"],
+["obiad", "czyta", "książkę"],
+["ogród", "idzie", "do"],
+["ogrodu", "rosną", "kwiaty"],
+["podlewa", "kosi", "trawę"],
+["lasu", "lesie", "drzewa"],
+["widzi", "słyszy", "ptaki"],
+["zbiera", "grzyby", "piękny"],
+["Są", "wakacje", "jedzie"],
+["nad", "morze", "pakuje"],
+["walizkę", "Mama", "Tata"],
+["zoo", "zwierzęta", "też"],
+["małpę", "banana", "je"],
+["słonia", "lwa", "widać"],
+["dziadków", "Babcia", "Dziadek"],
+["stole", "zupa", "Wszyscy"],
+["pyszna", "szczęśliwa", "Był"],
+["sklepu", "Kupują", "chleb"],
+["mleko", "Płacą", "kartą"],
+["tanio", "drogo", "razem"]

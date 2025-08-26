@@ -5,7 +5,7 @@ import { useDrawingsStore } from '@/store/drawings-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Dimensions, Image, Pressable, StyleSheet } from 'react-native';
+import { Image, Pressable, StyleSheet } from 'react-native';
 
 export default function DrawingDisplayScreen() {
   const { setId } = useLocalSearchParams<{ setId: string }>();
@@ -18,8 +18,6 @@ export default function DrawingDisplayScreen() {
   const hasMarkedRef = useRef(false);
   
   const imageSet = drawingSets.find(set => set.title === setId);
-  const { width } = Dimensions.get('window');
-  const imageWidth = width * 0.9;
   
   // Handle invalid image set
   useEffect(() => {
@@ -90,7 +88,7 @@ export default function DrawingDisplayScreen() {
       <ThemedView style={styles.content}>
         <Image
           source={currentImage.image}
-          style={[styles.image, { width: imageWidth }]}
+          style={styles.image}
           resizeMode="contain"
         />
         {settings.drawings.showCaptions && (
@@ -117,6 +115,7 @@ const styles = StyleSheet.create({
   },
   image: {
     maxHeight: '70%',
+    maxWidth: '90%',
   },
   captionContainer: {
     marginTop: 20,
