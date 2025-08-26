@@ -4,6 +4,7 @@ import { books } from '@/content/books';
 import { useBookStore } from '@/store/book-store';
 import { useSettingsStore } from '@/store/settings-store';
 import { Book } from '@/types/book';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { FlatList, StyleSheet } from 'react-native';
@@ -12,6 +13,7 @@ export default function BooksListScreen() {
   const router = useRouter();
   const { bookProgress } = useBookStore();
   const settings = useSettingsStore();
+  const bottomTabBarHeight = useBottomTabBarHeight();
   
   const handleBookPress = (bookIndex: number) => {
     router.push(`/book-display?bookIndex=${bookIndex}`);
@@ -35,7 +37,7 @@ export default function BooksListScreen() {
   };
   
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={[styles.container, { paddingBottom: bottomTabBarHeight }]}>
       <FlatList
         data={books}
         renderItem={renderBook}

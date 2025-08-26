@@ -4,6 +4,14 @@ import { useSettingsStore } from '@/store/settings-store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated';
+
+const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
 export default function DisplayScreen() {
   const params = useLocalSearchParams();
@@ -11,6 +19,14 @@ export default function DisplayScreen() {
   const settings = useSettingsStore();
   const [currentIndex, setCurrentIndex] = useState(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  
+  const opacity = useSharedValue(1);
+  
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
   
 
   const parsedItems = useMemo(() => JSON.parse(params.items as string) as string[], [params.items]);
@@ -20,11 +36,21 @@ export default function DisplayScreen() {
     return Math.max(...parsedItems.map(item => item.length), 0);
   }, [parsedItems]);
 
+  const fadeTransition = (callback: () => void) => {
+    'worklet';
+    opacity.value = withTiming(0, { duration: 100 }, () => {
+      runOnJS(callback)();
+      opacity.value = withTiming(1, { duration: 100 });
+    });
+  };
+
   useEffect(() => {
     if (parsedItems.length === 0) return;
 
     intervalRef.current = setInterval(() => {
-      setCurrentIndex((prevIndex) =>  prevIndex + 1);
+      fadeTransition(() => {
+        setCurrentIndex((prevIndex) =>  prevIndex + 1);
+      });
     }, settings.reading.interval[params.type as 'words' | 'sentences']);
 
     return () => {
@@ -44,17 +70,17 @@ export default function DisplayScreen() {
   }, [currentIndex]);
 
   if (parsedItems.length === 0) {
-    return <ThemedView style={styles.container} />;
+    return <AnimatedThemedView style={[styles.container, animatedStyle]} />;
   }
 
   return (
-    <ThemedView style={styles.container}>
+    <AnimatedThemedView style={[styles.container, animatedStyle]}>
       {currentIndex >= 0 && currentIndex < parsedItems.length && (
         <AutoSizeText color={color} maxLength={maxTextLength}>
           {parsedItems[currentIndex]}
         </AutoSizeText>
       )}
-    </ThemedView>
+    </AnimatedThemedView>
   );
 }
 

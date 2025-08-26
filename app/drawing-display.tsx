@@ -6,6 +6,14 @@ import { useSettingsStore } from '@/store/settings-store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Image, Pressable, StyleSheet } from 'react-native';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated';
+
+const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
 export default function DrawingDisplayScreen() {
   const { setId } = useLocalSearchParams<{ setId: string }>();
@@ -17,17 +25,15 @@ export default function DrawingDisplayScreen() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasMarkedRef = useRef(false);
   
-  const imageSet = drawingSets.find(set => set.title === setId);
+  const opacity = useSharedValue(1);
   
-  // Handle invalid image set
-  useEffect(() => {
-    if (!imageSet) {
-      const timer = setTimeout(() => {
-        router.back();
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [imageSet, router]);
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
+  
+  const imageSet = drawingSets.find(set => set.title === setId);
 
   useEffect(() => {
     if (imageSet && !hasMarkedRef.current) {
@@ -36,13 +42,23 @@ export default function DrawingDisplayScreen() {
     }
   }, [imageSet, drawingsStore]);
 
+  const fadeTransition = (callback: () => void) => {
+    'worklet';
+    opacity.value = withTiming(0, { duration: 100 }, () => {
+      runOnJS(callback)();
+      opacity.value = withTiming(1, { duration: 100 });
+    });
+  };
+
   useEffect(() => {
     if (!imageSet) {
       return;
     }
     
     intervalRef.current = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => prevIndex + 1);
+      fadeTransition(() => {
+        setCurrentImageIndex((prevIndex) => prevIndex + 1);
+      });
     }, settings.drawings.interval);
     
     return () => {
@@ -76,7 +92,7 @@ export default function DrawingDisplayScreen() {
   if (currentImageIndex === -1) {
     return (
       <Pressable onPress={handlePress} style={styles.container}>
-        <ThemedView style={styles.content} />
+        <AnimatedThemedView style={[styles.content, animatedStyle]} />
       </Pressable>
     );
   }
@@ -85,7 +101,7 @@ export default function DrawingDisplayScreen() {
   
   return (
     <Pressable onPress={handlePress} style={styles.container}>
-      <ThemedView style={styles.content}>
+      <AnimatedThemedView style={[styles.content, animatedStyle]}>
         <Image
           source={currentImage.image}
           style={styles.image}
@@ -98,7 +114,7 @@ export default function DrawingDisplayScreen() {
             </AutoSizeText>
           </ThemedView>
         )}
-      </ThemedView>
+      </AnimatedThemedView>
     </Pressable>
   );
 }

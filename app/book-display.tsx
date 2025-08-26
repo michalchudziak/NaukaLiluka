@@ -4,6 +4,14 @@ import { books } from '@/content/books';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet } from 'react-native';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
+} from 'react-native-reanimated';
+
+const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
 type DisplayState = 'title' | 'sentences' | 'image';
 
@@ -14,6 +22,22 @@ export default function BookDisplayScreen() {
   const [currentPageIndex, setCurrentPageIndex] = useState(-1); // -1 for title
   const [displayState, setDisplayState] = useState<DisplayState>('title');
   
+  const opacity = useSharedValue(1);
+  
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+    };
+  });
+  
+  const fadeTransition = (callback: () => void) => {
+    'worklet';
+    opacity.value = withTiming(0, { duration: 100 }, () => {
+      runOnJS(callback)();
+      opacity.value = withTiming(1, { duration: 100 });
+    });
+  };
+  
   const book = books[parseInt(bookIndex || '0')];
   if (!book) {
     router.back();
@@ -21,24 +45,26 @@ export default function BookDisplayScreen() {
   }
   
   const handlePress = () => {
-    if (displayState === 'title') {
-      // Move from title to first page sentences
-      setCurrentPageIndex(0);
-      setDisplayState('sentences');
-    } else if (displayState === 'sentences') {
-      // Move from sentences to image
-      setDisplayState('image');
-    } else if (displayState === 'image') {
-      // Move to next page or finish
-      const nextPageIndex = currentPageIndex + 1;
-      if (nextPageIndex < book.book.pages.length) {
-        setCurrentPageIndex(nextPageIndex);
+    fadeTransition(() => {
+      if (displayState === 'title') {
+        // Move from title to first page sentences
+        setCurrentPageIndex(0);
         setDisplayState('sentences');
-      } else {
-        // All pages shown, navigate back
-        router.back();
+      } else if (displayState === 'sentences') {
+        // Move from sentences to image
+        setDisplayState('image');
+      } else if (displayState === 'image') {
+        // Move to next page or finish
+        const nextPageIndex = currentPageIndex + 1;
+        if (nextPageIndex < book.book.pages.length) {
+          setCurrentPageIndex(nextPageIndex);
+          setDisplayState('sentences');
+        } else {
+          // All pages shown, navigate back
+          router.back();
+        }
       }
-    }
+    });
   };
 
   
@@ -87,9 +113,9 @@ export default function BookDisplayScreen() {
   
   return (
     <Pressable style={styles.container} onPress={handlePress}>
-      <ThemedView style={styles.content}>
+      <AnimatedThemedView style={[styles.content, animatedStyle]}>
         {renderContent()}
-      </ThemedView>
+      </AnimatedThemedView>
     </Pressable>
   );
 }
