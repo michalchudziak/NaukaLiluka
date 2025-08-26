@@ -4,11 +4,10 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
 import { useDrawingsStore } from '@/store/drawings-store';
 import { useNoRepStore } from '@/store/no-rep-store';
-import { widgetService } from '@/services/widgetService';
 import { isToday } from 'date-fns';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Platform } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 
 export default function MyDayScreen() {
   const { t } = useTranslation();
@@ -24,11 +23,6 @@ export default function MyDayScreen() {
   const [isDrawingsCompleted, setIsDrawingsCompleted] = useState(false);
 
   useEffect(() => {
-    // Initialize widget service on mount
-    if (Platform.OS === 'ios') {
-      widgetService.initialize();
-    }
-
     const checkCompletions = async () => {
       const routine1 = isNoRepPathCompletedToday();
       setIsNoRepCompleted(routine1);
@@ -66,52 +60,6 @@ export default function MyDayScreen() {
 
       const routine5 = drawingsStore.getTodayPresentationCount() > 0;
       setIsDrawingsCompleted(routine5);
-
-      // Update widget on iOS
-      if (Platform.OS === 'ios') {
-        try {
-          // Update each routine state in the widget
-          const currentState = await widgetService.getRoutineState();
-          
-          if (currentState.routine1 !== routine1) {
-            if (routine1) {
-              await widgetService.completeRoutine(1);
-            } else {
-              await widgetService.resetRoutine(1);
-            }
-          }
-          if (currentState.routine2 !== routine2) {
-            if (routine2) {
-              await widgetService.completeRoutine(2);
-            } else {
-              await widgetService.resetRoutine(2);
-            }
-          }
-          if (currentState.routine3 !== routine3) {
-            if (routine3) {
-              await widgetService.completeRoutine(3);
-            } else {
-              await widgetService.resetRoutine(3);
-            }
-          }
-          if (currentState.routine4 !== routine4) {
-            if (routine4) {
-              await widgetService.completeRoutine(4);
-            } else {
-              await widgetService.resetRoutine(4);
-            }
-          }
-          if (currentState.routine5 !== routine5) {
-            if (routine5) {
-              await widgetService.completeRoutine(5);
-            } else {
-              await widgetService.resetRoutine(5);
-            }
-          }
-        } catch (error) {
-          console.error('Failed to update widget:', error);
-        }
-      }
     };
 
     checkCompletions();

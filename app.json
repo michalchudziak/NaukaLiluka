@@ -10,11 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.michalchudziak.NaukaLiluka",
-      "deploymentTarget": "17.0",
-      "entitlements": {
-        "com.apple.security.application-groups": ["group.com.michalchudziak.NaukaLiluka"]
-      }
+      "bundleIdentifier": "com.michalchudziak.NaukaLiluka"
     },
     "android": {
       "adaptiveIcon": {
@@ -38,13 +34,6 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#d303fc"
-        }
-      ],
-      [
-        "react-native-widget-extension",
-        {
-          "widgetsFolder": "NaukaLilukaWidget",
-          "deploymentTarget": "17.0"
         }
       ]
     ],

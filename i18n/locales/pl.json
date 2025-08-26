@@ -88,10 +88,6 @@
     "developer": {
       "sectionTitle": "Programista"
     },
-    "widget": {
-      "title": "Demo Widget iOS",
-      "subtitle": "Testuj widgety Live Activities"
-    },
     "cloudData": {
       "menuTitle": "Dane w chmurze",
       "menuSubtitle": "Synchronizuj dane z bazą danych",
