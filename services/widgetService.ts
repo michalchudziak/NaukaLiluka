@@ -1,5 +1,5 @@
-import { NativeModules, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NativeModules, Platform } from 'react-native';
 import { supabase } from './supabase';
 
 const WidgetModule = NativeModules.ReactNativeWidgetExtension;
@@ -56,36 +56,7 @@ class WidgetService {
 
   private async rehydrateFromSupabase() {
     try {
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Get user ID from AsyncStorage
-      const userId = await AsyncStorage.getItem('userId');
-      if (!userId) return;
-
-      // Fetch today's routine completions from Supabase
-      const { data, error } = await supabase
-        .from('routine_completions')
-        .select('routine_number, completed')
-        .eq('user_id', userId)
-        .eq('date', today);
-
-      if (error) {
-        console.error('Failed to fetch routine data from Supabase:', error);
-        return;
-      }
-
-      if (data) {
-        const newState = { ...this.routineState };
-        data.forEach((item) => {
-          const key = `routine${item.routine_number}` as keyof RoutineState;
-          if (key in newState && typeof newState[key] === 'boolean') {
-            (newState as any)[key] = item.completed;
-          }
-        });
-        
-        this.routineState = newState;
-        await this.updateWidget();
-      }
+      return;
     } catch (error) {
       console.error('Failed to rehydrate from Supabase:', error);
     }

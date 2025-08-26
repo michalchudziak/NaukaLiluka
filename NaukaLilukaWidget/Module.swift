@@ -14,7 +14,7 @@ public class ReactNativeWidgetExtensionModule: Module {
             WidgetCenter.shared.reloadTimelines(ofKind: kind)
         }
         
-        Function("updateRoutineState") { (routine1: Bool, routine2: Bool, routine3: Bool, routine4: Bool, routine5: Bool) in
+        Function("updateRoutineState") { (routine1: Bool, routine2: Bool, routine3: Bool, routine4: Bool, routine5: Bool) -> Bool in
             let data = RoutineData(
                 routine1: routine1,
                 routine2: routine2,
@@ -27,16 +27,54 @@ public class ReactNativeWidgetExtensionModule: Module {
             // Save to shared UserDefaults
             guard let userDefaults = UserDefaults(suiteName: "group.com.michalchudziak.NaukaLiluka") else {
                 print("Failed to access app group")
-                return
+                return false
             }
             
-            if let encoded = try? JSONEncoder().encode(data) {
+            do {
+                let encoded = try JSONEncoder().encode(data)
                 userDefaults.set(encoded, forKey: "routineData")
-                userDefaults.synchronize()
                 
-                // Reload widget to show new data
-                WidgetCenter.shared.reloadTimelines(ofKind: "RoutineWidget")
+                // Force synchronization (though deprecated, ensures immediate write)
+                let success = userDefaults.synchronize()
+                print("UserDefaults synchronize: \(success)")
+                
+                // Add a small delay to ensure UserDefaults is written before widget reload
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    // Reload all timelines to ensure widget updates
+                    WidgetCenter.shared.reloadAllTimelines()
+                    print("Widget timelines reloaded")
+                }
+                
+                return true
+            } catch {
+                print("Failed to encode routine data: \(error)")
+                return false
             }
+        }
+        
+        Function("forceRefreshWidget") { () -> [String: Any] in
+            guard let userDefaults = UserDefaults(suiteName: "group.com.michalchudziak.NaukaLiluka") else {
+                return ["error": "Failed to access app group"]
+            }
+            
+            // Force reload all widget timelines immediately
+            WidgetCenter.shared.reloadAllTimelines()
+            
+            // Read current data to verify
+            guard let data = userDefaults.data(forKey: "routineData"),
+                  let routineData = try? JSONDecoder().decode(RoutineData.self, from: data) else {
+                return ["error": "No data found in UserDefaults"]
+            }
+            
+            return [
+                "routine1": routineData.routine1,
+                "routine2": routineData.routine2,
+                "routine3": routineData.routine3,
+                "routine4": routineData.routine4,
+                "routine5": routineData.routine5,
+                "lastUpdated": routineData.lastUpdated.timeIntervalSince1970,
+                "message": "Widget refreshed successfully"
+            ]
         }
         
         Function("getRoutineState") { () -> [String: Any] in

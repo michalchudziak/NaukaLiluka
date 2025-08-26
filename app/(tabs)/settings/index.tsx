@@ -1,10 +1,11 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTranslation } from '@/hooks/useTranslation';
+import { widgetService } from '@/services/widgetService';
 import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 interface SettingItemProps {
   title: string;
@@ -45,6 +46,85 @@ export default function SettingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
+
+  const handleCompleteAllRoutines = async () => {
+    if (Platform.OS !== 'ios') {
+      Alert.alert('iOS Only', 'Widgets are only available on iOS devices.');
+      return;
+    }
+
+    try {
+      await widgetService.initialize();
+      
+      // Complete all routines
+      await widgetService.completeRoutine(1);
+      await widgetService.completeRoutine(2);
+      await widgetService.completeRoutine(3);
+      await widgetService.completeRoutine(4);
+      await widgetService.completeRoutine(5);
+      
+      Alert.alert('Success', 'All routines have been marked as complete in the widget!');
+    } catch (error) {
+      Alert.alert('Error', `Failed to update widget: ${error}`);
+    }
+  };
+
+  const handleResetAllRoutines = async () => {
+    if (Platform.OS !== 'ios') {
+      Alert.alert('iOS Only', 'Widgets are only available on iOS devices.');
+      return;
+    }
+
+    try {
+      await widgetService.initialize();
+      
+      // Reset all routines
+      await widgetService.resetRoutine(1);
+      await widgetService.resetRoutine(2);
+      await widgetService.resetRoutine(3);
+      await widgetService.resetRoutine(4);
+      await widgetService.resetRoutine(5);
+      
+      Alert.alert('Success', 'All routines have been reset in the widget!');
+    } catch (error) {
+      Alert.alert('Error', `Failed to update widget: ${error}`);
+    }
+  };
+
+  const handleForceRefreshWidget = async () => {
+    if (Platform.OS !== 'ios') {
+      Alert.alert('iOS Only', 'Widgets are only available on iOS devices.');
+      return;
+    }
+
+    try {
+      const NativeModules = require('react-native').NativeModules;
+      console.log('NativeModules', Object.keys(NativeModules));
+      const WidgetModule = NativeModules.ReactNativeWidgetExtension;
+      
+      if (WidgetModule?.forceRefreshWidget) {
+        const result = await WidgetModule.forceRefreshWidget();
+        
+        if (result.error) {
+          Alert.alert('Error', result.error);
+        } else {
+          Alert.alert(
+            'Widget Status',
+            `R1: ${result.routine1 ? '✓' : '○'}\n` +
+            `R2: ${result.routine2 ? '✓' : '○'}\n` +
+            `R3: ${result.routine3 ? '✓' : '○'}\n` +
+            `R4: ${result.routine4 ? '✓' : '○'}\n` +
+            `R5: ${result.routine5 ? '✓' : '○'}\n\n` +
+            `${result.message || 'Widget refreshed'}`
+          );
+        }
+      } else {
+        Alert.alert('Error', 'Widget module not available');
+      }
+    } catch (error) {
+      Alert.alert('Error', `Failed to refresh widget: ${error}`);
+    }
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -96,6 +176,41 @@ export default function SettingsScreen() {
             />
           </View>
         </View>
+
+        {Platform.OS === 'ios' && (
+          <View style={styles.section}>
+            <ThemedText style={styles.sectionTitle}>
+              Widget iOS
+            </ThemedText>
+            
+            <View style={styles.sectionContent}>
+              <SettingItem
+                title="Zaznacz wszystkie rutyny"
+                subtitle="Oznacz wszystkie dzisiejsze rutyny jako ukończone"
+                icon="checkmark-circle-outline"
+                onPress={handleCompleteAllRoutines}
+              />
+              
+              <View style={styles.separator} />
+              
+              <SettingItem
+                title="Wyczyść wszystkie rutyny"
+                subtitle="Resetuj wszystkie dzisiejsze rutyny"
+                icon="close-circle-outline"
+                onPress={handleResetAllRoutines}
+              />
+              
+              <View style={styles.separator} />
+              
+              <SettingItem
+                title="Wymuś odświeżenie widgetu"
+                subtitle="Debugowanie - sprawdź stan i odśwież widget"
+                icon="refresh-outline"
+                onPress={handleForceRefreshWidget}
+              />
+            </View>
+          </View>
+        )}
 
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>
