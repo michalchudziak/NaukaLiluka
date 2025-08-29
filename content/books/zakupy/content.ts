@@ -6,40 +6,45 @@ const zakupy: Book = {
         pages: [
             {
                 sentences: [
-                    "Mama idzie do sklepu razem."
+                    "Mama kupuje chleb."
                 ]
             },
             {
                 sentences: [
-                    "Karolcia też idzie do sklepu."
+                    "Karolcia kupuje słodycze."
                 ]
             },
             {
                 sentences: [
-                    "Wszyscy kupują chleb i mleko."
+                    "Tata kupuje mleko."
                 ]
             },
             {
                 sentences: [
-                    "Chleb jest tanio, mleko jest drogo."
+                    "Karol kupuje napój."
                 ]
             },
             {
                 sentences: [
-                    "Wszyscy razem płacą kartą."
+                    "Wszyscy są w sklepie."
                 ]
-            }
+            },
+            {
+                sentences: [
+                    "Lora jest w domu."
+                ]
+            },
         ]
     },
     words: [
-        ["sklepu", "Kupują", "chleb"],
-        ["mleko", "Płacą", "kartą"],
-        ["tanio", "drogo", "razem"]
+        ["sklepie", "kupuje", "chleb"],
+        ["mleko", "napój", "słodycze"],
+        ["sklep", "i", "razem"]
     ],
     sentences: [
-        ["Tata idzie do sklepu.", "Gdzie jest chleb?", "Karol idzie do sklepu."],
-        ["Gdzie jest mleko?", "Wszyscy kupują mleko.", "Wszyscy płacą."],
-        ["Chleb jest drogo.", "Mleko jest tanio.", "Kupują razem."]
+        ["Tata jest w sklepie.", "Gdzie jest chleb?", "Karol jest w sklepie."],
+        ["Gdzie jest mleko?", "Mama kupuje mleko.", "Tata kupuje słodycze."],
+        ["Wszyscy są razem.", "Mama i Lora są w sklepie.", "Tata i Karol są w sklepie."]
     ]
 };
 

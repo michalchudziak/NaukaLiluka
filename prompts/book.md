@@ -15,6 +15,7 @@ Rules for creating books:
 - The story should follow some theme. I will provide the theme for the next book later in this prompt.
 - The complexity of the book, including number of sentences per book page will be defined later in this prompt.
 - Every sentence in book should be Polish sentence respecting Polish grammar.
+- On the SIMPLE complexity level we should present patterns in books - changing only verb or adjective across the sentence. Only one pattern should be used per book. 
 
 All the words used in the book should be included in the "words" section. 
 
@@ -28,6 +29,7 @@ After choosing the words triplets lets create 3 sentences triplets.
 
 Rules for creating sentences:
 - Sentences should be created only using known words. This means words form other books and new words from the current book.
+- Sentences should have at least 3 words.
 - In the current book sentences, you can only use words from the same or previous triplet, for example:
     From the previous book we know following words:
         ["brudna", "jest", "Karol"],
@@ -93,31 +95,31 @@ export default rodzina;
 ```
 
 BOOK INFO:
-Complexity: simple
+Complexity level: SIMPLE
 Number of sentences per page in book: 1
-Theme: Zakupy
+Theme: Zoo
 Words known from previous books:
 ["brudna", "jest", "Karol"],
 ["Lora", "mama", "Gdzie"],
 ["To", "tata", "Karolcia"],
 ["w", "domu", "siedzi"],
-["na", "kanapie", "gotuje"],
-["obiad", "czyta", "książkę"],
-["ogród", "idzie", "do"],
-["ogrodu", "rosną", "kwiaty"],
-["podlewa", "kosi", "trawę"],
-["lasu", "lesie", "drzewa"],
-["widzi", "słyszy", "ptaki"],
-["zbiera", "grzyby", "piękny"],
-["Są", "wakacje", "jedzie"],
-["nad", "morze", "pakuje"],
-["walizkę", "Mama", "Tata"],
-["zoo", "zwierzęta", "też"],
+["Mama", "kanapie", "pracuje"],
+["Tata", "czyta", "książkę"]
+["podlewa", "kwiaty", "trawę"],
+["drzewo", "krzaki", "warzywa"],
+["ogrodzie", "rosną", "piękne"],
+["idzie", "do", "lasu"],
+["biega", "lesie", "śpiewa"],
+["skacze", "odpoczywa", "wraca"],
+["Wakacje", "są", "długie"],
+["słoneczne", "wesołe", "ciepłe"],
+["spokojne", "udane", "beztroskie"],
+["zoo", "widzi", "też"],
 ["małpę", "banana", "je"],
-["słonia", "lwa", "widać"],
-["dziadków", "Babcia", "Dziadek"],
-["stole", "zupa", "Wszyscy"],
-["pyszna", "szczęśliwa", "Był"],
-["sklepu", "Kupują", "chleb"],
-["mleko", "Płacą", "kartą"],
-["tanio", "drogo", "razem"]
+["słonia", "lwa", "zwierzęta"],
+["dziadków", "Babcia", "obiad"],
+["stole", "zupę", "Dziadek"],
+["pyszna", "szczęśliwa", "Wszyscy"],
+["sklepie", "kupuje", "chleb"],
+["mleko", "napój", "słodycze"],
+["sklep", "i", "razem"]

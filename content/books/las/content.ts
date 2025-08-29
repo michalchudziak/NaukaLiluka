@@ -11,40 +11,40 @@ const las: Book = {
             },
             {
                 sentences: [
-                    "W lesie rosną drzewa."
+                    "Karol biega w lesie."
                 ],
             },
             {
                 sentences: [
-                    "Karolcia widzi ptaki."
+                    "Karol śpiewa w lesie."
                 ],
             },
             {
                 sentences: [
-                    "Tata słyszy ptaki."
+                    "Karol skacze w lesie."
                 ],
             },
             {
                 sentences: [
-                    "Mama zbiera grzyby."
+                    "Karol odpoczywa w lesie."
                 ],
             },
             {
                 sentences: [
-                    "Lora jest w lesie."
+                    "Karol wraca do domu."
                 ],
             }
         ]
     },
     words: [
-        ["lasu", "lesie", "drzewa"],
-        ["widzi", "słyszy", "ptaki"],
-        ["zbiera", "grzyby", "piękny"]
+        ["idzie", "do", "lasu"],
+        ["biega", "lesie", "śpiewa"],
+        ["skacze", "odpoczywa", "wraca"]
     ],
     sentences: [
-        ["Tata idzie do lasu.", "Mama idzie do lasu.", "Lora idzie do lasu."],
-        ["Karol widzi drzewa.", "Lora słyszy ptaki.", "Tata widzi ptaki."],
-        ["Mama zbiera kwiaty.", "Karolcia zbiera grzyby.", "Ogród jest piękny."]
+        ["Karolcia idzie do lasu.", "Tata idzie do domu.", "Mama idzie do domu."],
+        ["Lora biega w lesie.", "Karolcia śpiewa w domu.", "Tata biega w lesie."],
+        ["Karol skacze w domu.", "Mama odpoczywa w domu.", "Lora wraca do domu."]
     ]
 };
 

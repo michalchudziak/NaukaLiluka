@@ -6,60 +6,50 @@ const wakacje: Book = {
         pages: [
             {
                 sentences: [
-                    "Są wakacje!"
+                    "Wakacje są długie."
                 ],
             },
             {
                 sentences: [
-                    "Karol jedzie nad morze."
+                    "Wakacje są słoneczne."
                 ],
             },
             {
                 sentences: [
-                    "Karolcia jedzie nad morze."
+                    "Wakacje są wesołe."
                 ],
             },
             {
                 sentences: [
-                    "Mama pakuje walizkę."
+                    "Wakacje są ciepłe."
                 ],
             },
             {
                 sentences: [
-                    "Tata jedzie."
+                    "Wakacje są spokojne."
                 ],
             },
             {
                 sentences: [
-                    "Lora jedzie."
+                    "Wakacje są udane."
                 ],
             },
             {
                 sentences: [
-                    "To jest morze."
-                ],
-            },
-            {
-                sentences: [
-                    "Karol jest w domu."
-                ],
-            },
-            {
-                sentences: [
-                    "Wakacje są w domu."
+                    "Wakacje są beztroskie."
                 ],
             }
         ]
     },
     words: [
-        ["Są", "wakacje", "jedzie"],
-        ["nad", "morze", "pakuje"],
-        ["walizkę", "Mama", "Tata"]
+        ["Wakacje", "są", "długie"],
+        ["słoneczne", "wesołe", "ciepłe"],
+        ["spokojne", "udane", "beztroskie"]
     ],
     sentences: [
-        ["Karol jedzie.", "Są wakacje.", "Lora jedzie."],
-        ["Tata jedzie nad morze.", "Mama pakuje.", "Karolcia jedzie nad morze."],
-        ["Mama pakuje walizkę.", "Tata jedzie.", "Gdzie jest Mama?"]
+        ["To są piękne warzywa.", "To jest Karol.", "Mama pracuje w domu."],
+        ["To są wesołe warzywa.", "To są słoneczne krzaki.", "To jest ciepłe drzewo."],
+        ["To są spokojne kwiaty.", "To są beztroskie warzywa.", "To jest udane drzewo."]
     ]
 };
 

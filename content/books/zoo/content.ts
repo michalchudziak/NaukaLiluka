@@ -6,60 +6,50 @@ const zoo: Book = {
         pages: [
             {
                 sentences: [
-                    "Karol idzie do zoo."
+                    "Karol widzi małpę."
                 ],
             },
             {
                 sentences: [
-                    "Karolcia też idzie."
+                    "Karolcia widzi słonia."
                 ],
             },
             {
                 sentences: [
-                    "Mama idzie do zoo."
+                    "Karol widzi słonia."
                 ],
             },
             {
                 sentences: [
-                    "Tata też idzie."
+                    "Tata widzi lwa."
                 ],
             },
             {
                 sentences: [
-                    "To jest zoo."
+                    "Tata widzi lwa."
                 ],
             },
             {
                 sentences: [
-                    "Karol widzi zwierzęta."
+                    "Karol widzi małpę."
                 ],
             },
             {
                 sentences: [
-                    "Mama je banana."
+                    "Mama widzi zwierzęta."
                 ],
             },
-            {
-                sentences: [
-                    "Tata widzi słonia."
-                ],
-            },
-            {
-                sentences: [
-                    "Lora widzi lwa."
-                ],
-            }
         ]
     },
     words: [
-        ["zoo", "zwierzęta", "też"],
+        ["zoo", "widzi", "też"],
         ["małpę", "banana", "je"],
-        ["słonia", "lwa", "widać"]
+        ["słonia", "lwa", "zwierzęta"]
     ],
     sentences: [
         ["Lora idzie do zoo.", "Gdzie jest zoo?", "Karolcia widzi zwierzęta."],
         ["Karol je banana.", "Mama widzi małpę.", "Tata je banana."],
-        ["Karolcia widzi słonia.", "Mama widzi lwa.", "Gdzie widać zwierzęta?"]
+        ["Karolcia widzi słonia.", "Mama widzi lwa.", "Gdzie są zwierzęta?"]
     ]
 };
 

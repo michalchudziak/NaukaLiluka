@@ -11,7 +11,7 @@ const obiadUDziadkow: Book = {
             },
             {
                 sentences: [
-                    "Karolcia też jedzie."
+                    "Karolcia jedzie do dziadków."
                 ],
             },
             {
@@ -21,22 +21,7 @@ const obiadUDziadkow: Book = {
             },
             {
                 sentences: [
-                    "Dziadek siedzi w ogrodzie."
-                ],
-            },
-            {
-                sentences: [
-                    "Na stole jest zupa."
-                ],
-            },
-            {
-                sentences: [
-                    "Wszyscy siedzą w domu."
-                ],
-            },
-            {
-                sentences: [
-                    "Zupa jest pyszna."
+                    "Dziadek gotuje zupę."
                 ],
             },
             {
@@ -44,17 +29,27 @@ const obiadUDziadkow: Book = {
                     "Babcia jest szczęśliwa."
                 ],
             },
+            {
+                sentences: [
+                    "Mama jest szczęśliwa."
+                ],
+            },
+            {
+                sentences: [
+                    "Karolcia jest szczęśliwa."
+                ],
+            },
         ]
     },
     words: [
-        ["dziadków", "Babcia", "Dziadek"],
-        ["stole", "zupa", "Wszyscy"],
-        ["pyszna", "szczęśliwa", "Był"]
+        ["dziadków", "Babcia", "obiad"],
+        ["stole", "zupę", "Dziadek"],
+        ["pyszna", "szczęśliwa", "Wszyscy"]
     ],
     sentences: [
         ["Mama jedzie do dziadków.", "Tata jedzie do dziadków.", "Lora jedzie do dziadków."],
-        ["Na stole jest obiad.", "Dziadek jest w domu.", "Wszyscy są w domu."],
-        ["Karolcia jest szczęśliwa.", "Mama jest szczęśliwa.", "Lora jest szczęśliwa."]
+        ["Mama gotuje zupę.", "Dziadek jest w domu.", "Wszyscy siedzą w domu."],
+        ["Karolcia jest szczęśliwa.", "Wszyscy są w domu.", "Lora jest szczęśliwa."]
     ]
 };
 

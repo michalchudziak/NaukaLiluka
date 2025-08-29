@@ -11,40 +11,35 @@ const dom: Book = {
             },
             {
                 sentences: [
-                    "Karolcia siedzi na kanapie."
+                    "Karolcia jest w domu."
                 ]
             },
             {
                 sentences: [
-                    "Mama gotuje obiad."
+                    "Mama czyta w domu."
                 ]
             },
             {
                 sentences: [
-                    "Tata czyta książkę."
+                    "Tata pracuje w domu."
                 ]
             },
             {
                 sentences: [
-                    "Gdzie jest Lora?"
+                    "Lora siedzi w domu."
                 ]
             },
-            {
-                sentences: [
-                    "Lora jest brudna."
-                ]
-            }
         ]
     },
     words: [
         ["w", "domu", "siedzi"],
-        ["na", "kanapie", "gotuje"],
-        ["obiad", "czyta", "książkę"]
+        ["Mama", "kanapie", "pracuje"],
+        ["Tata", "czyta", "książkę"]
     ],
     sentences: [
-        ["Karolcia jest w domu.", "Gdzie jest mama?", "Lora siedzi."],
-        ["Mama siedzi na kanapie.", "Tata jest na kanapie.", "Gdzie jest Karolcia?"],
-        ["Mama czyta książkę.", "Tata gotuje obiad.", "Karolcia czyta książkę."]
+        ["Karol jest w domu.", "Gdzie jest mama?", "Lora siedzi na kanapie."],
+        ["Mama siedzi w domu.", "Mama pracuje w domu.", "Gdzie jest Karolcia?"],
+        ["Mama czyta książkę.", "Karol pracuje w domu.", "Karolcia czyta książkę."]
     ]
 };
 

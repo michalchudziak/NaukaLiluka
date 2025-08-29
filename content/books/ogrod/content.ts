@@ -6,55 +6,40 @@ const ogrod: Book = {
         pages: [
             {
                 sentences: [
-                    "To jest ogród."
-                ]
-            },
-            {
-                sentences: [
-                    "Karol idzie do ogrodu."
-                ]
-            },
-            {
-                sentences: [
-                    "W ogrodzie rosną kwiaty."
-                ]
-            },
-            {
-                sentences: [
                     "Mama podlewa kwiaty."
                 ]
             },
             {
                 sentences: [
-                    "Tata kosi trawę."
+                    "Mama podlewa trawę."
                 ]
             },
             {
                 sentences: [
-                    "Karolcia zbiera jabłka."
+                    "Mama podlewa drzewo."
                 ]
             },
             {
                 sentences: [
-                    "Lora biega po trawie."
+                    "Mama podlewa krzaki."
                 ]
             },
             {
                 sentences: [
-                    "Ogród jest piękny."
+                    "Mama podlewa warzywa."
                 ]
             }
         ]
     },
     words: [
-        ["ogród", "idzie", "do"],
-        ["ogrodu", "rosną", "kwiaty"],
-        ["podlewa", "kosi", "trawę"]
+        ["podlewa", "kwiaty", "trawę"],
+        ["drzewo", "krzaki", "warzywa"],
+        ["ogrodzie", "rosną", "piękne"]
     ],
     sentences: [
-        ["Karol idzie do domu.", "Mama idzie do domu.", "Tata idzie do ogrodu."],
-        ["Gdzie rosną kwiaty?", "Kwiaty rosną w ogrodzie.", "Karolcia idzie do ogrodu."],
-        ["Kto podlewa kwiaty?", "Mama kosi trawę.", "Tata podlewa kwiaty."]
+        ["Tata podlewa kwiaty.", "Karolcia podlewa trawę.", "Karol podlewa kwiaty."],
+        ["Tata podlewa drzewo.", "Gdzie rosną krzaki?", "Karolcia podlewa warzywa."],
+        ["Gdzie rosną warzywa?", "Kwiaty rosną w ogrodzie.", "Krzaki rosną w ogrodzie."]
     ]
 };
 
