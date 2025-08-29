@@ -26,19 +26,9 @@ const wakacje: Book = {
             },
             {
                 sentences: [
-                    "Wakacje są spokojne."
-                ],
-            },
-            {
-                sentences: [
                     "Wakacje są udane."
                 ],
             },
-            {
-                sentences: [
-                    "Wakacje są beztroskie."
-                ],
-            }
         ]
     },
     words: [

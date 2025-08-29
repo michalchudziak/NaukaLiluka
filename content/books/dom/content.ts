@@ -7,27 +7,32 @@ const dom: Book = {
             {
                 sentences: [
                     "Karol jest w domu."
-                ]
+                ],
+                image: require('./karol-dom.png')
             },
             {
                 sentences: [
                     "Karolcia jest w domu."
-                ]
+                ],
+                image: require('./karolcia-dom.png')
             },
             {
                 sentences: [
                     "Mama czyta w domu."
-                ]
+                ],
+                image: require('./mama-dom.png')
             },
             {
                 sentences: [
                     "Tata pracuje w domu."
-                ]
+                ],
+                image: require('./tata-dom.png')
             },
             {
                 sentences: [
                     "Lora siedzi w domu."
-                ]
+                ],
+                image: require('./lora-dom.png')
             },
         ]
     },

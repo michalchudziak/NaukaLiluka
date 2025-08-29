@@ -26,16 +26,6 @@ const zoo: Book = {
             },
             {
                 sentences: [
-                    "Tata widzi lwa."
-                ],
-            },
-            {
-                sentences: [
-                    "Karol widzi małpę."
-                ],
-            },
-            {
-                sentences: [
                     "Mama widzi zwierzęta."
                 ],
             },

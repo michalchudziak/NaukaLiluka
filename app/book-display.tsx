@@ -13,7 +13,7 @@ import Animated, {
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
-type DisplayState = 'title' | 'sentences' | 'image';
+type DisplayState = 'title' | 'sentences' | 'image' | 'summary';
 
 export default function BookDisplayScreen() {
   const { bookIndex } = useLocalSearchParams<{ bookIndex: string }>();
@@ -54,15 +54,18 @@ export default function BookDisplayScreen() {
         // Move from sentences to image
         setDisplayState('image');
       } else if (displayState === 'image') {
-        // Move to next page or finish
+        // Move to next page or show summary
         const nextPageIndex = currentPageIndex + 1;
         if (nextPageIndex < book.book.pages.length) {
           setCurrentPageIndex(nextPageIndex);
           setDisplayState('sentences');
         } else {
-          // All pages shown, navigate back
-          router.back();
+          // All pages shown, show summary
+          setDisplayState('summary');
         }
+      } else if (displayState === 'summary') {
+        // From summary, navigate back
+        router.back();
       }
     });
   };
@@ -104,6 +107,27 @@ export default function BookDisplayScreen() {
             style={styles.image}
             resizeMode="contain"
           />
+        </ThemedView>
+      );
+    }
+    
+    if (displayState === 'summary') {
+      // Collect all sentences from all pages
+      const allSentences = book.book.pages.flatMap(page => page.sentences);
+      const maxSentenceLength = Math.max(...allSentences.map(s => s.length));
+      
+      return (
+        <ThemedView style={styles.summaryContainer}>
+          {allSentences.map((sentence, index) => (
+            <AutoSizeText 
+              key={index} 
+              color="#000000"
+              style={styles.summaryText}
+              maxLength={maxSentenceLength}
+            >
+              {sentence}
+            </AutoSizeText>
+          ))}
         </ThemedView>
       );
     }
@@ -153,5 +177,14 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
+  },
+  summaryContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    width: '100%',
+    backgroundColor: 'transparent',
+  },
+  summaryText: {
+    marginVertical: 5,
   },
 });
