@@ -1,4 +1,5 @@
 import { AutoSizeText } from '@/components/AutoSizeText';
+import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { books } from '@/content/books';
 import { useSettingsStore } from '@/store/settings-store';
@@ -127,20 +128,30 @@ export default function BookDisplayScreen() {
     if (displayState === 'summary') {
       // Collect all sentences from all pages
       const allSentences = book.book.pages.flatMap(page => page.sentences);
-      const maxSentenceLength = Math.max(...allSentences.map(s => applyWordSpacing(s).length));
       
       return (
         <ThemedView style={styles.summaryContainer}>
-          {allSentences.map((sentence, index) => (
-            <AutoSizeText 
-              key={index} 
-              color="#000000"
-              style={styles.summaryText}
-              maxLength={maxSentenceLength}
-            >
-              {applyWordSpacing(sentence)}
-            </AutoSizeText>
-          ))}
+          <ThemedText 
+            color="#000000"
+            style={styles.summaryTitle}
+          >
+            {book.book.title}
+          </ThemedText>
+          <ThemedView style={styles.summaryTextContainer}>
+            <ThemedView>
+              {allSentences.map((sentence, index) => (
+                <ThemedText 
+                  key={index} 
+                  style={styles.summaryText}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.5}
+                >
+                  {applyWordSpacing(sentence)}
+                </ThemedText>
+              ))}
+            </ThemedView>
+          </ThemedView>
         </ThemedView>
       );
     }
@@ -149,11 +160,11 @@ export default function BookDisplayScreen() {
   };
   
   return (
-    <Pressable style={styles.container} onPress={handlePress}>
-      <AnimatedThemedView style={[styles.content, animatedStyle]}>
-        {renderContent()}
-      </AnimatedThemedView>
-    </Pressable>
+      <Pressable style={styles.container} onPress={handlePress}>
+        <AnimatedThemedView style={[styles.content, animatedStyle]}>
+          {renderContent()}
+        </AnimatedThemedView>
+      </Pressable>
   );
 }
 
@@ -198,7 +209,24 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'transparent',
   },
+  summaryTitle: {
+    fontSize: 60,
+    fontWeight: 'bold',
+    marginVertical: 20,
+    paddingTop: 50,
+  },
+  summaryTextContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+  },
   summaryText: {
-    marginVertical: 1,
+    fontSize: 48,
+    lineHeight: 48,
+    marginVertical: 2,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    color: '#000000',
   },
 });
