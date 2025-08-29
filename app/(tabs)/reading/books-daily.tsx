@@ -17,7 +17,7 @@ export default function BooksDailyScreen() {
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [isLoading, setIsLoading] = useState(true);
   
-  const { dailyPlan, getDailyContent, markSessionItemCompleted } = useBookStore();
+  const { dailyPlan, getDailyContent, markSessionItemCompleted, isSessionItemCompletedToday } = useBookStore();
 
   useEffect(() => {
     const initializeDaily = async () => {
@@ -69,7 +69,7 @@ export default function BooksDailyScreen() {
           {hasWords && (
             <TrackButton
               title={t('booksDaily.words')}
-              isCompleted={sessionData?.isWordsCompleted || false}
+              isCompleted={isSessionItemCompletedToday(sessionKey, 'words')}
               onPress={() => handleTrackPress(sessionKey, 'words')}
             />
           )}
@@ -77,7 +77,7 @@ export default function BooksDailyScreen() {
           {hasSentences && (
             <TrackButton
               title={t('booksDaily.sentences')}
-              isCompleted={sessionData?.isSentencesCompleted || false}
+              isCompleted={isSessionItemCompletedToday(sessionKey, 'sentences')}
               onPress={() => handleTrackPress(sessionKey, 'sentences')}
             />
           )}

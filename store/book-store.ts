@@ -54,6 +54,7 @@ interface BookStore {
   markBookTrackSessionCompleted: (session: 'session1' | 'session2' | 'session3', type: 'words' | 'sentences') => void;
   isDailyPlanCompleted: () => boolean;
   isBookTrackCompletedToday: () => boolean;
+  isSessionItemCompletedToday: (session: 'session1' | 'session2' | 'session3', type: 'words' | 'sentences') => boolean;
   hydrate: () => Promise<void>;
   clearDailyPlan: () => void;
 }
@@ -307,6 +308,12 @@ export const useBookStore = create<BookStore>((set, get) => ({
     
     // Check if all sessions are completed
     return state.isDailyPlanCompleted();
+  },
+  
+  isSessionItemCompletedToday: (session: 'session1' | 'session2' | 'session3', type: 'words' | 'sentences') => {
+    const state = get();
+    const todayCompletions = state.bookTrackSessionCompletions.filter(c => isToday(c.timestamp));
+    return todayCompletions.some(c => c.session === session && c.type === type);
   },
   
   hydrate: async () => {
