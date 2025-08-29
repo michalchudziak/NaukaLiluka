@@ -45,7 +45,9 @@ export default function BookDisplayScreen() {
   };
   
   const applyWordSpacing = (text: string): string => {
-    const spaces = ' '.repeat(reading.wordSpacing);
+    const spacing = reading.wordSpacing ?? 1;
+    if (spacing === 1) return text;
+    const spaces = ' '.repeat(spacing);
     return text.split(' ').join(spaces);
   };
   
@@ -192,10 +194,11 @@ const styles = StyleSheet.create({
   summaryContainer: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     width: '100%',
     backgroundColor: 'transparent',
   },
   summaryText: {
-    marginVertical: 5,
+    marginVertical: 1,
   },
 });

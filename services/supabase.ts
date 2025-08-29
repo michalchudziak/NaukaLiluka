@@ -43,7 +43,8 @@ export class SupabaseService {
           },
           books: {
             allowAllBooks: settings.reading_allow_all_books,
-          }
+          },
+          wordSpacing: settings.reading_word_spacing || 1
         },
         drawings: {
           showCaptions: settings.drawings_show_captions,
@@ -67,7 +68,8 @@ export class SupabaseService {
         },
         books: {
           allowAllBooks: settings.reading_allow_all_books,
-        }
+        },
+        wordSpacing: settings.reading_word_spacing || 1
       },
       drawings: {
         showCaptions: settings.drawings_show_captions,
@@ -86,6 +88,7 @@ export class SupabaseService {
         reading_interval_words: settings.reading.interval.words,
         reading_interval_sentences: settings.reading.interval.sentences,
         reading_allow_all_books: settings.reading.books.allowAllBooks,
+        reading_word_spacing: settings.reading.wordSpacing || 1,
         drawings_show_captions: settings.drawings.showCaptions,
         drawings_interval: settings.drawings.interval,
         drawings_random_order: settings.drawings.randomOrder,

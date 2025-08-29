@@ -102,6 +102,8 @@ export default function WordSpacingSettingsScreen() {
     hydrate();
   }, [hydrate]);
 
+  const wordSpacing = reading.wordSpacing ?? 1;
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -113,7 +115,7 @@ export default function WordSpacingSettingsScreen() {
           <View style={styles.settingsContent}>
             <NumberInput
               label={t('settings.reading.wordSpacing')}
-              value={reading.wordSpacing}
+              value={wordSpacing}
               onChangeValue={updateReadingWordSpacing}
               min={1}
               max={10}
@@ -122,7 +124,7 @@ export default function WordSpacingSettingsScreen() {
             />
           </View>
           
-          <PreviewText spacing={reading.wordSpacing} />
+          <PreviewText spacing={wordSpacing} />
           
           <ThemedText style={styles.hint}>
             {t('settings.reading.wordSpacingHint')}

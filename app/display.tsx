@@ -32,13 +32,11 @@ export default function DisplayScreen() {
   const parsedItems = useMemo(() => JSON.parse(params.items as string) as string[], [params.items]);
   const color = params.color as string;
   
-  const applyWordSpacing = (text: string): string => {
-    const spaces = ' '.repeat(settings.reading.wordSpacing);
-    return text.split(' ').join(spaces);
-  };
-  
   const itemsWithSpacing = useMemo(() => {
-    return parsedItems.map(item => applyWordSpacing(item));
+    const spacing = settings.reading.wordSpacing ?? 1;
+    if (spacing === 1) return parsedItems;
+    const spaces = ' '.repeat(spacing);
+    return parsedItems.map(item => item.split(' ').join(spaces));
   }, [parsedItems, settings.reading.wordSpacing]);
   
   const maxTextLength = useMemo(() => {
@@ -54,13 +52,15 @@ export default function DisplayScreen() {
   };
 
   useEffect(() => {
-    if (itemsWithSpacing.length === 0) return;
+    settings.hydrate().then(() => {
+      if (itemsWithSpacing.length === 0) return;
 
-    intervalRef.current = setInterval(() => {
-      fadeTransition(() => {
-        setCurrentIndex((prevIndex) =>  prevIndex + 1);
-      });
-    }, settings.reading.interval[params.type as 'words' | 'sentences']);
+      intervalRef.current = setInterval(() => {
+        fadeTransition(() => {
+          setCurrentIndex((prevIndex) =>  prevIndex + 1);
+        });
+      }, settings.reading.interval[params.type as 'words' | 'sentences']);
+    });
 
     return () => {
       if (intervalRef.current) {
