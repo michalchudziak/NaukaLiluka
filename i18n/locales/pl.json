@@ -71,7 +71,13 @@
       "wordsInterval": "Czas wyświetlania słów",
       "sentencesInterval": "Czas wyświetlania zdań",
       "allowAllBooks": "Pokaż wszystkie książki",
-      "allowAllBooksDescription": "Gdy włączone, wszystkie książki będą dostępne do wyboru."
+      "allowAllBooksDescription": "Gdy włączone, wszystkie książki będą dostępne do wyboru.",
+      "wordSpacingSettings": "Odstępy między wyrazami",
+      "wordSpacingSettingsSubtitle": "Konfiguracja odstępów w tekście",
+      "wordSpacing": "Mnożnik odstępów",
+      "wordSpacingDescription": "Ustaw mnożnik odstępów między wyrazami w wyświetlanych tekstach.",
+      "wordSpacingHint": "Wartość 1 = normalny odstęp, 2 = podwójny odstęp, itd.",
+      "wordSpacingPreview": "Podgląd:"
     },
     "drawings": {
       "sectionTitle": "Ustawienia obrazków",

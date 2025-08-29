@@ -16,6 +16,7 @@ interface SettingsState {
     books: {
       allowAllBooks: boolean;
     };
+    wordSpacing: number;
   };
   drawings: {
     showCaptions: boolean;
@@ -29,6 +30,7 @@ interface SettingsState {
   updateReadingIntervalWords: (value: number) => void;
   updateReadingIntervalSentences: (value: number) => void;
   updateReadingBooksAllowAll: (value: boolean) => void;
+  updateReadingWordSpacing: (value: number) => void;
   updateDrawingsShowCaptions: (value: boolean) => void;
   updateDrawingsInterval: (value: number) => void;
   updateDrawingsRandomOrder: (value: boolean) => void;
@@ -48,7 +50,8 @@ const defaultSettings = {
     },
     books: {
       allowAllBooks: true,
-    }
+    },
+    wordSpacing: 1
   },
   drawings: {
     showCaptions: true,
@@ -151,6 +154,23 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
             ...state.reading.books,
             allowAllBooks: value
           }
+        }
+      };
+      HybridStorageService.writeSettings(STORAGE_KEY, {
+        reading: newState.reading,
+        drawings: newState.drawings
+      });
+      return newState;
+    });
+  },
+  
+  updateReadingWordSpacing: (value: number) => {
+    set((state) => {
+      const newState = {
+        ...state,
+        reading: {
+          ...state.reading,
+          wordSpacing: value
         }
       };
       HybridStorageService.writeSettings(STORAGE_KEY, {

@@ -32,9 +32,18 @@ export default function DisplayScreen() {
   const parsedItems = useMemo(() => JSON.parse(params.items as string) as string[], [params.items]);
   const color = params.color as string;
   
+  const applyWordSpacing = (text: string): string => {
+    const spaces = ' '.repeat(settings.reading.wordSpacing);
+    return text.split(' ').join(spaces);
+  };
+  
+  const itemsWithSpacing = useMemo(() => {
+    return parsedItems.map(item => applyWordSpacing(item));
+  }, [parsedItems, settings.reading.wordSpacing]);
+  
   const maxTextLength = useMemo(() => {
-    return Math.max(...parsedItems.map(item => item.length), 0);
-  }, [parsedItems]);
+    return Math.max(...itemsWithSpacing.map(item => item.length), 0);
+  }, [itemsWithSpacing]);
 
   const fadeTransition = (callback: () => void) => {
     'worklet';
@@ -45,7 +54,7 @@ export default function DisplayScreen() {
   };
 
   useEffect(() => {
-    if (parsedItems.length === 0) return;
+    if (itemsWithSpacing.length === 0) return;
 
     intervalRef.current = setInterval(() => {
       fadeTransition(() => {
@@ -61,7 +70,7 @@ export default function DisplayScreen() {
   }, []);
 
   useEffect(() => {
-    if (currentIndex >= parsedItems.length) {
+    if (currentIndex >= itemsWithSpacing.length) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
@@ -69,15 +78,15 @@ export default function DisplayScreen() {
     }
   }, [currentIndex]);
 
-  if (parsedItems.length === 0) {
+  if (itemsWithSpacing.length === 0) {
     return <AnimatedThemedView style={[styles.container, animatedStyle]} />;
   }
 
   return (
     <AnimatedThemedView style={[styles.container, animatedStyle]}>
-      {currentIndex >= 0 && currentIndex < parsedItems.length && (
+      {currentIndex >= 0 && currentIndex < itemsWithSpacing.length && (
         <AutoSizeText color={color} maxLength={maxTextLength}>
-          {parsedItems[currentIndex]}
+          {itemsWithSpacing[currentIndex]}
         </AutoSizeText>
       )}
     </AnimatedThemedView>

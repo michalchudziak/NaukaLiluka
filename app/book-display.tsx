@@ -1,8 +1,9 @@
 import { AutoSizeText } from '@/components/AutoSizeText';
 import { ThemedView } from '@/components/ThemedView';
 import { books } from '@/content/books';
+import { useSettingsStore } from '@/store/settings-store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet } from 'react-native';
 import Animated, {
   runOnJS,
@@ -18,11 +19,16 @@ type DisplayState = 'title' | 'sentences' | 'image' | 'summary';
 export default function BookDisplayScreen() {
   const { bookIndex } = useLocalSearchParams<{ bookIndex: string }>();
   const router = useRouter();
+  const { reading, hydrate } = useSettingsStore();
   
   const [currentPageIndex, setCurrentPageIndex] = useState(-1); // -1 for title
   const [displayState, setDisplayState] = useState<DisplayState>('title');
   
   const opacity = useSharedValue(1);
+  
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
   
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -36,6 +42,11 @@ export default function BookDisplayScreen() {
       runOnJS(callback)();
       opacity.value = withTiming(1, { duration: 100 });
     });
+  };
+  
+  const applyWordSpacing = (text: string): string => {
+    const spaces = ' '.repeat(reading.wordSpacing);
+    return text.split(' ').join(spaces);
   };
   
   const book = books[parseInt(bookIndex || '0')];
@@ -90,9 +101,9 @@ export default function BookDisplayScreen() {
               key={index} 
               color="#000000"
               style={styles.sentenceText}
-              maxLength={Math.max(...currentPage.sentences.map(s => s.length))}
+              maxLength={Math.max(...currentPage.sentences.map(s => applyWordSpacing(s).length))}
             >
-              {sentence}
+              {applyWordSpacing(sentence)}
             </AutoSizeText>
           ))}
         </ThemedView>
@@ -114,7 +125,7 @@ export default function BookDisplayScreen() {
     if (displayState === 'summary') {
       // Collect all sentences from all pages
       const allSentences = book.book.pages.flatMap(page => page.sentences);
-      const maxSentenceLength = Math.max(...allSentences.map(s => s.length));
+      const maxSentenceLength = Math.max(...allSentences.map(s => applyWordSpacing(s).length));
       
       return (
         <ThemedView style={styles.summaryContainer}>
@@ -125,7 +136,7 @@ export default function BookDisplayScreen() {
               style={styles.summaryText}
               maxLength={maxSentenceLength}
             >
-              {sentence}
+              {applyWordSpacing(sentence)}
             </AutoSizeText>
           ))}
         </ThemedView>

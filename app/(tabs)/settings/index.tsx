@@ -79,6 +79,15 @@ export default function SettingsScreen() {
               icon="book-outline"
               onPress={() => router.push('/(tabs)/settings/reading-books')}
             />
+            
+            <View style={styles.separator} />
+            
+            <SettingItem
+              title={t('settings.reading.wordSpacingSettings')}
+              subtitle={t('settings.reading.wordSpacingSettingsSubtitle')}
+              icon="text-outline"
+              onPress={() => router.push('/(tabs)/settings/word-spacing')}
+            />
           </View>
         </View>
         
