@@ -5,25 +5,39 @@ import { TrackButton } from '@/components/TrackButton';
 import { WordColors } from '@/constants/WordColors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function SetsScreen() {
   const { t } = useTranslation();
+  const { width, height } = useWindowDimensions();
+  const isHorizontal = width > height;
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
 
-  const handleStartTrack = () => {
-    console.log('Starting track with:', { color: selectedColor, shape: selectedShape });
+  const handleOrderedPress = () => {
+    console.log('Starting ordered track with:', { color: selectedColor, shape: selectedShape });
+  };
+
+  const handleUnorderedPress = () => {
+    console.log('Starting unordered track with:', { color: selectedColor, shape: selectedShape });
   };
 
   return (
     <ScrollView style={styles.container}>
       <ThemedView style={styles.content}>
-        <TrackButton 
-          title={t('math.sets.startTrack')}
-          isCompleted={false}
-          onPress={handleStartTrack}
-        />
+        <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
+          <TrackButton 
+            title={t('math.sets.ordered')}
+            isCompleted={false}
+            onPress={handleOrderedPress}
+          />
+          
+          <TrackButton 
+            title={t('math.sets.unordered')}
+            isCompleted={false}
+            onPress={handleUnorderedPress}
+          />
+        </ThemedView>
         
         <ColorPicker
           selectedColor={selectedColor}
@@ -50,5 +64,16 @@ const styles = StyleSheet.create({
     minHeight: '100%',
     padding: 20,
     paddingTop: 40,
+  },
+  buttonsContainer: {
+    gap: 20,
+    marginBottom: 20,
+  },
+  horizontal: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  vertical: {
+    flexDirection: 'column',
   },
 });

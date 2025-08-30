@@ -191,7 +191,8 @@
     "back": "Wróć",
     "sets": {
       "title": "Zbiory liczb",
-      "startTrack": "Rozpocznij ścieżkę",
+      "ordered": "Uporządkowane",
+      "unordered": "Nieuporządkowane",
       "selectColor": "Wybierz kolor",
       "selectShape": "Wybierz kształt"
     }
