@@ -19,7 +19,7 @@ export default function SetsScreen() {
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { getDailyData, markSessionCompleted, isSessionCompletedToday } = useMathStore();
-  
+
   const dailyData = getDailyData();
 
   const handleSessionPress = async (sessionContent: SessionContent) => {
@@ -30,7 +30,10 @@ export default function SetsScreen() {
       : [...dailyData.numbers].sort(() => Math.random() - 0.5);
 
     // Map session content to the session type for tracking
-    const sessionType = `${sessionContent.type}${sessionContent.isOrdered ? 'Ordered' : 'Unordered'}` as Parameters<typeof markSessionCompleted>[0];
+    const sessionType =
+      `${sessionContent.type}${sessionContent.isOrdered ? 'Ordered' : 'Unordered'}` as Parameters<
+        typeof markSessionCompleted
+      >[0];
 
     if (sessionContent.type === 'subitizing') {
       router.push({
@@ -62,7 +65,7 @@ export default function SetsScreen() {
   const renderSession = (sessionNumber: number) => {
     const sessionKey = `session${sessionNumber}`;
     const sessionIndex = sessionNumber - 1;
-    
+
     if (!dailyData.sessionContent[sessionIndex]) {
       return null;
     }
@@ -76,11 +79,15 @@ export default function SetsScreen() {
           {dailyData.sessionContent[sessionIndex].map((item) => {
             // Check if this specific content is completed
             const isCompleted = isSessionCompletedToday(sessionKey as 'session1' | 'session2');
-            
+
             return (
               <TrackButton
                 key={`${item.type}-${item.isOrdered}`}
-                title={t(`math.sets.${item.type}`) + " - " + t(`math.sets.${item.isOrdered ? 'ordered' : 'unordered'}`)}
+                title={
+                  t(`math.sets.${item.type}`) +
+                  ' - ' +
+                  t(`math.sets.${item.isOrdered ? 'ordered' : 'unordered'}`)
+                }
                 isCompleted={isCompleted}
                 onPress={() => handleSessionPress(item)}
               />

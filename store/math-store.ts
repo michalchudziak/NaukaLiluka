@@ -156,9 +156,9 @@ export const useMathStore = create<MathStore>((set, get) => ({
 
   hydrate: async () => {
     await HybridStorageService.initialize();
-    
+
     const mathProgress = await HybridStorageService.readMathProgress(STORAGE_KEYS.MATH_PROGRESS);
-    
+
     if (mathProgress) {
       set({
         currentDay: mathProgress.currentDay || 1,

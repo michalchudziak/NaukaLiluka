@@ -33,10 +33,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   // Rehydrate when app comes from background
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
-      if (
-        appState.current.match(/inactive|background/) &&
-        nextAppState === 'active'
-      ) {
+      if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
         // App has come to the foreground
         hydrateStores();
       }

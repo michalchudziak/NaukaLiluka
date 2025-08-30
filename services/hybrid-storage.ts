@@ -351,7 +351,10 @@ export class HybridStorageService {
           return cloudData;
         }
       } catch (error) {
-        console.error('Failed to fetch math session completions from cloud, using local data:', error);
+        console.error(
+          'Failed to fetch math session completions from cloud, using local data:',
+          error
+        );
       }
     }
 
