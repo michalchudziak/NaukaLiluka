@@ -5,6 +5,7 @@ import {
   getNumbersLearningScheme,
   type SessionContent,
 } from '@/content/math/learning-scheme';
+import { HybridStorageService } from '@/services/hybrid-storage';
 
 const STORAGE_KEYS = {
   MATH_PROGRESS: 'progress.math',
@@ -19,9 +20,10 @@ interface MathStore {
   completedSessions: Session[];
 
   getDailyData: () => DailyData;
-  markSessionCompleted: (session: Session) => void;
+  markSessionCompleted: (session: Session) => Promise<void>;
   isDayCompleted: () => boolean;
   isSessionCompletedToday: (session: 'session1' | 'session2') => boolean;
+  maybeAdvanceTheDay: () => Promise<void>;
   hydrate: () => Promise<void>;
 }
 
@@ -41,22 +43,42 @@ export const useMathStore = create<MathStore>((set, get) => ({
     return getNumbersLearningScheme(currentDay);
   },
 
-  markSessionCompleted: (session) => {
+  markSessionCompleted: async (session) => {
     const today = new Date().toISOString();
-    const { lastSessionDate, completedSessions } = get();
+    const { lastSessionDate, completedSessions, currentDay } = get();
 
+    let newState;
     if (!lastSessionDate || !isSameDay(parseISO(lastSessionDate), new Date())) {
-      set({
+      newState = {
         lastSessionDate: today,
         completedSessions: [session],
-      });
+      };
     } else {
       if (!completedSessions.includes(session)) {
-        set({
+        newState = {
           completedSessions: [...completedSessions, session],
-        });
+        };
+      } else {
+        return; // Session already completed
       }
     }
+
+    set(newState);
+
+    // Persist to storage
+    const updatedState = { ...get() };
+    await HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, {
+      currentDay: updatedState.currentDay,
+      lastSessionDate: updatedState.lastSessionDate,
+      completedSessions: updatedState.completedSessions,
+    });
+
+    // Save session completion record
+    await HybridStorageService.writeMathSessionCompletions(STORAGE_KEYS.MATH_SESSION_COMPLETIONS, {
+      session,
+      day: currentDay,
+      timestamp: Date.now(),
+    });
   },
 
   isDayCompleted: () => {
@@ -93,7 +115,58 @@ export const useMathStore = create<MathStore>((set, get) => ({
     return requiredSessions.every((s) => completedSessions.includes(s));
   },
 
+  maybeAdvanceTheDay: async () => {
+    const { currentDay, lastSessionDate, completedSessions } = get();
+
+    if (!lastSessionDate) {
+      return;
+    }
+
+    const lastSession = parseISO(lastSessionDate);
+
+    if (isToday(lastSession)) {
+      return;
+    }
+
+    // If last session was any day before today
+    const dailyData = getNumbersLearningScheme(currentDay);
+    const allSessions = dailyData.sessionContent.flat();
+    const requiredSessions = allSessions.map(sessionContentToSession);
+
+    const allSessionsCompleted = requiredSessions.every((session) =>
+      completedSessions.includes(session)
+    );
+
+    if (allSessionsCompleted) {
+      const newState = {
+        currentDay: currentDay + 1,
+        completedSessions: [],
+      };
+      set(newState);
+
+      // Persist the advancement
+      const updatedState = { ...get() };
+      await HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, {
+        currentDay: updatedState.currentDay,
+        lastSessionDate: updatedState.lastSessionDate,
+        completedSessions: updatedState.completedSessions,
+      });
+    }
+  },
+
   hydrate: async () => {
-    // TODO: Implement hydration from hybrid store later
+    await HybridStorageService.initialize();
+    
+    const mathProgress = await HybridStorageService.readMathProgress(STORAGE_KEYS.MATH_PROGRESS);
+    
+    if (mathProgress) {
+      set({
+        currentDay: mathProgress.currentDay || 1,
+        lastSessionDate: mathProgress.lastSessionDate || null,
+        completedSessions: mathProgress.completedSessions || [],
+      });
+    }
+
+    await get().maybeAdvanceTheDay();
   },
 }));

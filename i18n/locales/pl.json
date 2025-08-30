@@ -119,6 +119,7 @@
       "clearNoRep": "Wyczyść ściekę bez powtórzeń",
       "clearDrawings": "Wyczyść historię obrazków",
       "clearSettings": "Przywróć domyślne ustawienia",
+      "clearMath": "Wyczyść postępy matematyczne",
       "clearAll": "Wyczyść wszystkie dane",
       "confirmTitle": "Potwierdzenie",
       "confirmMessage": "Czy na pewno chcesz usunąć wszystkie dane aplikacji? Ta operacja jest nieodwracalna.",
@@ -130,12 +131,15 @@
       "confirmDrawingsMessage": "Cała historia wyświetlonych obrazków zostanie usunięta.",
       "confirmSettingsTitle": "Przywrócić domyślne ustawienia?",
       "confirmSettingsMessage": "Wszystkie ustawienia zostaną przywrócone do wartości domyślnych.",
+      "confirmMathTitle": "Usunąć postępy matematyczne?",
+      "confirmMathMessage": "Wszystkie postępy w nauce matematyki zostaną utracone.",
       "successTitle": "Sukces",
       "successMessage": "Wszystkie dane zostały usunięte.",
       "bookClearedMessage": "Postępy książek zostały usunięte.",
       "noRepClearedMessage": "Dane ścieki bez powtórzeń zostały usunięte.",
       "drawingsClearedMessage": "Historia obrazków została usunięta.",
       "settingsClearedMessage": "Ustawienia zostały przywrócone do wartości domyślnych.",
+      "mathClearedMessage": "Postępy matematyczne zostały usunięte.",
       "errorTitle": "Błąd",
       "errorMessage": "Wystąpił błąd podczas usuwania danych."
     },
@@ -184,8 +188,8 @@
     "routine3": "Książki - Sesja 2",
     "routine4": "Książki - Sesja 3",
     "routine5": "Prezentacja Obrazków",
-    "mathSet1": "Liczby - Uporządkowane",
-    "mathSet2": "Liczby - Nieuporządkowane"
+    "mathSet1": "Liczby - Sesja 1",
+    "mathSet2": "Liczby - Sesja 2"
   },
   "math": {
     "numberSets": "Liczby",
@@ -193,6 +197,9 @@
     "back": "Wróć",
     "sets": {
       "title": "Liczby",
+      "back": "Wróć",
+      "subitizing": "Podliczanie",
+      "numbers": "Liczby",
       "ordered": "Uporządkowane",
       "unordered": "Nieuporządkowane",
       "selectColor": "Wybierz kolor",

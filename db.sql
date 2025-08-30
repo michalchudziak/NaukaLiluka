@@ -77,6 +77,24 @@
       presented_at TIMESTAMPTZ DEFAULT NOW()
   );
 
+  -- Math progress tracking (single row table)
+  CREATE TABLE public.math_progress (
+      id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+      current_day INTEGER DEFAULT 1,
+      last_session_date TIMESTAMPTZ,
+      completed_sessions TEXT[] DEFAULT '{}',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+  );
+
+  -- Math session completion tracking
+  CREATE TABLE public.math_session_completions (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      session_type TEXT NOT NULL CHECK (session_type IN ('subitizingOrdered', 'subitizingUnordered', 'numbersOrdered', 'numbersUnordered')),
+      day_number INTEGER NOT NULL,
+      completed_at TIMESTAMPTZ DEFAULT NOW()
+  );
+
 
 
   -- Create indexes for efficient queries
@@ -88,6 +106,8 @@
   public.no_rep_completions(completed_at DESC);
   CREATE INDEX idx_drawing_presentations_date ON
   public.drawing_presentations(presented_at DESC);
+  CREATE INDEX idx_math_session_completions_date ON
+  public.math_session_completions(completed_at DESC);
 
   -- Triggers for updated_at timestamps
   CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -110,6 +130,10 @@
   public.no_rep_progress
       FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+  CREATE TRIGGER update_math_progress_updated_at BEFORE UPDATE ON
+  public.math_progress
+      FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 
   -- Initialize default data
   INSERT INTO public.settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
@@ -117,6 +141,7 @@
       (1, 'words'),
       (2, 'sentences')
   ON CONFLICT DO NOTHING;
+  INSERT INTO public.math_progress (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 
   -- Helper views for common queries
   CREATE VIEW today_book_track_completions AS
@@ -135,4 +160,8 @@
   SELECT * FROM public.daily_plans
   ORDER BY created_at DESC
   LIMIT 1;
+
+  CREATE VIEW today_math_sessions AS
+  SELECT * FROM public.math_session_completions
+  WHERE DATE(completed_at) = CURRENT_DATE;
 

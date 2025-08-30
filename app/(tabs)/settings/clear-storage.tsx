@@ -197,6 +197,47 @@ export default function ClearStorageScreen() {
     );
   };
 
+  const handleClearMath = async () => {
+    Alert.alert(
+      t('settings.clearStorage.confirmMathTitle'),
+      t('settings.clearStorage.confirmMathMessage'),
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('common.confirm'),
+          style: 'destructive',
+          onPress: async () => {
+            setIsClearing(true);
+            try {
+              // Clear all math related storage keys
+              await AsyncStorageService.clear('progress.math');
+              await AsyncStorageService.clear('routines.math.sessions');
+
+              // Reinitialize math store
+              await mathStore.hydrate();
+
+              Alert.alert(
+                t('settings.clearStorage.successTitle'),
+                t('settings.clearStorage.mathClearedMessage')
+              );
+            } catch (error) {
+              console.error('Error clearing storage:', error);
+              Alert.alert(
+                t('settings.clearStorage.errorTitle'),
+                t('settings.clearStorage.errorMessage')
+              );
+            } finally {
+              setIsClearing(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const handleClearNoRep = async () => {
     Alert.alert(
       t('settings.clearStorage.confirmNoRepTitle'),
@@ -280,6 +321,13 @@ export default function ClearStorageScreen() {
             <Button
               title={t('settings.clearStorage.clearSettings')}
               onPress={handleClearSettings}
+              disabled={isClearing}
+              style={styles.button}
+            />
+
+            <Button
+              title={t('settings.clearStorage.clearMath')}
+              onPress={handleClearMath}
               disabled={isClearing}
               style={styles.button}
             />
