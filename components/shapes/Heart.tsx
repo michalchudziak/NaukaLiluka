@@ -1,4 +1,4 @@
-import { View, StyleSheet } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 interface HeartProps {
   size?: number;
@@ -6,55 +6,9 @@ interface HeartProps {
 }
 
 export function Heart({ size = 30, color = '#333' }: HeartProps) {
-  const heartWidth = size * 0.53;
-  const heartHeight = size * 0.67;
-  const borderRadius = heartWidth / 2;
-
   return (
-    <View style={[styles.container, { width: size, height: size }]}>
-      <View
-        style={[
-          styles.heartBefore,
-          {
-            width: heartWidth,
-            height: heartHeight,
-            backgroundColor: color,
-            borderTopLeftRadius: borderRadius,
-            borderTopRightRadius: borderRadius,
-            top: size * 0.2,
-            left: size * 0.23,
-          },
-        ]}
-      />
-      <View
-        style={[
-          styles.heartAfter,
-          {
-            width: heartWidth,
-            height: heartHeight,
-            backgroundColor: color,
-            borderTopLeftRadius: borderRadius,
-            borderTopRightRadius: borderRadius,
-            top: size * 0.2,
-            left: size * 0.23,
-          },
-        ]}
-      />
-    </View>
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+    </Svg>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  heartBefore: {
-    position: 'absolute',
-    transform: [{ rotate: '-45deg' }],
-  },
-  heartAfter: {
-    position: 'absolute',
-    transform: [{ rotate: '45deg' }],
-  },
-});

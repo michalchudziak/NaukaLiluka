@@ -4,27 +4,47 @@ import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { WordColors } from '@/constants/WordColors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function SetsScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { width, height } = useWindowDimensions();
+  const bottomTabBarHeight = useBottomTabBarHeight();
   const isHorizontal = width > height;
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
 
   const handleOrderedPress = () => {
-    console.log('Starting ordered track with:', { color: selectedColor, shape: selectedShape });
+    const orderedNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    router.push({
+      pathname: '/set-display',
+      params: {
+        numbers: JSON.stringify(orderedNumbers),
+        shape: selectedShape,
+        color: selectedColor,
+      },
+    });
   };
 
   const handleUnorderedPress = () => {
-    console.log('Starting unordered track with:', { color: selectedColor, shape: selectedShape });
+    const unorderedNumbers = [149, 148, 147, 146, 144, 140, 142, 141, 140, 148].sort(() => Math.random() - 0.5);
+    router.push({
+      pathname: '/set-display',
+      params: {
+        numbers: JSON.stringify(unorderedNumbers),
+        shape: selectedShape,
+        color: selectedColor,
+      },
+    });
   };
 
   return (
     <ScrollView style={styles.container}>
-      <ThemedView style={styles.content}>
+      <ThemedView style={[styles.content, { paddingBottom: bottomTabBarHeight + 10 }]}>
         <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
           <TrackButton 
             title={t('math.sets.ordered')}

@@ -186,11 +186,11 @@
     "routine5": "Prezentacja Obrazków"
   },
   "math": {
-    "numberSets": "Zbiory liczb",
+    "numberSets": "Liczby",
     "title": "Matematyka",
     "back": "Wróć",
     "sets": {
-      "title": "Zbiory liczb",
+      "title": "Liczby",
       "ordered": "Uporządkowane",
       "unordered": "Nieuporządkowane",
       "selectColor": "Wybierz kolor",
