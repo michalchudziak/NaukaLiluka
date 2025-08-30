@@ -1,7 +1,7 @@
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { WordColors } from '@/constants/WordColors';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 interface ColorPickerProps {
   selectedColor: string;

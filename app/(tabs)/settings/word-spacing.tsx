@@ -1,10 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
-import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface NumberInputProps {
   label: string;
@@ -16,7 +16,15 @@ interface NumberInputProps {
   suffix?: string;
 }
 
-function NumberInput({ label, value, onChangeValue, min = 1, max = 10, step = 1, suffix = 'x' }: NumberInputProps) {
+function NumberInput({
+  label,
+  value,
+  onChangeValue,
+  min = 1,
+  max = 10,
+  step = 1,
+  suffix = 'x',
+}: NumberInputProps) {
   const handleDecrement = () => {
     if (value > min) {
       onChangeValue(Math.max(min, value - step));
@@ -30,7 +38,7 @@ function NumberInput({ label, value, onChangeValue, min = 1, max = 10, step = 1,
   };
 
   const handleTextChange = (text: string) => {
-    const num = parseInt(text) || min;
+    const num = parseInt(text, 10) || min;
     if (num >= min && num <= max) {
       onChangeValue(num);
     }
@@ -47,7 +55,7 @@ function NumberInput({ label, value, onChangeValue, min = 1, max = 10, step = 1,
         >
           <Ionicons name="remove" size={20} color={value <= min ? '#C7C7CC' : '#007AFF'} />
         </TouchableOpacity>
-        
+
         <View style={styles.inputWrapper}>
           <TextInput
             style={styles.input}
@@ -58,7 +66,7 @@ function NumberInput({ label, value, onChangeValue, min = 1, max = 10, step = 1,
           />
           <Text style={styles.suffix}>{suffix}</Text>
         </View>
-        
+
         <TouchableOpacity
           style={[styles.button, value >= max && styles.buttonDisabled]}
           onPress={handleIncrement}
@@ -75,16 +83,14 @@ function PreviewText({ spacing }: { spacing: number }) {
   const { t } = useTranslation();
   const spaces = ' '.repeat(spacing);
   const previewText = ['To', 'jest', 'przykładowy', 'tekst'].join(spaces);
-  
+
   return (
     <View style={styles.previewContainer}>
       <ThemedText style={styles.previewLabel}>
         {t('settings.reading.wordSpacingPreview')}
       </ThemedText>
       <View style={styles.previewBox}>
-        <ThemedText style={styles.previewText}>
-          {previewText}
-        </ThemedText>
+        <ThemedText style={styles.previewText}>{previewText}</ThemedText>
       </View>
     </View>
   );
@@ -92,11 +98,7 @@ function PreviewText({ spacing }: { spacing: number }) {
 
 export default function WordSpacingSettingsScreen() {
   const { t } = useTranslation();
-  const {
-    reading,
-    updateReadingWordSpacing,
-    hydrate
-  } = useSettingsStore();
+  const { reading, updateReadingWordSpacing, hydrate } = useSettingsStore();
 
   useEffect(() => {
     hydrate();
@@ -111,7 +113,7 @@ export default function WordSpacingSettingsScreen() {
           <ThemedText style={styles.sectionDescription}>
             {t('settings.reading.wordSpacingDescription')}
           </ThemedText>
-          
+
           <View style={styles.settingsContent}>
             <NumberInput
               label={t('settings.reading.wordSpacing')}
@@ -123,12 +125,10 @@ export default function WordSpacingSettingsScreen() {
               suffix="x"
             />
           </View>
-          
+
           <PreviewText spacing={wordSpacing} />
-          
-          <ThemedText style={styles.hint}>
-            {t('settings.reading.wordSpacingHint')}
-          </ThemedText>
+
+          <ThemedText style={styles.hint}>{t('settings.reading.wordSpacingHint')}</ThemedText>
         </View>
       </ScrollView>
     </ThemedView>

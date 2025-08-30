@@ -1,6 +1,6 @@
+import { type StyleProp, StyleSheet, TouchableOpacity, View, type ViewStyle } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { Colors } from '@/constants/Colors';
-import { StyleProp, StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 interface ButtonProps {
   title: string;
@@ -12,11 +12,7 @@ interface ButtonProps {
 export function Button({ title, onPress, style, disabled = false }: ButtonProps) {
   return (
     <TouchableOpacity
-      style={[
-        styles.button,
-        style,
-        disabled && styles.buttonDisabled
-      ]}
+      style={[styles.button, style, disabled && styles.buttonDisabled]}
       activeOpacity={0.8}
       onPress={onPress}
       disabled={disabled}

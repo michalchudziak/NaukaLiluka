@@ -1,3 +1,7 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -5,10 +9,6 @@ import { TrackButton } from '@/components/TrackButton';
 import { WordColors } from '@/constants/WordColors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 export default function BooksDailyScreen() {
   const { t } = useTranslation();
@@ -16,8 +16,9 @@ export default function BooksDailyScreen() {
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [isLoading, setIsLoading] = useState(true);
-  
-  const { dailyPlan, getDailyContent, markSessionItemCompleted, isSessionItemCompletedToday } = useBookStore();
+
+  const { dailyPlan, getDailyContent, markSessionItemCompleted, isSessionItemCompletedToday } =
+    useBookStore();
 
   useEffect(() => {
     const initializeDaily = async () => {
@@ -25,20 +26,20 @@ export default function BooksDailyScreen() {
       await getDailyContent();
       setIsLoading(false);
     };
-    
+
     initializeDaily();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [getDailyContent]);
 
   const handleTrackPress = (
-    sessionId: 'session1' | 'session2' | 'session3', 
+    sessionId: 'session1' | 'session2' | 'session3',
     type: 'words' | 'sentences'
   ) => {
     if (!dailyPlan) return;
-    
+
     const sessionContent = dailyPlan.sessions[sessionId];
     const items = type === 'words' ? sessionContent.words : sessionContent.sentences;
-    
+
     // Navigate to display screen with the content
     router.push({
       pathname: '/display',
@@ -48,7 +49,7 @@ export default function BooksDailyScreen() {
         color: selectedColor,
       },
     });
-    
+
     // Mark as completed
     markSessionItemCompleted(sessionId, type);
   };
@@ -56,7 +57,7 @@ export default function BooksDailyScreen() {
   const renderSession = (sessionNumber: number) => {
     const sessionKey = `session${sessionNumber}` as 'session1' | 'session2' | 'session3';
     const sessionData = dailyPlan?.sessions[sessionKey];
-    
+
     const hasWords = sessionData?.words && sessionData.words.length > 0;
     const hasSentences = sessionData?.sentences && sessionData.sentences.length > 0;
 
@@ -65,7 +66,12 @@ export default function BooksDailyScreen() {
         <ThemedText type="subtitle" style={styles.sessionLabel}>
           {t(`booksDaily.${sessionKey}`)}
         </ThemedText>
-        <View style={[styles.buttonsContainer, (!hasWords || !hasSentences) && styles.singleButtonContainer]}>
+        <View
+          style={[
+            styles.buttonsContainer,
+            (!hasWords || !hasSentences) && styles.singleButtonContainer,
+          ]}
+        >
           {hasWords && (
             <TrackButton
               title={t('booksDaily.words')}
@@ -105,14 +111,11 @@ export default function BooksDailyScreen() {
 
   return (
     <ThemedView style={[styles.container, { marginBottom: tabBarHeight }]}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <ThemedText type="subtitle" style={styles.bookTitle}>
           {dailyPlan.bookId}
         </ThemedText>
-        
+
         <View style={styles.sessionsContainer}>
           {renderSession(1)}
           {renderSession(2)}

@@ -6,6 +6,10 @@ export type ThemedViewProps = ViewProps & {
   backgroundColor?: string;
 };
 
-export function ThemedView({ style, backgroundColor = Colors.light.background, ...otherProps }: ThemedViewProps) {
+export function ThemedView({
+  style,
+  backgroundColor = Colors.light.background,
+  ...otherProps
+}: ThemedViewProps) {
   return <View style={[{ backgroundColor }, style]} {...otherProps} />;
 }

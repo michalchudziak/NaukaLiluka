@@ -1,3 +1,7 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Alert, StyleSheet, useWindowDimensions } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -6,10 +10,6 @@ import sentencesData from '@/content/no-rep/sentences.json';
 import wordsData from '@/content/no-rep/words.json';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useNoRepStore } from '@/store/no-rep-store';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Alert, StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function NoRepScreen() {
   const { width, height } = useWindowDimensions();
@@ -17,12 +17,12 @@ export default function NoRepScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState('#000000');
-  const displayedWords = useNoRepStore(state => state.displayedWords);
-  const displayedSentences = useNoRepStore(state => state.displayedSentences);
-  const chooseAndMarkWords = useNoRepStore(state => state.chooseAndMarkWords);
-  const chooseAndMarkSentences = useNoRepStore(state => state.chooseAndMarkSentences);
-  const isWordsCompletedToday = useNoRepStore(state => state.isWordsCompletedToday);
-  const isSentencesCompletedToday = useNoRepStore(state => state.isSentencesCompletedToday);
+  const displayedWords = useNoRepStore((state) => state.displayedWords);
+  const displayedSentences = useNoRepStore((state) => state.displayedSentences);
+  const chooseAndMarkWords = useNoRepStore((state) => state.chooseAndMarkWords);
+  const chooseAndMarkSentences = useNoRepStore((state) => state.chooseAndMarkSentences);
+  const isWordsCompletedToday = useNoRepStore((state) => state.isWordsCompletedToday);
+  const isSentencesCompletedToday = useNoRepStore((state) => state.isSentencesCompletedToday);
   const wordsCompletedToday = isWordsCompletedToday();
   const sentencesCompletedToday = isSentencesCompletedToday();
   const tabBarHeight = useBottomTabBarHeight();
@@ -70,18 +70,23 @@ export default function NoRepScreen() {
           {t('noRep.knownWordsCount', { count: displayedWords.length, total: wordsData.length })}
         </ThemedText>
         <ThemedText style={styles.counter}>
-          {t('noRep.knownSentencesCount', { count: displayedSentences.length, total: sentencesData.length })}
+          {t('noRep.knownSentencesCount', {
+            count: displayedSentences.length,
+            total: sentencesData.length,
+          })}
         </ThemedText>
       </ThemedView>
 
-      <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
-        <TrackButton 
+      <ThemedView
+        style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}
+      >
+        <TrackButton
           title={t('noRep.words')}
           isCompleted={wordsCompletedToday}
           onPress={handleWordsPress}
         />
-      
-        <TrackButton 
+
+        <TrackButton
           title={t('noRep.sentences')}
           isCompleted={sentencesCompletedToday}
           onPress={handleSentencesPress}

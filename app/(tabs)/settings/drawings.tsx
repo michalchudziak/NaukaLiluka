@@ -1,10 +1,18 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
-import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
-import { ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface SwitchSettingProps {
   label: string;
@@ -18,9 +26,7 @@ function SwitchSetting({ label, description, value, onValueChange }: SwitchSetti
     <View style={styles.switchContainer}>
       <View style={styles.switchTextContainer}>
         <ThemedText style={styles.switchLabel}>{label}</ThemedText>
-        {description && (
-          <ThemedText style={styles.switchDescription}>{description}</ThemedText>
-        )}
+        {description && <ThemedText style={styles.switchDescription}>{description}</ThemedText>}
       </View>
       <Switch
         value={value}
@@ -42,7 +48,15 @@ interface NumberInputProps {
   suffix?: string;
 }
 
-function NumberInput({ label, value, onChangeValue, min = 100, max = 10000, step = 100, suffix = 'ms' }: NumberInputProps) {
+function NumberInput({
+  label,
+  value,
+  onChangeValue,
+  min = 100,
+  max = 10000,
+  step = 100,
+  suffix = 'ms',
+}: NumberInputProps) {
   const handleDecrement = () => {
     if (value > min) {
       onChangeValue(Math.max(min, value - step));
@@ -56,7 +70,7 @@ function NumberInput({ label, value, onChangeValue, min = 100, max = 10000, step
   };
 
   const handleTextChange = (text: string) => {
-    const num = parseInt(text) || min;
+    const num = parseInt(text, 10) || min;
     if (num >= min && num <= max) {
       onChangeValue(num);
     }
@@ -73,7 +87,7 @@ function NumberInput({ label, value, onChangeValue, min = 100, max = 10000, step
         >
           <Ionicons name="remove" size={20} color={value <= min ? '#C7C7CC' : '#007AFF'} />
         </TouchableOpacity>
-        
+
         <View style={styles.inputWrapper}>
           <TextInput
             style={styles.input}
@@ -84,7 +98,7 @@ function NumberInput({ label, value, onChangeValue, min = 100, max = 10000, step
           />
           <Text style={styles.suffix}>{suffix}</Text>
         </View>
-        
+
         <TouchableOpacity
           style={[styles.button, value >= max && styles.buttonDisabled]}
           onPress={handleIncrement}
@@ -104,7 +118,7 @@ export default function DrawingsSettingsScreen() {
     updateDrawingsShowCaptions,
     updateDrawingsInterval,
     updateDrawingsRandomOrder,
-    hydrate
+    hydrate,
   } = useSettingsStore();
 
   useEffect(() => {
@@ -118,7 +132,7 @@ export default function DrawingsSettingsScreen() {
           <ThemedText style={styles.sectionDescription}>
             {t('settings.drawings.description')}
           </ThemedText>
-          
+
           <View style={styles.settingsContent}>
             <SwitchSetting
               label={t('settings.drawings.showCaptions')}
@@ -126,18 +140,18 @@ export default function DrawingsSettingsScreen() {
               value={drawings.showCaptions}
               onValueChange={updateDrawingsShowCaptions}
             />
-            
+
             <View style={styles.separator} />
-            
+
             <SwitchSetting
               label={t('settings.drawings.randomOrder')}
               description={t('settings.drawings.randomOrderDescription')}
               value={drawings.randomOrder}
               onValueChange={updateDrawingsRandomOrder}
             />
-            
+
             <View style={styles.separator} />
-            
+
             <NumberInput
               label={t('settings.drawings.interval')}
               value={drawings.interval}

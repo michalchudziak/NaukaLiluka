@@ -1,4 +1,4 @@
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 interface TriangleProps {
   size?: number;
@@ -7,7 +7,7 @@ interface TriangleProps {
 
 export function Triangle({ size = 30, color = '#333' }: TriangleProps) {
   const borderWidth = size / 2;
-  const borderBottomWidth = (size * 0.866); // height = width * sqrt(3)/2
+  const borderBottomWidth = size * 0.866; // height = width * sqrt(3)/2
 
   return (
     <View style={styles.container}>

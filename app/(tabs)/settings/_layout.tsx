@@ -1,73 +1,73 @@
-import { useTranslation } from '@/hooks/useTranslation';
 import { Stack } from 'expo-router';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function SettingsLayout() {
   const { t } = useTranslation();
 
   return (
     <Stack>
-      <Stack.Screen 
-        name="index" 
-        options={{ 
+      <Stack.Screen
+        name="index"
+        options={{
           title: t('settings.title'),
-          headerShown: true
-        }} 
+          headerShown: true,
+        }}
       />
-      <Stack.Screen 
-        name="clear-storage" 
-        options={{ 
+      <Stack.Screen
+        name="clear-storage"
+        options={{
           title: t('settings.clearStorage.title'),
           headerShown: true,
-          presentation: 'modal'
-        }} 
+          presentation: 'modal',
+        }}
       />
-      <Stack.Screen 
-        name="view-storage" 
-        options={{ 
+      <Stack.Screen
+        name="view-storage"
+        options={{
           title: t('settings.viewStorage.title'),
           headerShown: true,
-          presentation: 'modal'
-        }} 
+          presentation: 'modal',
+        }}
       />
-      <Stack.Screen 
-        name="reading-norep" 
-        options={{ 
+      <Stack.Screen
+        name="reading-norep"
+        options={{
           title: t('settings.reading.noRepSettings'),
           headerShown: true,
-          presentation: 'modal'
-        }} 
+          presentation: 'modal',
+        }}
       />
-      <Stack.Screen 
-        name="reading-interval" 
-        options={{ 
+      <Stack.Screen
+        name="reading-interval"
+        options={{
           title: t('settings.reading.intervalSettings'),
           headerShown: true,
-          presentation: 'modal'
-        }} 
+          presentation: 'modal',
+        }}
       />
-      <Stack.Screen 
-        name="reading-books" 
-        options={{ 
+      <Stack.Screen
+        name="reading-books"
+        options={{
           title: t('settings.reading.booksSettings'),
           headerShown: true,
-          presentation: 'modal'
-        }} 
+          presentation: 'modal',
+        }}
       />
-      <Stack.Screen 
-        name="drawings" 
-        options={{ 
+      <Stack.Screen
+        name="drawings"
+        options={{
           title: t('settings.drawings.settings'),
           headerShown: true,
-          presentation: 'modal'
-        }} 
+          presentation: 'modal',
+        }}
       />
-      <Stack.Screen 
-        name="cloud-data" 
-        options={{ 
+      <Stack.Screen
+        name="cloud-data"
+        options={{
           title: t('settings.drawings.settings'),
           headerShown: true,
-          presentation: 'modal'
-        }} 
+          presentation: 'modal',
+        }}
       />
     </Stack>
   );

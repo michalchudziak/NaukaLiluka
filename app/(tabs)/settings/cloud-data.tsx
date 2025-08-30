@@ -1,8 +1,8 @@
+import { Alert, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
-import { Alert, ScrollView, StyleSheet, Switch, View } from 'react-native';
 
 export default function CloudDataScreen() {
   const { t } = useTranslation();
@@ -10,22 +10,18 @@ export default function CloudDataScreen() {
 
   const handleToggle = async (value: boolean) => {
     if (value) {
-      Alert.alert(
-        t('settings.cloudData.enableTitle'),
-        t('settings.cloudData.enableMessage'),
-        [
-          {
-            text: t('common.cancel'),
-            style: 'cancel',
+      Alert.alert(t('settings.cloudData.enableTitle'), t('settings.cloudData.enableMessage'), [
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('common.enable'),
+          onPress: async () => {
+            await updateUseCloudData(true);
           },
-          {
-            text: t('common.enable'),
-            onPress: async () => {
-              await updateUseCloudData(true);
-            },
-          },
-        ]
-      );
+        },
+      ]);
     } else {
       await updateUseCloudData(false);
     }
@@ -38,9 +34,7 @@ export default function CloudDataScreen() {
           <View style={styles.sectionContent}>
             <View style={styles.settingItem}>
               <View style={styles.settingContent}>
-                <ThemedText style={styles.settingTitle}>
-                  {t('settings.cloudData.title')}
-                </ThemedText>
+                <ThemedText style={styles.settingTitle}>{t('settings.cloudData.title')}</ThemedText>
                 <ThemedText style={styles.settingDescription}>
                   {t('settings.cloudData.description')}
                 </ThemedText>
@@ -57,12 +51,8 @@ export default function CloudDataScreen() {
         </View>
 
         <View style={styles.infoSection}>
-          <ThemedText style={styles.infoTitle}>
-            {t('settings.cloudData.infoTitle')}
-          </ThemedText>
-          <ThemedText style={styles.infoText}>
-            {t('settings.cloudData.infoText')}
-          </ThemedText>
+          <ThemedText style={styles.infoTitle}>{t('settings.cloudData.infoTitle')}</ThemedText>
+          <ThemedText style={styles.infoText}>{t('settings.cloudData.infoText')}</ThemedText>
         </View>
 
         {useCloudData && (

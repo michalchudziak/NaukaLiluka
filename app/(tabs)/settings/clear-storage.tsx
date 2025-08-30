@@ -1,3 +1,7 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -8,16 +12,12 @@ import { useDrawingsStore } from '@/store/drawings-store';
 import { useMathStore } from '@/store/math-store';
 import { useNoRepStore } from '@/store/no-rep-store';
 import { useSettingsStore } from '@/store/settings-store';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 export default function ClearStorageScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [isClearing, setIsClearing] = useState(false);
-  
+
   const bookStore = useBookStore();
   const noRepStore = useNoRepStore();
   const drawingsStore = useDrawingsStore();
@@ -41,19 +41,19 @@ export default function ClearStorageScreen() {
             try {
               // Clear all AsyncStorage - this wipes everything
               await AsyncStorage.clear();
-              
+
               // Reinitialize all stores with default values
               await Promise.all([
                 bookStore.hydrate(),
                 noRepStore.hydrate(),
                 drawingsStore.hydrate(),
                 settingsStore.hydrate(),
-                mathStore.hydrate()
+                mathStore.hydrate(),
               ]);
-              
+
               // Reset stores to ensure clean state
               bookStore.initializeBookProgress();
-              
+
               Alert.alert(
                 t('settings.clearStorage.successTitle'),
                 t('settings.clearStorage.successMessage'),
@@ -93,11 +93,11 @@ export default function ClearStorageScreen() {
               await AsyncStorageService.clear('progress.books');
               await AsyncStorageService.clear('progress.books.daily-plan');
               await AsyncStorageService.clear('routines.reading.book-track.sessions');
-              
+
               // Reinitialize book store
               await bookStore.hydrate();
               bookStore.initializeBookProgress();
-              
+
               Alert.alert(
                 t('settings.clearStorage.successTitle'),
                 t('settings.clearStorage.bookClearedMessage')
@@ -134,10 +134,10 @@ export default function ClearStorageScreen() {
             try {
               // Clear drawings storage
               await AsyncStorageService.clear('progress.drawings.presentations');
-              
+
               // Reinitialize drawings store
               await drawingsStore.hydrate();
-              
+
               Alert.alert(
                 t('settings.clearStorage.successTitle'),
                 t('settings.clearStorage.drawingsClearedMessage')
@@ -174,10 +174,10 @@ export default function ClearStorageScreen() {
             try {
               // Clear settings storage
               await AsyncStorageService.clear('settings');
-              
+
               // Reinitialize settings store with defaults
               await settingsStore.hydrate();
-              
+
               Alert.alert(
                 t('settings.clearStorage.successTitle'),
                 t('settings.clearStorage.settingsClearedMessage')
@@ -217,10 +217,10 @@ export default function ClearStorageScreen() {
               await AsyncStorageService.clear('progress.reading.no-rep.sentences');
               await AsyncStorageService.clear('routines.reading.no-rep.words');
               await AsyncStorageService.clear('routines.reading.no-rep.sentences');
-              
+
               // Reinitialize no-rep store
               await noRepStore.hydrate();
-              
+
               Alert.alert(
                 t('settings.clearStorage.successTitle'),
                 t('settings.clearStorage.noRepClearedMessage')
@@ -244,9 +244,7 @@ export default function ClearStorageScreen() {
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.warningCard}>
-          <ThemedText style={styles.warningTitle}>
-            {t('settings.clearStorage.warning')}
-          </ThemedText>
+          <ThemedText style={styles.warningTitle}>{t('settings.clearStorage.warning')}</ThemedText>
           <ThemedText style={styles.warningText}>
             {t('settings.clearStorage.warningDescription')}
           </ThemedText>
@@ -256,7 +254,7 @@ export default function ClearStorageScreen() {
           <ThemedText style={styles.sectionTitle}>
             {t('settings.clearStorage.selectiveTitle')}
           </ThemedText>
-          
+
           <View style={styles.buttonContainer}>
             <Button
               title={t('settings.clearStorage.clearBooks')}
@@ -264,21 +262,21 @@ export default function ClearStorageScreen() {
               disabled={isClearing}
               style={styles.button}
             />
-            
+
             <Button
               title={t('settings.clearStorage.clearNoRep')}
               onPress={handleClearNoRep}
               disabled={isClearing}
               style={styles.button}
             />
-            
+
             <Button
               title={t('settings.clearStorage.clearDrawings')}
               onPress={handleClearDrawings}
               disabled={isClearing}
               style={styles.button}
             />
-            
+
             <Button
               title={t('settings.clearStorage.clearSettings')}
               onPress={handleClearSettings}
@@ -292,7 +290,7 @@ export default function ClearStorageScreen() {
           <ThemedText style={styles.sectionTitle}>
             {t('settings.clearStorage.completeTitle')}
           </ThemedText>
-          
+
           <View style={styles.buttonContainer}>
             <Button
               title={t('settings.clearStorage.clearAll')}

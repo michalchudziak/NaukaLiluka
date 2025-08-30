@@ -1,17 +1,17 @@
-import { AutoSizeText } from '@/components/AutoSizeText';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { books } from '@/content/books';
-import { useSettingsStore } from '@/store/settings-store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withTiming
+  withTiming,
 } from 'react-native-reanimated';
+import { AutoSizeText } from '@/components/AutoSizeText';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { books } from '@/content/books';
+import { useSettingsStore } from '@/store/settings-store';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
@@ -21,22 +21,22 @@ export default function BookDisplayScreen() {
   const { bookIndex } = useLocalSearchParams<{ bookIndex: string }>();
   const router = useRouter();
   const { reading, hydrate } = useSettingsStore();
-  
+
   const [currentPageIndex, setCurrentPageIndex] = useState(-1); // -1 for title
   const [displayState, setDisplayState] = useState<DisplayState>('title');
-  
+
   const opacity = useSharedValue(1);
-  
+
   useEffect(() => {
     hydrate();
   }, [hydrate]);
-  
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
     };
   });
-  
+
   const fadeTransition = (callback: () => void) => {
     'worklet';
     opacity.value = withTiming(0, { duration: 100 }, () => {
@@ -44,20 +44,20 @@ export default function BookDisplayScreen() {
       opacity.value = withTiming(1, { duration: 100 });
     });
   };
-  
+
   const applyWordSpacing = (text: string): string => {
     const spacing = reading.wordSpacing ?? 1;
     if (spacing === 1) return text;
     const spaces = ' '.repeat(spacing);
     return text.split(' ').join(spaces);
   };
-  
-  const book = books[parseInt(bookIndex || '0')];
+
+  const book = books[parseInt(bookIndex || '0', 10)];
   if (!book) {
     router.back();
     return null;
   }
-  
+
   const handlePress = () => {
     fadeTransition(() => {
       if (displayState === 'title') {
@@ -84,7 +84,6 @@ export default function BookDisplayScreen() {
     });
   };
 
-  
   const renderContent = () => {
     if (displayState === 'title') {
       return (
@@ -93,18 +92,18 @@ export default function BookDisplayScreen() {
         </AutoSizeText>
       );
     }
-    
+
     const currentPage = book.book.pages[currentPageIndex];
-    
+
     if (displayState === 'sentences') {
       return (
         <ThemedView style={styles.sentencesContainer}>
           {currentPage.sentences.map((sentence, index) => (
-            <AutoSizeText 
-              key={index} 
+            <AutoSizeText
+              key={index}
               color="#000000"
               style={styles.sentenceText}
-              maxLength={Math.max(...currentPage.sentences.map(s => applyWordSpacing(s).length))}
+              maxLength={Math.max(...currentPage.sentences.map((s) => applyWordSpacing(s).length))}
             >
               {applyWordSpacing(sentence)}
             </AutoSizeText>
@@ -112,36 +111,29 @@ export default function BookDisplayScreen() {
         </ThemedView>
       );
     }
-    
+
     if (displayState === 'image') {
       return (
         <ThemedView style={styles.imageContainer}>
-          <Image 
-            source={currentPage.image}
-            style={styles.image}
-            resizeMode="contain"
-          />
+          <Image source={currentPage.image} style={styles.image} resizeMode="contain" />
         </ThemedView>
       );
     }
-    
+
     if (displayState === 'summary') {
       // Collect all sentences from all pages
-      const allSentences = book.book.pages.flatMap(page => page.sentences);
-      
+      const allSentences = book.book.pages.flatMap((page) => page.sentences);
+
       return (
         <ThemedView style={styles.summaryContainer}>
-          <ThemedText 
-            color="#000000"
-            style={styles.summaryTitle}
-          >
+          <ThemedText color="#000000" style={styles.summaryTitle}>
             {book.book.title}
           </ThemedText>
           <ThemedView style={styles.summaryTextContainer}>
             <ThemedView>
               {allSentences.map((sentence, index) => (
-                <ThemedText 
-                  key={index} 
+                <ThemedText
+                  key={index}
                   style={styles.summaryText}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
@@ -155,16 +147,16 @@ export default function BookDisplayScreen() {
         </ThemedView>
       );
     }
-    
+
     return null;
   };
-  
+
   return (
-      <Pressable style={styles.container} onPress={handlePress}>
-        <AnimatedThemedView style={[styles.content, animatedStyle]}>
-          {renderContent()}
-        </AnimatedThemedView>
-      </Pressable>
+    <Pressable style={styles.container} onPress={handlePress}>
+      <AnimatedThemedView style={[styles.content, animatedStyle]}>
+        {renderContent()}
+      </AnimatedThemedView>
+    </Pressable>
   );
 }
 

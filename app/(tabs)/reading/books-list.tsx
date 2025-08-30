@@ -1,30 +1,29 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useRouter } from 'expo-router';
+import { FlatList, StyleSheet } from 'react-native';
 import { BookListItem } from '@/components/BookListItem';
 import { ThemedView } from '@/components/ThemedView';
 import { books } from '@/content/books';
 import { useBookStore } from '@/store/book-store';
 import { useSettingsStore } from '@/store/settings-store';
-import { Book } from '@/types/book';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import type { Book } from '@/types/book';
 
 export default function BooksListScreen() {
   const router = useRouter();
   const { bookProgress } = useBookStore();
   const settings = useSettingsStore();
   const bottomTabBarHeight = useBottomTabBarHeight();
-  
+
   const handleBookPress = (bookIndex: number) => {
     router.push(`/book-display?bookIndex=${bookIndex}`);
   };
-  
+
   const renderBook = ({ item, index }: { item: Book; index: number }) => {
-    const progress = bookProgress.find(p => p.bookId === item.book.title);
+    const progress = bookProgress.find((p) => p.bookId === item.book.title);
     const isCompleted = progress?.isCompleted ?? false;
     const allowAllBooks = settings.reading.books.allowAllBooks;
     const isAccessible = allowAllBooks || isCompleted;
-    
+
     return (
       <BookListItem
         book={item}
@@ -34,7 +33,7 @@ export default function BooksListScreen() {
       />
     );
   };
-  
+
   return (
     <ThemedView style={[styles.container, { paddingBottom: bottomTabBarHeight }]}>
       <FlatList

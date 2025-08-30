@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
-import { Dimensions, StyleSheet, Text, TextProps, View } from 'react-native';
+import type React from 'react';
+import { useMemo } from 'react';
+import { Dimensions, StyleSheet, Text, type TextProps, View } from 'react-native';
 
 interface AutoSizeTextProps extends Omit<TextProps, 'style'> {
   children: string;
@@ -8,7 +9,7 @@ interface AutoSizeTextProps extends Omit<TextProps, 'style'> {
   maxLength?: number;
 }
 
-const getFontSizeForText = (text: string, screenWidth: number): number => {  
+const getFontSizeForText = (_text: string, screenWidth: number): number => {
   if (screenWidth < 448) {
     return 80;
   } else if (screenWidth > 448 && screenWidth < 768) {
@@ -17,7 +18,7 @@ const getFontSizeForText = (text: string, screenWidth: number): number => {
     return 120;
   } else if (screenWidth > 1024 && screenWidth < 1280) {
     return 140;
-  } else if (screenWidth > 1280 && screenWidth < 1536) {  
+  } else if (screenWidth > 1280 && screenWidth < 1536) {
     return 160;
   } else if (screenWidth > 1536 && screenWidth < 1920) {
     return 180;
@@ -28,15 +29,15 @@ const getFontSizeForText = (text: string, screenWidth: number): number => {
   }
 };
 
-export const AutoSizeText: React.FC<AutoSizeTextProps> = ({ 
-  children, 
+export const AutoSizeText: React.FC<AutoSizeTextProps> = ({
+  children,
   color = '#000000',
   style,
   maxLength,
-  ...textProps 
+  ...textProps
 }) => {
   const { width: screenWidth } = Dimensions.get('window');
-  
+
   const fontSize = useMemo(() => {
     const lengthToUse = maxLength ? Math.max(children.length, maxLength) : children.length;
     return getFontSizeForText('x'.repeat(lengthToUse), screenWidth);
@@ -46,11 +47,7 @@ export const AutoSizeText: React.FC<AutoSizeTextProps> = ({
     <View style={styles.container}>
       <Text
         {...textProps}
-        style={[
-          styles.text,
-          { fontSize, color },
-          style,
-        ]}
+        style={[styles.text, { fontSize, color }, style]}
         numberOfLines={1}
         adjustsFontSizeToFit={true}
         minimumFontScale={0.5}

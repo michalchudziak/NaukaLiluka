@@ -1,8 +1,7 @@
+import { Pressable, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Book } from '@/types/book';
-import React from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import type { Book } from '@/types/book';
 
 interface BookListItemProps {
   book: Book;
@@ -13,18 +12,16 @@ interface BookListItemProps {
 
 export function BookListItem({ book, isCompleted, isAccessible, onPress }: BookListItemProps) {
   const canInteract = isCompleted || isAccessible;
-  
+
   return (
     <Pressable
       style={({ pressed }) => [
         styles.bookItem,
-        { 
-          backgroundColor: pressed && canInteract
-            ? '#f0f0f0'
-            : '#ffffff',
+        {
+          backgroundColor: pressed && canInteract ? '#f0f0f0' : '#ffffff',
           borderColor: '#e0e0e0',
           opacity: canInteract ? 1 : 0.4,
-        }
+        },
       ]}
       onPress={canInteract ? onPress : undefined}
       disabled={!canInteract}

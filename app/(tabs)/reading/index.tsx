@@ -1,10 +1,10 @@
+import { useRouter } from 'expo-router';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
 import { useNoRepStore } from '@/store/no-rep-store';
-import { useRouter } from 'expo-router';
-import { StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function ReadingScreen() {
   const { width, height } = useWindowDimensions();
@@ -18,14 +18,16 @@ export default function ReadingScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
-        <TrackButton 
+      <ThemedView
+        style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}
+      >
+        <TrackButton
           title={t('reading.bookTrack')}
           isCompleted={isBookTrackCompleted}
           onPress={() => router.push('/reading/book-track')}
         />
-        
-        <TrackButton 
+
+        <TrackButton
           title={t('reading.noRepeatTrack')}
           isCompleted={isNoRepPathCompleted}
           onPress={() => router.push('/reading/no-rep-track')}

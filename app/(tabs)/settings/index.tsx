@@ -1,10 +1,10 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { useTranslation } from '@/hooks/useTranslation';
 import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface SettingItemProps {
   title: string;
@@ -16,11 +16,7 @@ interface SettingItemProps {
 
 function SettingItem({ title, subtitle, icon, onPress, destructive }: SettingItemProps) {
   return (
-    <TouchableOpacity
-      style={styles.settingItem}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
+    <TouchableOpacity style={styles.settingItem} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.settingItemContent}>
         <View style={[styles.iconContainer, destructive && styles.destructiveIcon]}>
           <Ionicons name={icon} size={24} color={destructive ? '#FF3B30' : '#007AFF'} />
@@ -29,11 +25,7 @@ function SettingItem({ title, subtitle, icon, onPress, destructive }: SettingIte
           <ThemedText style={[styles.settingTitle, destructive && styles.destructiveText]}>
             {title}
           </ThemedText>
-          {subtitle && (
-            <ThemedText style={styles.settingSubtitle}>
-              {subtitle}
-            </ThemedText>
-          )}
+          {subtitle && <ThemedText style={styles.settingSubtitle}>{subtitle}</ThemedText>}
         </View>
         <Ionicons name="chevron-forward" size={20} color="#C7C7CC" />
       </View>
@@ -48,12 +40,14 @@ export default function SettingsScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={{ paddingBottom: tabBarHeight }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{ paddingBottom: tabBarHeight }}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>
-            {t('settings.reading.sectionTitle')}
-          </ThemedText>
-          
+          <ThemedText style={styles.sectionTitle}>{t('settings.reading.sectionTitle')}</ThemedText>
+
           <View style={styles.sectionContent}>
             <SettingItem
               title={t('settings.reading.noRepSettings')}
@@ -61,27 +55,27 @@ export default function SettingsScreen() {
               icon="repeat-outline"
               onPress={() => router.push('/(tabs)/settings/reading-norep')}
             />
-            
+
             <View style={styles.separator} />
-            
+
             <SettingItem
               title={t('settings.reading.intervalSettings')}
               subtitle={t('settings.reading.intervalSettingsSubtitle')}
               icon="timer-outline"
               onPress={() => router.push('/(tabs)/settings/reading-interval')}
             />
-            
+
             <View style={styles.separator} />
-            
+
             <SettingItem
               title={t('settings.reading.booksSettings')}
               subtitle={t('settings.reading.booksSettingsSubtitle')}
               icon="book-outline"
               onPress={() => router.push('/(tabs)/settings/reading-books')}
             />
-            
+
             <View style={styles.separator} />
-            
+
             <SettingItem
               title={t('settings.reading.wordSpacingSettings')}
               subtitle={t('settings.reading.wordSpacingSettingsSubtitle')}
@@ -90,12 +84,10 @@ export default function SettingsScreen() {
             />
           </View>
         </View>
-        
+
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>
-            {t('settings.drawings.sectionTitle')}
-          </ThemedText>
-          
+          <ThemedText style={styles.sectionTitle}>{t('settings.drawings.sectionTitle')}</ThemedText>
+
           <View style={styles.sectionContent}>
             <SettingItem
               title={t('settings.drawings.settings')}
@@ -107,10 +99,8 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>
-            {t('settings.storage.sectionTitle')}
-          </ThemedText>
-          
+          <ThemedText style={styles.sectionTitle}>{t('settings.storage.sectionTitle')}</ThemedText>
+
           <View style={styles.sectionContent}>
             <SettingItem
               title={t('settings.cloudData.menuTitle')}
@@ -118,9 +108,9 @@ export default function SettingsScreen() {
               icon="cloud-outline"
               onPress={() => router.push('/(tabs)/settings/cloud-data')}
             />
-            
+
             <View style={styles.separator} />
-            
+
             <SettingItem
               title={t('settings.clearStorage.title')}
               subtitle={t('settings.clearStorage.subtitle')}
@@ -128,9 +118,9 @@ export default function SettingsScreen() {
               onPress={() => router.push('/(tabs)/settings/clear-storage')}
               destructive
             />
-            
+
             <View style={styles.separator} />
-            
+
             <SettingItem
               title={t('settings.viewStorage.title')}
               subtitle={t('settings.viewStorage.subtitle')}

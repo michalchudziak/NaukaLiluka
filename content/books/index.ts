@@ -1,4 +1,4 @@
-import { Book } from '@/types/book';
+import type { Book } from '@/types/book';
 import dom from './dom/content';
 import las from './las/content';
 import obiadUdziadkow from './obiad-u-dziadkow/content';

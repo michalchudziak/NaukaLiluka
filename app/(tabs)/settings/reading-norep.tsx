@@ -1,10 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
+import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
-import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
-import { ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface NumberInputProps {
   label: string;
@@ -28,7 +28,7 @@ function NumberInput({ label, value, onChangeValue, min = 1, max = 99 }: NumberI
   };
 
   const handleTextChange = (text: string) => {
-    const num = parseInt(text) || min;
+    const num = parseInt(text, 10) || min;
     if (num >= min && num <= max) {
       onChangeValue(num);
     }
@@ -45,7 +45,7 @@ function NumberInput({ label, value, onChangeValue, min = 1, max = 99 }: NumberI
         >
           <Ionicons name="remove" size={20} color={value <= min ? '#C7C7CC' : '#007AFF'} />
         </TouchableOpacity>
-        
+
         <TextInput
           style={styles.input}
           value={value.toString()}
@@ -53,7 +53,7 @@ function NumberInput({ label, value, onChangeValue, min = 1, max = 99 }: NumberI
           keyboardType="number-pad"
           selectTextOnFocus
         />
-        
+
         <TouchableOpacity
           style={[styles.button, value >= max && styles.buttonDisabled]}
           onPress={handleIncrement}
@@ -68,12 +68,8 @@ function NumberInput({ label, value, onChangeValue, min = 1, max = 99 }: NumberI
 
 export default function ReadingNoRepSettingsScreen() {
   const { t } = useTranslation();
-  const {
-    reading,
-    updateReadingNoRepWords,
-    updateReadingNoRepSentences,
-    hydrate
-  } = useSettingsStore();
+  const { reading, updateReadingNoRepWords, updateReadingNoRepSentences, hydrate } =
+    useSettingsStore();
 
   useEffect(() => {
     hydrate();
@@ -86,7 +82,7 @@ export default function ReadingNoRepSettingsScreen() {
           <ThemedText style={styles.sectionDescription}>
             {t('settings.reading.noRepDescription')}
           </ThemedText>
-          
+
           <View style={styles.settingsContent}>
             <NumberInput
               label={t('settings.reading.wordsPerSession')}
@@ -95,9 +91,9 @@ export default function ReadingNoRepSettingsScreen() {
               min={1}
               max={10}
             />
-            
+
             <View style={styles.separator} />
-            
+
             <NumberInput
               label={t('settings.reading.sentencesPerSession')}
               value={reading.noRep.sentences}

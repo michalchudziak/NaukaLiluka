@@ -1,20 +1,30 @@
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import { 
-  Circle, 
-  Triangle, 
-  Square, 
-  X, 
-  Star, 
-  Pentagon, 
-  Hexagon, 
-  Diamond, 
-  Heart, 
-  Plus 
+import {
+  Circle,
+  Diamond,
+  Heart,
+  Hexagon,
+  Pentagon,
+  Plus,
+  Square,
+  Star,
+  Triangle,
+  X,
 } from './shapes';
 
-export type ShapeType = 'circle' | 'triangle' | 'square' | 'x' | 'star' | 'pentagon' | 'hexagon' | 'diamond' | 'heart' | 'plus';
+export type ShapeType =
+  | 'circle'
+  | 'triangle'
+  | 'square'
+  | 'x'
+  | 'star'
+  | 'pentagon'
+  | 'hexagon'
+  | 'diamond'
+  | 'heart'
+  | 'plus';
 
 interface ShapePickerProps {
   selectedShape: ShapeType;
@@ -22,12 +32,23 @@ interface ShapePickerProps {
   label?: string;
 }
 
-const shapes: ShapeType[] = ['circle', 'triangle', 'square', 'x', 'star', 'pentagon', 'hexagon', 'diamond', 'heart', 'plus'];
+const shapes: ShapeType[] = [
+  'circle',
+  'triangle',
+  'square',
+  'x',
+  'star',
+  'pentagon',
+  'hexagon',
+  'diamond',
+  'heart',
+  'plus',
+];
 
 export function ShapePicker({ selectedShape, onShapeSelect, label }: ShapePickerProps) {
   const renderShape = (shape: ShapeType) => {
     const shapeProps = { size: 30, color: '#333' };
-    
+
     switch (shape) {
       case 'circle':
         return <Circle {...shapeProps} />;
@@ -60,10 +81,7 @@ export function ShapePicker({ selectedShape, onShapeSelect, label }: ShapePicker
           <TouchableOpacity
             key={shape}
             onPress={() => onShapeSelect(shape)}
-            style={[
-              styles.shapeSwatch,
-              selectedShape === shape && styles.selectedSwatch,
-            ]}
+            style={[styles.shapeSwatch, selectedShape === shape && styles.selectedSwatch]}
           >
             {renderShape(shape)}
           </TouchableOpacity>

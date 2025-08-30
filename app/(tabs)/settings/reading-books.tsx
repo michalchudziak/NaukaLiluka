@@ -1,9 +1,9 @@
+import { useEffect } from 'react';
+import { ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
-import { useEffect } from 'react';
-import { ScrollView, StyleSheet, Switch, View } from 'react-native';
 
 interface SwitchSettingProps {
   label: string;
@@ -17,9 +17,7 @@ function SwitchSetting({ label, description, value, onValueChange }: SwitchSetti
     <View style={styles.switchContainer}>
       <View style={styles.switchTextContainer}>
         <ThemedText style={styles.switchLabel}>{label}</ThemedText>
-        {description && (
-          <ThemedText style={styles.switchDescription}>{description}</ThemedText>
-        )}
+        {description && <ThemedText style={styles.switchDescription}>{description}</ThemedText>}
       </View>
       <Switch
         value={value}
@@ -33,11 +31,7 @@ function SwitchSetting({ label, description, value, onValueChange }: SwitchSetti
 
 export default function ReadingBooksSettingsScreen() {
   const { t } = useTranslation();
-  const {
-    reading,
-    updateReadingBooksAllowAll,
-    hydrate
-  } = useSettingsStore();
+  const { reading, updateReadingBooksAllowAll, hydrate } = useSettingsStore();
 
   useEffect(() => {
     hydrate();
@@ -50,7 +44,7 @@ export default function ReadingBooksSettingsScreen() {
           <ThemedText style={styles.sectionDescription}>
             {t('settings.reading.booksDescription')}
           </ThemedText>
-          
+
           <View style={styles.settingsContent}>
             <SwitchSetting
               label={t('settings.reading.allowAllBooks')}

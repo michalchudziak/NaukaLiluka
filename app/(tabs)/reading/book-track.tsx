@@ -1,11 +1,11 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useRouter } from 'expo-router';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import { Button } from '@/components/Button';
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
-import { StyleSheet, useWindowDimensions } from 'react-native';
 
 export default function BookTrackScreen() {
   const { width, height } = useWindowDimensions();
@@ -13,7 +13,7 @@ export default function BookTrackScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
-  const isBookTrackCompletedToday = useBookStore(state => state.isBookTrackCompletedToday);
+  const isBookTrackCompletedToday = useBookStore((state) => state.isBookTrackCompletedToday);
   const isTrainingCompleted = isBookTrackCompletedToday();
 
   const handleTrainingPress = () => {
@@ -26,17 +26,16 @@ export default function BookTrackScreen() {
 
   return (
     <ThemedView style={[styles.container, { marginBottom: tabBarHeight }]}>
-      <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
-        <TrackButton 
+      <ThemedView
+        style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}
+      >
+        <TrackButton
           title={t('bookTrack.training')}
           isCompleted={isTrainingCompleted}
           onPress={handleTrainingPress}
         />
-      
-        <Button 
-          title={t('bookTrack.books')}
-          onPress={handleBooksPress}
-        />
+
+        <Button title={t('bookTrack.books')} onPress={handleBooksPress} />
       </ThemedView>
     </ThemedView>
   );

@@ -1,10 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
-import { Ionicons } from '@expo/vector-icons';
-import { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface NumberInputProps {
   label: string;
@@ -16,7 +16,15 @@ interface NumberInputProps {
   suffix?: string;
 }
 
-function NumberInput({ label, value, onChangeValue, min = 100, max = 10000, step = 100, suffix = 'ms' }: NumberInputProps) {
+function NumberInput({
+  label,
+  value,
+  onChangeValue,
+  min = 100,
+  max = 10000,
+  step = 100,
+  suffix = 'ms',
+}: NumberInputProps) {
   const handleDecrement = () => {
     if (value > min) {
       onChangeValue(Math.max(min, value - step));
@@ -30,7 +38,7 @@ function NumberInput({ label, value, onChangeValue, min = 100, max = 10000, step
   };
 
   const handleTextChange = (text: string) => {
-    const num = parseInt(text) || min;
+    const num = parseInt(text, 10) || min;
     if (num >= min && num <= max) {
       onChangeValue(num);
     }
@@ -47,7 +55,7 @@ function NumberInput({ label, value, onChangeValue, min = 100, max = 10000, step
         >
           <Ionicons name="remove" size={20} color={value <= min ? '#C7C7CC' : '#007AFF'} />
         </TouchableOpacity>
-        
+
         <View style={styles.inputWrapper}>
           <TextInput
             style={styles.input}
@@ -58,7 +66,7 @@ function NumberInput({ label, value, onChangeValue, min = 100, max = 10000, step
           />
           <Text style={styles.suffix}>{suffix}</Text>
         </View>
-        
+
         <TouchableOpacity
           style={[styles.button, value >= max && styles.buttonDisabled]}
           onPress={handleIncrement}
@@ -73,12 +81,8 @@ function NumberInput({ label, value, onChangeValue, min = 100, max = 10000, step
 
 export default function ReadingIntervalSettingsScreen() {
   const { t } = useTranslation();
-  const {
-    reading,
-    updateReadingIntervalWords,
-    updateReadingIntervalSentences,
-    hydrate
-  } = useSettingsStore();
+  const { reading, updateReadingIntervalWords, updateReadingIntervalSentences, hydrate } =
+    useSettingsStore();
 
   useEffect(() => {
     hydrate();
@@ -91,7 +95,7 @@ export default function ReadingIntervalSettingsScreen() {
           <ThemedText style={styles.sectionDescription}>
             {t('settings.reading.intervalDescription')}
           </ThemedText>
-          
+
           <View style={styles.settingsContent}>
             <NumberInput
               label={t('settings.reading.wordsInterval')}
@@ -102,9 +106,9 @@ export default function ReadingIntervalSettingsScreen() {
               step={100}
               suffix="ms"
             />
-            
+
             <View style={styles.separator} />
-            
+
             <NumberInput
               label={t('settings.reading.sentencesInterval')}
               value={reading.interval.sentences}
@@ -115,10 +119,8 @@ export default function ReadingIntervalSettingsScreen() {
               suffix="ms"
             />
           </View>
-          
-          <ThemedText style={styles.hint}>
-            {t('settings.reading.intervalHint')}
-          </ThemedText>
+
+          <ThemedText style={styles.hint}>{t('settings.reading.intervalHint')}</ThemedText>
         </View>
       </ScrollView>
     </ThemedView>
