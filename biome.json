@@ -28,7 +28,13 @@
     "lineWidth": 100,
     "attributePosition": "auto"
   },
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
@@ -38,7 +44,8 @@
         "noUselessSwitchCase": "error",
         "noUselessTypeConstraint": "error",
         "noCommaOperator": "error",
-        "useNumericLiterals": "error"
+        "useNumericLiterals": "error",
+        "noStaticOnlyClass": null,
       },
       "correctness": {
         "noConstAssign": "error",
@@ -69,7 +76,9 @@
         "noRestrictedGlobals": {
           "level": "error",
           "options": {
-            "deniedGlobals": { "self": "TODO: Add a custom message here." }
+            "deniedGlobals": {
+              "self": "TODO: Add a custom message here."
+            }
           }
         },
         "useConsistentArrayType": {
@@ -138,7 +147,12 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      "includes": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.mts",
+        "**/*.cts"
+      ],
       "linter": {
         "rules": {
           "correctness": {
@@ -165,7 +179,10 @@
       }
     },
     {
-      "includes": ["**/*.jsx", "**/*.tsx"],
+      "includes": [
+        "**/*.jsx",
+        "**/*.tsx"
+      ],
       "linter": {
         "rules": {
           "correctness": {

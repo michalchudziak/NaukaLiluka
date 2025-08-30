@@ -1,227 +1,99 @@
 import { isSameDay, isToday, parseISO } from 'date-fns';
 import { create } from 'zustand';
-import { getNumbersLearningScheme } from '@/content/math/learning-scheme';
-import { HybridStorageService } from '@/services/hybrid-storage';
+import {
+  type DailyData,
+  getNumbersLearningScheme,
+  type SessionContent,
+} from '@/content/math/learning-scheme';
 
 const STORAGE_KEYS = {
   MATH_PROGRESS: 'progress.math',
   MATH_SESSION_COMPLETIONS: 'routines.math.sessions',
 } as const;
 
-interface MathProgress {
-  completedDays: number[]; // array of completed day numbers
-  lastPracticeDate: string | null; // ISO date string of last practice
-  lastDayCompleted: boolean; // whether the last practiced day was completed
-  lastCompletionDate: string | null; // ISO date string of last completion
-}
-
-interface MathSessionCompletion {
-  session: 'session1' | 'session2';
-  timestamp: number;
-}
-
-export interface MathDailyData {
-  dayNumber: number;
-  numbers: number[];
-  actualNumbers: boolean;
-  activeDay: number; // the day to display (might differ from currentDay)
-}
+type Session = 'subitizingOrdered' | 'subitizingUnordered' | 'numbersOrdered' | 'numbersUnordered';
 
 interface MathStore {
-  mathProgress: MathProgress | null;
-  mathSessionCompletions: MathSessionCompletion[];
+  currentDay: number;
+  lastSessionDate: string | null;
+  completedSessions: Session[];
 
-  initializeMathProgress: () => void;
-  getDailyData: () => MathDailyData | null;
-  markSessionCompleted: (session: 'session1' | 'session2') => void;
+  getDailyData: () => DailyData;
+  markSessionCompleted: (session: Session) => void;
   isDayCompleted: () => boolean;
   isSessionCompletedToday: (session: 'session1' | 'session2') => boolean;
-  getNumbersForDisplay: (type: 'ordered' | 'unordered') => number[];
   hydrate: () => Promise<void>;
 }
 
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
+const sessionContentToSession = (content: SessionContent): Session => {
+  const ordered = content.isOrdered ? 'Ordered' : 'Unordered';
+  const type = content.type === 'subitizing' ? 'subitizing' : 'numbers';
+  return `${type}${ordered}` as Session;
+};
 
 export const useMathStore = create<MathStore>((set, get) => ({
-  mathProgress: null,
-  mathSessionCompletions: [],
-
-  initializeMathProgress: () => {
-    const progress: MathProgress = {
-      completedDays: [],
-      lastPracticeDate: null,
-      lastDayCompleted: false,
-      lastCompletionDate: null,
-    };
-
-    set({ mathProgress: progress });
-    HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, progress);
-  },
+  currentDay: 1,
+  lastSessionDate: null,
+  completedSessions: [],
 
   getDailyData: () => {
-    const state = get();
-    let progress = state.mathProgress;
-
-    if (!progress) {
-      state.initializeMathProgress();
-      progress = get().mathProgress;
-    }
-
-    if (!progress) return null;
-
-    const today = new Date();
-
-    // Derive current day from completedDays
-    const currentDay =
-      progress.completedDays.length > 0 ? Math.max(...progress.completedDays) + 1 : 1;
-
-    // Calculate active day: if completed today, show today's content; otherwise show next day
-    let activeDay = currentDay;
-    if (progress.lastCompletionDate && isSameDay(parseISO(progress.lastCompletionDate), today)) {
-      // If completed today, show the completed day's content
-      activeDay = progress.completedDays[progress.completedDays.length - 1] || currentDay;
-    }
-
-    // Clear old session completions (older than today) if needed
-    const todayCompletions = state.mathSessionCompletions.filter((c) => isToday(c.timestamp));
-    if (todayCompletions.length !== state.mathSessionCompletions.length) {
-      set({ mathSessionCompletions: todayCompletions });
-      HybridStorageService.writeMathSessions(
-        STORAGE_KEYS.MATH_SESSION_COMPLETIONS,
-        todayCompletions
-      );
-    }
-
-    const scheme = getNumbersLearningScheme(activeDay);
-    return {
-      dayNumber: currentDay,
-      numbers: scheme.data,
-      actualNumbers: scheme.actualNumbers,
-      activeDay: activeDay,
-    };
+    const { currentDay } = get();
+    return getNumbersLearningScheme(currentDay);
   },
 
-  markSessionCompleted: (session: 'session1' | 'session2') => {
-    // Add completion record
-    const newCompletion: MathSessionCompletion = {
-      session,
-      timestamp: Date.now(),
-    };
-    const newCompletions = [...get().mathSessionCompletions, newCompletion];
-    set({ mathSessionCompletions: newCompletions });
-    HybridStorageService.writeMathSessions(STORAGE_KEYS.MATH_SESSION_COMPLETIONS, newCompletions);
+  markSessionCompleted: (session) => {
+    const today = new Date().toISOString();
+    const { lastSessionDate, completedSessions } = get();
 
-    const state = get();
-    const progress = state.mathProgress;
-    if (progress) {
-      const today = new Date();
-      const todayString = today.toISOString().split('T')[0];
-
-      // Update lastPracticeDate whenever a session is completed (user practiced today)
-      if (!progress.lastPracticeDate || !isSameDay(parseISO(progress.lastPracticeDate), today)) {
-        const updatedProgress: MathProgress = {
-          ...progress,
-          lastPracticeDate: todayString,
-        };
-        set({ mathProgress: updatedProgress });
-        HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, updatedProgress);
-      }
-    }
-
-    // Check if the entire day is completed and update progress
-    if (state.isDayCompleted() && progress) {
-      const today = new Date();
-      const todayString = today.toISOString().split('T')[0];
-      const wasCompletedToday =
-        progress.lastCompletionDate && isSameDay(parseISO(progress.lastCompletionDate), today);
-
-      // Derive current day from completedDays
-      const currentDay =
-        progress.completedDays.length > 0 ? Math.max(...progress.completedDays) + 1 : 1;
-
-      if (wasCompletedToday) {
-        // If already completed today, just update the completion timestamp
-        const updatedProgress: MathProgress = {
-          ...progress,
-          lastCompletionDate: todayString,
-          lastDayCompleted: true,
-        };
-        set({ mathProgress: updatedProgress });
-        HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, updatedProgress);
-      } else {
-        // Mark current day as completed and save completion date
-        // Update lastPracticeDate since user actually practiced
-        const updatedProgress: MathProgress = {
-          ...progress,
-          completedDays: [...progress.completedDays, currentDay],
-          lastPracticeDate: todayString,
-          lastCompletionDate: todayString,
-          lastDayCompleted: true,
-        };
-        set({ mathProgress: updatedProgress });
-        HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, updatedProgress);
-
-        // Don't clear session completions - they'll be cleared on the next calendar day
+    if (!lastSessionDate || !isSameDay(parseISO(lastSessionDate), new Date())) {
+      set({
+        lastSessionDate: today,
+        completedSessions: [session],
+      });
+    } else {
+      if (!completedSessions.includes(session)) {
+        set({
+          completedSessions: [...completedSessions, session],
+        });
       }
     }
   },
 
   isDayCompleted: () => {
-    const todayCompletions = get().mathSessionCompletions.filter((c) => isToday(c.timestamp));
+    const { currentDay, completedSessions, lastSessionDate } = get();
 
-    // Check if both sessions are completed today
-    const session1Complete = todayCompletions.some((c) => c.session === 'session1');
-    const session2Complete = todayCompletions.some((c) => c.session === 'session2');
-
-    return session1Complete && session2Complete;
-  },
-
-  isSessionCompletedToday: (session: 'session1' | 'session2') => {
-    const todayCompletions = get().mathSessionCompletions.filter((c) => isToday(c.timestamp));
-    return todayCompletions.some((c) => c.session === session);
-  },
-
-  getNumbersForDisplay: (type: 'ordered' | 'unordered') => {
-    const dailyData = get().getDailyData();
-    if (!dailyData) return [];
-
-    if (type === 'ordered') {
-      return dailyData.numbers;
-    } else {
-      return shuffleArray(dailyData.numbers);
+    if (!lastSessionDate || !isToday(parseISO(lastSessionDate))) {
+      return false;
     }
+
+    const dailyData = getNumbersLearningScheme(currentDay);
+    const allSessions = dailyData.sessionContent.flat();
+    const requiredSessions = allSessions.map(sessionContentToSession);
+
+    return requiredSessions.every((session) => completedSessions.includes(session));
+  },
+
+  isSessionCompletedToday: (session) => {
+    const { currentDay, completedSessions, lastSessionDate } = get();
+
+    if (!lastSessionDate || !isToday(parseISO(lastSessionDate))) {
+      return false;
+    }
+
+    const dailyData = getNumbersLearningScheme(currentDay);
+    const sessionIndex = session === 'session1' ? 0 : 1;
+
+    if (sessionIndex >= dailyData.sessionContent.length) {
+      return false;
+    }
+
+    const sessionContents = dailyData.sessionContent[sessionIndex];
+    const requiredSessions = sessionContents.map(sessionContentToSession);
+
+    return requiredSessions.every((s) => completedSessions.includes(s));
   },
 
   hydrate: async () => {
-    await HybridStorageService.initialize();
-    const [storedProgress, storedSessions] = await Promise.all([
-      HybridStorageService.readMathProgress(STORAGE_KEYS.MATH_PROGRESS),
-      HybridStorageService.readMathSessions(STORAGE_KEYS.MATH_SESSION_COMPLETIONS),
-    ]);
-
-    const state: Partial<MathStore> = {};
-
-    if (storedProgress) {
-      state.mathProgress = storedProgress;
-    } else {
-      // Initialize if no stored progress
-      get().initializeMathProgress();
-    }
-
-    if (storedSessions) {
-      // Keep all sessions, they'll be cleared on new day in getDailyData
-      state.mathSessionCompletions = storedSessions;
-    }
-
-    if (Object.keys(state).length > 0) {
-      set(state);
-    }
+    // TODO: Implement hydration from hybrid store later
   },
 }));

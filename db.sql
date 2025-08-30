@@ -77,23 +77,7 @@
       presented_at TIMESTAMPTZ DEFAULT NOW()
   );
 
-  -- Math progress tracking
-  CREATE TABLE public.math_progress (
-      id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
-      completed_days INTEGER[] DEFAULT '{}',
-      last_practice_date DATE DEFAULT NULL,
-      last_day_completed BOOLEAN DEFAULT false,
-      last_completion_date DATE DEFAULT NULL,
-      created_at TIMESTAMPTZ DEFAULT NOW(),
-      updated_at TIMESTAMPTZ DEFAULT NOW()
-  );
 
-  -- Math session completions
-  CREATE TABLE public.math_sessions (
-      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-      session_name TEXT NOT NULL CHECK (session_name IN ('session1', 'session2')),
-      completed_at TIMESTAMPTZ DEFAULT NOW()
-  );
 
   -- Create indexes for efficient queries
   CREATE INDEX idx_daily_plans_created ON public.daily_plans(created_at
@@ -104,7 +88,6 @@
   public.no_rep_completions(completed_at DESC);
   CREATE INDEX idx_drawing_presentations_date ON
   public.drawing_presentations(presented_at DESC);
-  CREATE INDEX idx_math_sessions_completed ON public.math_sessions(completed_at DESC);
 
   -- Triggers for updated_at timestamps
   CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -127,9 +110,6 @@
   public.no_rep_progress
       FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
-  CREATE TRIGGER update_math_progress_updated_at BEFORE UPDATE ON
-  public.math_progress
-      FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
   -- Initialize default data
   INSERT INTO public.settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
@@ -137,7 +117,6 @@
       (1, 'words'),
       (2, 'sentences')
   ON CONFLICT DO NOTHING;
-  INSERT INTO public.math_progress (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 
   -- Helper views for common queries
   CREATE VIEW today_book_track_completions AS
@@ -157,6 +136,3 @@
   ORDER BY created_at DESC
   LIMIT 1;
 
-  CREATE VIEW today_math_completions AS
-  SELECT * FROM public.math_sessions
-  WHERE DATE(completed_at) = CURRENT_DATE;

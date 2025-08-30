@@ -8,18 +8,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { WordColors } from '@/constants/WordColors';
+import type { DailyData, SessionContent } from '@/content/math/learning-scheme';
 import { useTranslation } from '@/hooks/useTranslation';
-
-type SessionContent = {
-  type: 'subitizing' | 'numbers';
-  isOrdered: boolean;
-};
-
-type DailyData = {
-  activeDay: number;
-  numbers: number[];
-  sessionContent: SessionContent[][];
-};
 
 export default function SetsScreen() {
   const { t } = useTranslation();
