@@ -1,6 +1,7 @@
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useMathStore } from '@/store/math-store';
 import { useRouter } from 'expo-router';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 
@@ -9,13 +10,14 @@ export default function MathScreen() {
   const isHorizontal = width > height;
   const { t } = useTranslation();
   const router = useRouter();
+  const { isDayCompleted } = useMathStore();
 
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
         <TrackButton 
           title={t('math.numberSets')}
-          isCompleted={false}
+          isCompleted={isDayCompleted()}
           onPress={() => router.push('/math/sets')}
         />
       </ThemedView>
