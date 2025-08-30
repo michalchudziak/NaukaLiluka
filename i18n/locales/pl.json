@@ -3,7 +3,8 @@
     "reading": "Czytanie",
     "pictures": "Obrazki",
     "settings": "Ustawienia",
-    "myDay": "Mój dzień"
+    "myDay": "Mój dzień",
+    "math": "Matematyka"
   },
   "common": {
     "cancel": "Anuluj",
@@ -183,5 +184,16 @@
     "routine3": "Książki - Sesja 2",
     "routine4": "Książki - Sesja 3",
     "routine5": "Prezentacja Obrazków"
+  },
+  "math": {
+    "numberSets": "Zbiory liczb",
+    "title": "Matematyka",
+    "back": "Wróć",
+    "sets": {
+      "title": "Zbiory liczb",
+      "startTrack": "Rozpocznij ścieżkę",
+      "selectColor": "Wybierz kolor",
+      "selectShape": "Wybierz kształt"
+    }
   }
 }

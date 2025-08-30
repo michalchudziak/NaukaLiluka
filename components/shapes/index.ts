@@ -1,0 +1,10 @@
+export { Circle } from './Circle';
+export { Triangle } from './Triangle';
+export { Square } from './Square';
+export { X } from './X';
+export { Star } from './Star';
+export { Pentagon } from './Pentagon';
+export { Hexagon } from './Hexagon';
+export { Diamond } from './Diamond';
+export { Heart } from './Heart';
+export { Plus } from './Plus';

@@ -45,6 +45,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="math"
+        options={{
+          title: t('tabs.math'),
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="calculate" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="drawings"
         options={{
           title: t('tabs.pictures'),
