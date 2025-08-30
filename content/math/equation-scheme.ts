@@ -126,3 +126,80 @@ export const buildNegativeIntegerEquations = (day: number, numberLimit: number, 
 
   return equations;
 };
+
+export const buildDecimalEquations = (day: number, numberLimit: number, count: number) => {
+  const equations = [];
+  const operators = [];
+  switch (day) {
+    case 1:
+      operators.push('+');
+      break;
+    case 2:
+      operators.push('-');
+      break;
+    case 3:
+      operators.push('*');
+      break;
+    case 4:
+      operators.push('/');
+      break;
+    case 5:
+      operators.push('+');
+      operators.push('-');
+      operators.push('*');
+      operators.push('/');
+      break;
+  }
+
+  for (let i = 0; i < count; i++) {
+    const operator = operators[Math.floor(Math.random() * operators.length)];
+    let a: number;
+    let b: number;
+
+    if (operator === '/') {
+      // For division, work with integers multiplied by 100 to ensure clean decimal results
+      const aInt = Math.floor(Math.random() * numberLimit * 100);
+      const divisors = findDivisors(aInt);
+
+      let bInt: number;
+      if (divisors.length > 1) {
+        // Skip 1 and the number itself for more interesting divisions
+        const filteredDivisors = divisors.filter((d) => d !== 1 && d !== aInt);
+        bInt =
+          filteredDivisors.length > 0
+            ? filteredDivisors[Math.floor(Math.random() * filteredDivisors.length)]
+            : divisors[Math.floor(Math.random() * divisors.length)];
+      } else {
+        bInt = 100; // Default to 1 when divided by 100
+      }
+
+      // Convert back to decimals
+      a = aInt / 100;
+      b = bInt / 100;
+
+      // Ensure b is greater than 0.5
+      if (b <= 0.5) {
+        b = 1;
+      }
+    } else {
+      // For other operations, generate random decimals up to 3 decimal places
+      a = Math.floor(Math.random() * numberLimit * 100) / 100;
+      b = Math.floor(Math.random() * Math.floor(numberLimit / 7) * 100) / 100;
+    }
+
+    // Format numbers to remove trailing zeros
+    const formatNumber = (n: number) => {
+      const rounded = Math.round(n * 100) / 100;
+      return rounded.toString();
+    };
+
+    const leftSide = `${formatNumber(a)} ${operator} ${formatNumber(b)}`;
+    const result = eval(leftSide);
+    // Round result to 3 decimal places
+    const roundedResult = Math.round(result * 100) / 100;
+    const rightSide = `= ${formatNumber(roundedResult)}`;
+    equations.push([leftSide, rightSide]);
+  }
+
+  return equations;
+};
