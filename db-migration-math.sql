@@ -5,7 +5,6 @@
 CREATE TABLE IF NOT EXISTS public.math_progress (
     id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
     completed_days INTEGER[] DEFAULT '{}',
-    current_day INTEGER DEFAULT 1,
     last_practice_date DATE DEFAULT NULL,
     last_day_completed BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT NOW(),

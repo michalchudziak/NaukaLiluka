@@ -407,7 +407,6 @@ export default function ViewStorageScreen() {
 
     return (
       <View>
-        <DataRow label="Aktualny dzień" value={`Dzień ${progress.currentDay}`} />
         <DataRow 
           label="Ukończone dni" 
           value={`${progress.completedDays?.length || 0} / 30+`}

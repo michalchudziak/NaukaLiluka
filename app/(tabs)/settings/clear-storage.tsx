@@ -5,6 +5,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { AsyncStorageService } from '@/services/async-storage';
 import { useBookStore } from '@/store/book-store';
 import { useDrawingsStore } from '@/store/drawings-store';
+import { useMathStore } from '@/store/math-store';
 import { useNoRepStore } from '@/store/no-rep-store';
 import { useSettingsStore } from '@/store/settings-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,6 +22,7 @@ export default function ClearStorageScreen() {
   const noRepStore = useNoRepStore();
   const drawingsStore = useDrawingsStore();
   const settingsStore = useSettingsStore();
+  const mathStore = useMathStore();
 
   const handleClearAll = async () => {
     Alert.alert(
@@ -45,7 +47,8 @@ export default function ClearStorageScreen() {
                 bookStore.hydrate(),
                 noRepStore.hydrate(),
                 drawingsStore.hydrate(),
-                settingsStore.hydrate()
+                settingsStore.hydrate(),
+                mathStore.hydrate()
               ]);
               
               // Reset stores to ensure clean state

@@ -80,7 +80,7 @@ export default function SetsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ThemedText type="subtitle" style={styles.dayTitle}>
-          {t('math.sets.dayTitle', { day: dailyData.dayNumber })}
+          {t('math.sets.dayTitle', { day: dailyData.activeDay })}
         </ThemedText>
         
         <View style={styles.sessionsContainer}>

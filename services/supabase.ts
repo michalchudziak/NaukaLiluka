@@ -356,9 +356,9 @@ export class SupabaseService {
         .insert({ 
           id: 1, 
           completed_days: [], 
-          current_day: 1, 
           last_practice_date: null,
-          last_day_completed: false 
+          last_day_completed: false,
+          last_completion_date: null 
         })
         .select();
       
@@ -368,17 +368,17 @@ export class SupabaseService {
       
       return {
         completedDays: newProgress[0].completed_days || [],
-        currentDay: newProgress[0].current_day || 1,
         lastPracticeDate: newProgress[0].last_practice_date || null,
         lastDayCompleted: newProgress[0].last_day_completed || false,
+        lastCompletionDate: newProgress[0].last_completion_date || null,
       };
     }
     
     return {
       completedDays: data[0].completed_days || [],
-      currentDay: data[0].current_day || 1,
       lastPracticeDate: data[0].last_practice_date || null,
       lastDayCompleted: data[0].last_day_completed || false,
+      lastCompletionDate: data[0].last_completion_date || null,
     };
   }
   
@@ -387,9 +387,9 @@ export class SupabaseService {
       .from('math_progress')
       .update({
         completed_days: progress.completedDays,
-        current_day: progress.currentDay,
         last_practice_date: progress.lastPracticeDate,
         last_day_completed: progress.lastDayCompleted,
+        last_completion_date: progress.lastCompletionDate,
       })
       .eq('id', 1);
     
