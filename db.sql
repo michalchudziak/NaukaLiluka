@@ -77,6 +77,24 @@
       presented_at TIMESTAMPTZ DEFAULT NOW()
   );
 
+  -- Math progress tracking
+  CREATE TABLE public.math_progress (
+      id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+      completed_days INTEGER[] DEFAULT '{}',
+      current_day INTEGER DEFAULT 1,
+      last_practice_date DATE DEFAULT NULL,
+      last_day_completed BOOLEAN DEFAULT false,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
+  );
+
+  -- Math session completions
+  CREATE TABLE public.math_sessions (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      session_name TEXT NOT NULL CHECK (session_name IN ('session1', 'session2')),
+      completed_at TIMESTAMPTZ DEFAULT NOW()
+  );
+
   -- Create indexes for efficient queries
   CREATE INDEX idx_daily_plans_created ON public.daily_plans(created_at
   DESC);
@@ -86,6 +104,7 @@
   public.no_rep_completions(completed_at DESC);
   CREATE INDEX idx_drawing_presentations_date ON
   public.drawing_presentations(presented_at DESC);
+  CREATE INDEX idx_math_sessions_completed ON public.math_sessions(completed_at DESC);
 
   -- Triggers for updated_at timestamps
   CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -108,12 +127,17 @@
   public.no_rep_progress
       FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+  CREATE TRIGGER update_math_progress_updated_at BEFORE UPDATE ON
+  public.math_progress
+      FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
   -- Initialize default data
   INSERT INTO public.settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
   INSERT INTO public.no_rep_progress (id, content_type) VALUES
       (1, 'words'),
       (2, 'sentences')
   ON CONFLICT DO NOTHING;
+  INSERT INTO public.math_progress (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 
   -- Helper views for common queries
   CREATE VIEW today_book_track_completions AS
@@ -133,69 +157,6 @@
   ORDER BY created_at DESC
   LIMIT 1;
 
-  -- Function to check if daily plan is for today
-  CREATE OR REPLACE FUNCTION is_daily_plan_today()
-  RETURNS BOOLEAN AS $$
-  BEGIN
-      RETURN EXISTS (
-          SELECT 1 FROM public.daily_plans
-          WHERE DATE(created_at) = CURRENT_DATE
-      );
-  END;
-  $$ language plpgsql;
-
-  -- Function to get today's book track completion status
-  CREATE OR REPLACE FUNCTION get_today_book_track_status()
-  RETURNS TABLE (
-      session1_words BOOLEAN,
-      session1_sentences BOOLEAN,
-      session2_words BOOLEAN,
-      session2_sentences BOOLEAN,
-      session3_words BOOLEAN,
-      session3_sentences BOOLEAN
-  ) AS $$
-  BEGIN
-      RETURN QUERY
-      SELECT
-          EXISTS(SELECT 1 FROM today_book_track_completions WHERE
-  session_name = 'session1' AND content_type = 'words'),
-          EXISTS(SELECT 1 FROM today_book_track_completions WHERE
-  session_name = 'session1' AND content_type = 'sentences'),
-          EXISTS(SELECT 1 FROM today_book_track_completions WHERE
-  session_name = 'session2' AND content_type = 'words'),
-          EXISTS(SELECT 1 FROM today_book_track_completions WHERE
-  session_name = 'session2' AND content_type = 'sentences'),
-          EXISTS(SELECT 1 FROM today_book_track_completions WHERE
-  session_name = 'session3' AND content_type = 'words'),
-          EXISTS(SELECT 1 FROM today_book_track_completions WHERE
-  session_name = 'session3' AND content_type = 'sentences');
-  END;
-  $$ language plpgsql;
-
-  -- Function to get today's no-rep completion status
-  CREATE OR REPLACE FUNCTION get_today_no_rep_status()
-  RETURNS TABLE (
-      words_completed BOOLEAN,
-      sentences_completed BOOLEAN
-  ) AS $$
-  BEGIN
-      RETURN QUERY
-      SELECT
-          EXISTS(SELECT 1 FROM today_no_rep_completions WHERE content_type
-  = 'words'),
-          EXISTS(SELECT 1 FROM today_no_rep_completions WHERE content_type
-  = 'sentences');
-  END;
-  $$ language plpgsql;
-
-  -- Function to get drawing presentation count for a specific set today
-  CREATE OR REPLACE FUNCTION get_today_drawing_count(p_set_title TEXT)
-  RETURNS INTEGER AS $$
-  BEGIN
-      RETURN (
-          SELECT COUNT(*)::INTEGER
-          FROM today_drawing_presentations
-          WHERE set_title = p_set_title
-      );
-  END;
-  $$ language plpgsql;
+  CREATE VIEW today_math_completions AS
+  SELECT * FROM public.math_sessions
+  WHERE DATE(completed_at) = CURRENT_DATE;

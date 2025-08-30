@@ -302,6 +302,68 @@ export class HybridStorageService {
     }
   }
   
+  // Math Progress
+  static async readMathProgress(key: string): Promise<any> {
+    const localData = await AsyncStorageService.read(key);
+    
+    if (this.useCloudData) {
+      try {
+        const cloudData = await SupabaseService.getMathProgress();
+        // Use cloud data even if empty - empty is a valid state
+        if (cloudData !== null && cloudData !== undefined) {
+          return cloudData;
+        }
+      } catch (error) {
+        console.error('Failed to fetch math progress from cloud, using local data:', error);
+      }
+    }
+    
+    return localData;
+  }
+  
+  static async writeMathProgress(key: string, value: any) {
+    await AsyncStorageService.write(key, value);
+    
+    if (this.useCloudData) {
+      try {
+        await SupabaseService.updateMathProgress(value);
+      } catch (error) {
+        console.error('Failed to save math progress to cloud:', error);
+      }
+    }
+  }
+  
+  // Math Sessions
+  static async readMathSessions(key: string): Promise<any> {
+    const localData = await AsyncStorageService.read(key);
+    
+    if (this.useCloudData) {
+      try {
+        const cloudData = await SupabaseService.getMathSessions();
+        // Use cloud data even if empty - empty is a valid state
+        if (cloudData !== null && cloudData !== undefined) {
+          return cloudData;
+        }
+      } catch (error) {
+        console.error('Failed to fetch math sessions from cloud, using local data:', error);
+      }
+    }
+    
+    return localData;
+  }
+  
+  static async writeMathSessions(key: string, value: any) {
+    await AsyncStorageService.write(key, value);
+    
+    if (this.useCloudData && value && value.length > 0) {
+      try {
+        await SupabaseService.saveMathSession(value);
+      } catch (error) {
+        console.error('Failed to save math session to cloud:', error);
+      }
+    }
+  }
+  
   // Generic clear (only clears local storage)
   static async clear(key: string) {
     await AsyncStorageService.clear(key);

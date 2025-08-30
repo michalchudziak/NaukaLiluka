@@ -1,63 +1,92 @@
 import { ColorPicker } from '@/components/ColorPicker';
 import { ShapePicker, ShapeType } from '@/components/ShapePicker';
+import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { WordColors } from '@/constants/WordColors';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useMathStore } from '@/store/math-store';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 export default function SetsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { width, height } = useWindowDimensions();
   const bottomTabBarHeight = useBottomTabBarHeight();
-  const isHorizontal = width > height;
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
+  
+  const { 
+    getDailyData, 
+    markSessionCompleted, 
+    isSessionCompletedToday,
+    getNumbersForDisplay 
+  } = useMathStore();
+  
+  const dailyData = getDailyData();
 
-  const handleOrderedPress = () => {
-    const orderedNumbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const handleSessionPress = (sessionId: 'session1' | 'session2') => {
+    if (!dailyData) return;
+    
+    // Session 1 is always ordered, Session 2 is always unordered
+    const type = sessionId === 'session1' ? 'ordered' : 'unordered';
+    const numbers = getNumbersForDisplay(type);
+    
     router.push({
       pathname: '/set-display',
       params: {
-        numbers: JSON.stringify(orderedNumbers),
+        numbers: JSON.stringify(numbers),
         shape: selectedShape,
         color: selectedColor,
       },
     });
+    
+    // Mark as completed
+    markSessionCompleted(sessionId);
   };
 
-  const handleUnorderedPress = () => {
-    const unorderedNumbers = [149, 148, 147, 146, 144, 140, 142, 141, 140, 148].sort(() => Math.random() - 0.5);
-    router.push({
-      pathname: '/set-display',
-      params: {
-        numbers: JSON.stringify(unorderedNumbers),
-        shape: selectedShape,
-        color: selectedColor,
-      },
-    });
+  const renderSession = (sessionNumber: number) => {
+    const sessionKey = `session${sessionNumber}` as 'session1' | 'session2';
+    const isSession1 = sessionNumber === 1;
+    
+    return (
+      <View key={sessionKey} style={styles.sessionRow}>
+        <ThemedText type="subtitle" style={styles.sessionLabel}>
+          {t(`booksDaily.${sessionKey}`)}
+        </ThemedText>
+        <TrackButton 
+          title={t(isSession1 ? 'math.sets.ordered' : 'math.sets.unordered')}
+          isCompleted={isSessionCompletedToday(sessionKey)}
+          onPress={() => handleSessionPress(sessionKey)}
+        />
+      </View>
+    );
   };
+
+  if (!dailyData) {
+    return (
+      <ThemedView style={[styles.container, styles.centerContent, { marginBottom: bottomTabBarHeight }]}>
+        <ThemedText style={styles.noContentText}>{t('booksDaily.noContent')}</ThemedText>
+      </ThemedView>
+    );
+  }
 
   return (
-    <ScrollView style={styles.container}>
-      <ThemedView style={[styles.content, { paddingBottom: bottomTabBarHeight + 10 }]}>
-        <ThemedView style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}>
-          <TrackButton 
-            title={t('math.sets.ordered')}
-            isCompleted={false}
-            onPress={handleOrderedPress}
-          />
-          
-          <TrackButton 
-            title={t('math.sets.unordered')}
-            isCompleted={false}
-            onPress={handleUnorderedPress}
-          />
-        </ThemedView>
+    <ThemedView style={[styles.container, { marginBottom: bottomTabBarHeight }]}>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <ThemedText type="subtitle" style={styles.dayTitle}>
+          {t('math.sets.dayTitle', { day: dailyData.dayNumber })}
+        </ThemedText>
+        
+        <View style={styles.sessionsContainer}>
+          {renderSession(1)}
+          {renderSession(2)}
+        </View>
         
         <ColorPicker
           selectedColor={selectedColor}
@@ -70,30 +99,45 @@ export default function SetsScreen() {
           onShapeSelect={setSelectedShape}
           label={t('math.sets.selectShape')}
         />
-      </ThemedView>
-    </ScrollView>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  content: {
-    flex: 1,
-    minHeight: '100%',
     padding: 20,
-    paddingTop: 40,
   },
-  buttonsContainer: {
-    gap: 20,
-    marginBottom: 20,
-  },
-  horizontal: {
-    flexDirection: 'row',
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
   },
-  vertical: {
-    flexDirection: 'column',
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sessionsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: 30,
+  },
+  sessionRow: {
+    gap: 15,
+  },
+  sessionLabel: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  dayTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 30,
+  },
+  noContentText: {
+    fontSize: 18,
+    textAlign: 'center',
   },
 });

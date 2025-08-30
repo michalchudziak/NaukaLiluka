@@ -16,6 +16,10 @@ interface StorageData {
     dailyPlan: any;
     trackSessions: any;
   };
+  mathStore: {
+    mathProgress: any;
+    mathSessions: any[];
+  };
   noRepStore: {
     displayedWords: string[];
     displayedSentences: string[];
@@ -71,6 +75,8 @@ export default function ViewStorageScreen() {
         bookProgress,
         dailyPlan,
         trackSessions,
+        mathProgress,
+        mathSessions,
         noRepWords,
         noRepSentences,
         routineWords,
@@ -82,6 +88,8 @@ export default function ViewStorageScreen() {
         HybridStorageService.readBookProgress('progress.books'),
         HybridStorageService.readDailyPlan('progress.books.daily-plan'),
         HybridStorageService.readBookTrackSessions('progress.books.track'),
+        HybridStorageService.readMathProgress('progress.math'),
+        HybridStorageService.readMathSessions('routines.math.sessions'),
         HybridStorageService.readNoRepWords('progress.reading.no-rep.words'),
         HybridStorageService.readNoRepSentences('progress.reading.no-rep.sentences'),
         HybridStorageService.readNoRepWordCompletions('routines.reading.no-rep.words'),
@@ -96,6 +104,10 @@ export default function ViewStorageScreen() {
           bookProgress: bookProgress || null,
           dailyPlan: dailyPlan || null,
           trackSessions: trackSessions || null,
+        },
+        mathStore: {
+          mathProgress: mathProgress || null,
+          mathSessions: mathSessions || [],
         },
         noRepStore: {
           displayedWords: noRepWords || [],
@@ -381,6 +393,69 @@ export default function ViewStorageScreen() {
     );
   };
 
+  const renderMathProgress = () => {
+    const progress = data?.mathStore.mathProgress;
+    const sessions = data?.mathStore.mathSessions || [];
+    
+    if (!progress) {
+      return <ThemedText style={styles.emptyText}>Brak postępów w matematyce</ThemedText>;
+    }
+
+    const todaySessions = sessions.filter(s => isToday(new Date(s.timestamp)));
+    const session1Completed = todaySessions.some(s => s.session === 'session1');
+    const session2Completed = todaySessions.some(s => s.session === 'session2');
+
+    return (
+      <View>
+        <DataRow label="Aktualny dzień" value={`Dzień ${progress.currentDay}`} />
+        <DataRow 
+          label="Ukończone dni" 
+          value={`${progress.completedDays?.length || 0} / 30+`}
+        />
+        <DataRow 
+          label="Ostatnia praktyka" 
+          value={progress.lastPracticeDate || 'Brak'}
+        />
+        <DataRow 
+          label="Ostatni dzień ukończony" 
+          value={progress.lastDayCompleted ? 'Tak ✓' : 'Nie'}
+          valueStyle={progress.lastDayCompleted ? styles.activeText : undefined}
+        />
+        
+        <View style={styles.sessionsContainer}>
+          <ThemedText style={styles.recentTitle}>Dzisiejsze sesje:</ThemedText>
+          <View style={styles.sessionItem}>
+            <ThemedText style={styles.sessionName}>Sesja 1 (Uporządkowane)</ThemedText>
+            <View style={[styles.statusBadge, session1Completed && styles.completedStatusBadge]}>
+              <ThemedText style={[styles.statusText, session1Completed && styles.completedStatusText]}>
+                {session1Completed ? '✓ Ukończone' : 'Nieukończone'}
+              </ThemedText>
+            </View>
+          </View>
+          <View style={styles.sessionItem}>
+            <ThemedText style={styles.sessionName}>Sesja 2 (Nieuporządkowane)</ThemedText>
+            <View style={[styles.statusBadge, session2Completed && styles.completedStatusBadge]}>
+              <ThemedText style={[styles.statusText, session2Completed && styles.completedStatusText]}>
+                {session2Completed ? '✓ Ukończone' : 'Nieukończone'}
+              </ThemedText>
+            </View>
+          </View>
+        </View>
+        
+        {progress.completedDays && progress.completedDays.length > 0 && (
+          <View style={styles.recentItems}>
+            <ThemedText style={styles.recentTitle}>Ukończone dni:</ThemedText>
+            <View style={styles.itemsList}>
+              <ThemedText style={styles.listItem}>
+                {progress.completedDays.sort((a: number, b: number) => a - b).join(', ')}
+              </ThemedText>
+            </View>
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
     <ThemedView style={[styles.container, { marginBottom: tabBarHeight }]}>
       <ScrollView
@@ -417,6 +492,10 @@ export default function ViewStorageScreen() {
 
         <InfoCard title="Rysunki">
           {renderDrawingPresentations()}
+        </InfoCard>
+
+        <InfoCard title="Matematyka - Liczby">
+          {renderMathProgress()}
         </InfoCard>
 
         <InfoCard title={t('settings.viewStorage.storageInfo')}>

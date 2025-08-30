@@ -336,4 +336,99 @@ export class SupabaseService {
       console.error('Error saving drawing presentation to Supabase:', error);
     }
   }
+  
+  // Math Progress
+  static async getMathProgress() {
+    const { data, error } = await supabase
+      .from('math_progress')
+      .select('*')
+      .eq('id', 1);
+    
+    if (error) {
+      console.error('Error fetching math progress from Supabase:', error);
+      return null;
+    }
+    
+    if (!data || data.length === 0) {
+      // Create the row if it doesn't exist
+      const { data: newProgress, error: insertError } = await supabase
+        .from('math_progress')
+        .insert({ 
+          id: 1, 
+          completed_days: [], 
+          current_day: 1, 
+          last_practice_date: null,
+          last_day_completed: false 
+        })
+        .select();
+      
+      if (insertError || !newProgress || newProgress.length === 0) {
+        return null;
+      }
+      
+      return {
+        completedDays: newProgress[0].completed_days || [],
+        currentDay: newProgress[0].current_day || 1,
+        lastPracticeDate: newProgress[0].last_practice_date || null,
+        lastDayCompleted: newProgress[0].last_day_completed || false,
+      };
+    }
+    
+    return {
+      completedDays: data[0].completed_days || [],
+      currentDay: data[0].current_day || 1,
+      lastPracticeDate: data[0].last_practice_date || null,
+      lastDayCompleted: data[0].last_day_completed || false,
+    };
+  }
+  
+  static async updateMathProgress(progress: any) {
+    const { error } = await supabase
+      .from('math_progress')
+      .update({
+        completed_days: progress.completedDays,
+        current_day: progress.currentDay,
+        last_practice_date: progress.lastPracticeDate,
+        last_day_completed: progress.lastDayCompleted,
+      })
+      .eq('id', 1);
+    
+    if (error) {
+      console.error('Error updating math progress in Supabase:', error);
+    }
+  }
+  
+  // Math Sessions
+  static async getMathSessions() {
+    const { data, error } = await supabase
+      .from('math_sessions')
+      .select('*')
+      .order('completed_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching math sessions from Supabase:', error);
+      return [];
+    }
+    
+    return data.map(item => ({
+      session: item.session_name,
+      timestamp: new Date(item.completed_at).getTime(),
+    }));
+  }
+  
+  static async saveMathSession(sessions: any[]) {
+    const lastSession = sessions[sessions.length - 1];
+    if (!lastSession) return;
+    
+    const { error } = await supabase
+      .from('math_sessions')
+      .insert({
+        session_name: lastSession.session,
+        completed_at: new Date(lastSession.timestamp).toISOString(),
+      });
+    
+    if (error) {
+      console.error('Error saving math session to Supabase:', error);
+    }
+  }
 }

@@ -194,7 +194,8 @@
       "ordered": "Uporządkowane",
       "unordered": "Nieuporządkowane",
       "selectColor": "Wybierz kolor",
-      "selectShape": "Wybierz kształt"
+      "selectShape": "Wybierz kształt",
+      "dayTitle": "Dzień {{day}}"
     }
   }
 }
