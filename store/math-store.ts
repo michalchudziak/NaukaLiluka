@@ -78,13 +78,12 @@ export const useMathStore = create<MathStore>((set, get) => ({
     if (!progress) return null;
     
     const today = new Date();
-    const todayString = today.toISOString().split('T')[0];
-    const isNewDay = !progress.lastPracticeDate || !isSameDay(parseISO(progress.lastPracticeDate), today);
     
     // Derive current day from completedDays
     const currentDay = progress.completedDays.length > 0 
       ? Math.max(...progress.completedDays) + 1 
       : 1;
+
     
     // Calculate active day: if completed today, show today's content; otherwise show next day
     let activeDay = currentDay;
@@ -93,19 +92,11 @@ export const useMathStore = create<MathStore>((set, get) => ({
       activeDay = progress.completedDays[progress.completedDays.length - 1] || currentDay;
     }
     
-    // Only update the practice date on a new calendar day
-    if (isNewDay) {
-      const updatedProgress: MathProgress = {
-        ...progress,
-        lastPracticeDate: todayString,
-      };
-      set({ mathProgress: updatedProgress });
-      HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, updatedProgress);
-      progress = updatedProgress;
-      
-      // Clear session completions on new calendar day
-      set({ mathSessionCompletions: [] });
-      HybridStorageService.writeMathSessions(STORAGE_KEYS.MATH_SESSION_COMPLETIONS, []);
+    // Clear old session completions (older than today) if needed
+    const todayCompletions = state.mathSessionCompletions.filter(c => isToday(c.timestamp));
+    if (todayCompletions.length !== state.mathSessionCompletions.length) {
+      set({ mathSessionCompletions: todayCompletions });
+      HybridStorageService.writeMathSessions(STORAGE_KEYS.MATH_SESSION_COMPLETIONS, todayCompletions);
     }
     
     const scheme = getNumbersLearningScheme(activeDay);
@@ -128,43 +119,57 @@ export const useMathStore = create<MathStore>((set, get) => ({
     set({ mathSessionCompletions: newCompletions });
     HybridStorageService.writeMathSessions(STORAGE_KEYS.MATH_SESSION_COMPLETIONS, newCompletions);
     
-    // Check if the entire day is completed and update progress
     const state = get();
-    if (state.isDayCompleted()) {
-      const progress = state.mathProgress;
-      if (progress) {
-        const today = new Date();
-        const todayString = today.toISOString().split('T')[0];
-        const wasCompletedToday = progress.lastCompletionDate && isSameDay(parseISO(progress.lastCompletionDate), today);
+    const progress = state.mathProgress;
+    if (progress) {
+      const today = new Date();
+      const todayString = today.toISOString().split('T')[0];
+      
+      // Update lastPracticeDate whenever a session is completed (user practiced today)
+      if (!progress.lastPracticeDate || !isSameDay(parseISO(progress.lastPracticeDate), today)) {
+        const updatedProgress: MathProgress = {
+          ...progress,
+          lastPracticeDate: todayString,
+        };
+        set({ mathProgress: updatedProgress });
+        HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, updatedProgress);
+      }
+    }
+    
+    // Check if the entire day is completed and update progress
+    if (state.isDayCompleted() && progress) {
+      const today = new Date();
+      const todayString = today.toISOString().split('T')[0];
+      const wasCompletedToday = progress.lastCompletionDate && isSameDay(parseISO(progress.lastCompletionDate), today);
+      
+      // Derive current day from completedDays
+      const currentDay = progress.completedDays.length > 0 
+        ? Math.max(...progress.completedDays) + 1 
+        : 1;
+      
+      if (wasCompletedToday) {
+        // If already completed today, just update the completion timestamp
+        const updatedProgress: MathProgress = {
+          ...progress,
+          lastCompletionDate: todayString,
+          lastDayCompleted: true,
+        };
+        set({ mathProgress: updatedProgress });
+        HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, updatedProgress);
+      } else {
+        // Mark current day as completed and save completion date
+        // Update lastPracticeDate since user actually practiced
+        const updatedProgress: MathProgress = {
+          ...progress,
+          completedDays: [...progress.completedDays, currentDay],
+          lastPracticeDate: todayString,
+          lastCompletionDate: todayString,
+          lastDayCompleted: true,
+        };
+        set({ mathProgress: updatedProgress });
+        HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, updatedProgress);
         
-        // Derive current day from completedDays
-        const currentDay = progress.completedDays.length > 0 
-          ? Math.max(...progress.completedDays) + 1 
-          : 1;
-        
-        if (wasCompletedToday) {
-          // If already completed today, just update the completion timestamp
-          const updatedProgress: MathProgress = {
-            ...progress,
-            lastCompletionDate: todayString,
-            lastDayCompleted: true,
-          };
-          set({ mathProgress: updatedProgress });
-          HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, updatedProgress);
-        } else {
-          // Mark current day as completed and save completion date
-          const updatedProgress: MathProgress = {
-            ...progress,
-            completedDays: [...progress.completedDays, currentDay],
-            lastPracticeDate: todayString,
-            lastCompletionDate: todayString,
-            lastDayCompleted: true,
-          };
-          set({ mathProgress: updatedProgress });
-          HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, updatedProgress);
-          
-          // Don't clear session completions - they'll be cleared on the next calendar day
-        }
+        // Don't clear session completions - they'll be cleared on the next calendar day
       }
     }
   },
