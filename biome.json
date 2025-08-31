@@ -147,7 +147,12 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      "includes": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/*.mts",
+        "**/*.cts"
+      ],
       "linter": {
         "rules": {
           "correctness": {
@@ -169,12 +174,18 @@
             "noRedeclare": "off",
             "noUnsafeNegation": "off",
             "useGetterReturn": "off"
+          },
+          "style": {
+            "noGlobalEval": "off"
           }
         }
       }
     },
     {
-      "includes": ["**/*.jsx", "**/*.tsx"],
+      "includes": [
+        "**/*.jsx",
+        "**/*.tsx"
+      ],
       "linter": {
         "rules": {
           "correctness": {
