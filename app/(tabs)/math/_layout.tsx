@@ -14,6 +14,13 @@ export default function MathLayout() {
           headerBackTitle: t('math.back'),
         }}
       />
+      <Stack.Screen
+        name="equations"
+        options={{
+          title: t('math.equations.title'),
+          headerBackTitle: t('math.back'),
+        }}
+      />
     </Stack>
   );
 }

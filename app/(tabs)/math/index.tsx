@@ -3,6 +3,7 @@ import { StyleSheet, useWindowDimensions } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useEquationsStore } from '@/store/equations-store';
 import { useMathStore } from '@/store/math-store';
 
 export default function MathScreen() {
@@ -11,6 +12,7 @@ export default function MathScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { isDayCompleted } = useMathStore();
+  const { isDayCompleted: isEquationsDayCompleted } = useEquationsStore();
 
   return (
     <ThemedView style={styles.container}>
@@ -21,6 +23,11 @@ export default function MathScreen() {
           title={t('math.numberSets')}
           isCompleted={isDayCompleted()}
           onPress={() => router.push('/math/sets')}
+        />
+        <TrackButton
+          title={t('math.equations.title')}
+          isCompleted={isEquationsDayCompleted()}
+          onPress={() => router.push('/math/equations')}
         />
       </ThemedView>
     </ThemedView>

@@ -542,35 +542,35 @@ export const buildEquationScheme = (
         activeDay: day,
         category: 'integer',
         equations: buildIntegerEquations(day, numberLimit, count),
-        sessionContent: day === 1 ? [['subitizing', 'equations']] : [['equations']],
+        sessionContent: day === 1 ? [['subitizing', 'equations'], ['subitizing', 'equations']] : [['equations'], ['equations']],
       };
     case 'fraction':
       return {
         activeDay: day,
         category: 'fraction',
         equations: buildFractionEquations(day, numberLimit, count),
-        sessionContent: day === 2 ? [['subitizing', 'equations']] : [['equations']],
+        sessionContent: day === 2 ? [['subitizing', 'equations'], ['subitizing', 'equations']] : [['equations'], ['equations']],
       };
     case 'decimal':
       return {
         activeDay: day,
         category: 'decimal',
         equations: buildDecimalEquations(day, numberLimit, count),
-        sessionContent: day === 2 ? [['subitizing', 'equations']] : [['equations']],
+        sessionContent: day === 2 ? [['subitizing', 'equations'], ['subitizing', 'equations']] : [['equations'], ['equations']],
       };
     case 'negative':
       return {
         activeDay: day,
         category: 'negative',
         equations: buildNegativeIntegerEquations(day, numberLimit, count),
-        sessionContent: day === 2 ? [['subitizing', 'equations']] : [['equations']],
+        sessionContent: day === 2 ? [['subitizing', 'equations'], ['subitizing', 'equations']] : [['equations'], ['equations']],
       };
     case 'percentage':
       return {
         activeDay: day,
         category: 'percentage',
         equations: buildPercentageEquations(day, numberLimit, count),
-        sessionContent: day === 2 ? [['subitizing', 'equations']] : [['equations']],
+        sessionContent: day === 2 ? [['subitizing', 'equations'], ['subitizing', 'equations']] : [['equations'], ['equations']],
       };
   }
 };

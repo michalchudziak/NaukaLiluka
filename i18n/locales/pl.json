@@ -205,6 +205,12 @@
       "selectColor": "Wybierz kolor",
       "selectShape": "Wybierz kształt",
       "dayTitle": "Dzień {{day}}"
+    },
+    "equations": {
+      "title": "Równania",
+      "subitizing": "Podliczanie",
+      "equations": "Równania",
+      "dayTitle": "Dzień {{day}}"
     }
   }
 }
