@@ -35,7 +35,10 @@ const CATEGORY_DURATIONS: Record<Category, number> = {
   percentage: 6,
 };
 
-const nextDayAndCategory = (day: number, category: Category): { day: number; category: Category } => {
+const nextDayAndCategory = (
+  day: number,
+  category: Category
+): { day: number; category: Category } => {
   const maxDays = CATEGORY_DURATIONS[category];
   if (day < maxDays) {
     return { day: day + 1, category };
@@ -111,10 +114,9 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
     if (!lastSessionDate || !isToday(parseISO(lastSessionDate))) return false;
 
     const daily = get().getDailyData();
-    const requiredTokens = daily.sessionContent
-      .flatMap((sessionContents, idx) =>
-        sessionContents.map((c) => contentToSessionToken(c, idx))
-      );
+    const requiredTokens = daily.sessionContent.flatMap((sessionContents, idx) =>
+      sessionContents.map((c) => contentToSessionToken(c, idx))
+    );
     return requiredTokens.every((t) => completedSessions.includes(t));
   },
 
@@ -138,10 +140,9 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
     if (isToday(parseISO(lastSessionDate))) return;
 
     const daily = get().getDailyData();
-    const requiredTokens = daily.sessionContent
-      .flatMap((sessionContents, idx) =>
-        sessionContents.map((c) => contentToSessionToken(c, idx))
-      );
+    const requiredTokens = daily.sessionContent.flatMap((sessionContents, idx) =>
+      sessionContents.map((c) => contentToSessionToken(c, idx))
+    );
     const allCompleted = requiredTokens.every((t) => completedSessions.includes(t));
     if (!allCompleted) return;
 

@@ -147,12 +147,7 @@
   },
   "overrides": [
     {
-      "includes": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        "**/*.cts"
-      ],
+      "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       "linter": {
         "rules": {
           "correctness": {
@@ -182,10 +177,7 @@
       }
     },
     {
-      "includes": [
-        "**/*.jsx",
-        "**/*.tsx"
-      ],
+      "includes": ["**/*.jsx", "**/*.tsx"],
       "linter": {
         "rules": {
           "correctness": {

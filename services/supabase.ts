@@ -384,7 +384,13 @@ export class SupabaseService {
     if (!data || data.length === 0) {
       const { data: newProgress, error: insertError } = await supabase
         .from('equations_progress')
-        .insert({ id: 1, current_day: 1, current_category: 'integer', last_session_date: null, completed_sessions: [] })
+        .insert({
+          id: 1,
+          current_day: 1,
+          current_category: 'integer',
+          last_session_date: null,
+          completed_sessions: [],
+        })
         .select();
 
       if (insertError || !newProgress || newProgress.length === 0) {

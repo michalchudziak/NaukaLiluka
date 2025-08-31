@@ -27,6 +27,7 @@ export default function RootLayout() {
           <Stack.Screen name="book-display" options={{ headerShown: false }} />
           <Stack.Screen name="drawing-display" options={{ headerShown: false }} />
           <Stack.Screen name="set-display" options={{ headerShown: false }} />
+          <Stack.Screen name="equations-display" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="dark" />
       </ThemeProvider>

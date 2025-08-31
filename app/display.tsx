@@ -89,7 +89,7 @@ export default function DisplayScreen() {
     }
   }, [currentIndex, itemsWithSpacing.length, router.back]);
 
-  if (itemsWithSpacing.length === 0) {
+  if (itemsWithSpacing.length === 0 || currentIndex === -1) {
     return <AnimatedThemedView style={[styles.container, animatedStyle]} />;
   }
 

@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AutoSizeText } from '@/components/AutoSizeText';
 import type { ShapeType } from '@/components/ShapePicker';
 import {
   Circle,
@@ -39,7 +40,12 @@ export default function SetDisplayScreen() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { width, height } = useWindowDimensions();
 
-  const numbers = useMemo(() => JSON.parse(params.numbers as string) as number[], [params.numbers]);
+  const showNumberFollowups = (params.showNumberFollowups as string) === 'true';
+
+  const numbers = useMemo(() => {
+    const arr = JSON.parse(params.numbers as string) as number[];
+    return showNumberFollowups ? arr.flatMap((n) => [n, n]) : arr;
+  }, [params.numbers, showNumberFollowups]);
 
   // Calculate shape size based on screen dimensions to fit up to 200 dots
   const shapeSize = useMemo(() => {
@@ -180,30 +186,52 @@ export default function SetDisplayScreen() {
     return <AnimatedThemedView style={[styles.container, animatedStyle]} />;
   }
 
+  const renderContent = () => {
+    return (
+      <>
+        <View style={[styles.counter, { top: insets.top + 10, left: insets.left + 20 }]}>
+          <ThemedText style={styles.counterText}>{currentNumber}</ThemedText>
+        </View>
+
+        {currentIndex >= 0 &&
+          currentIndex < numbers.length &&
+          shapePositions.map((position, index) => (
+            <View
+              key={`${index}-${position.x}-${position.y}`}
+              style={[
+                styles.shape,
+                {
+                  left: position.x,
+                  top: position.y,
+                  width: shapeSize,
+                  height: shapeSize,
+                },
+              ]}
+            >
+              {renderShape(shape)}
+            </View>
+          ))}
+      </>
+    );
+  };
+
+  if (currentIndex === -1) {
+    return <AnimatedThemedView style={[styles.container, animatedStyle]} />;
+  }
+
   return (
     <AnimatedThemedView style={[styles.container, animatedStyle]}>
-      <View style={[styles.counter, { top: insets.top + 10, left: insets.left + 20 }]}>
-        <ThemedText style={styles.counterText}>{currentNumber}</ThemedText>
-      </View>
-
-      {currentIndex >= 0 &&
-        currentIndex < numbers.length &&
-        shapePositions.map((position, index) => (
-          <View
-            key={index}
-            style={[
-              styles.shape,
-              {
-                left: position.x,
-                top: position.y,
-                width: shapeSize,
-                height: shapeSize,
-              },
-            ]}
-          >
-            {renderShape(shape)}
+      {showNumberFollowups ? (
+        currentIndex % 2 === 0 ? (
+          renderContent()
+        ) : (
+          <View style={styles.centerOverlay} pointerEvents="none">
+            <AutoSizeText color={color}>{currentNumber.toString()}</AutoSizeText>
           </View>
-        ))}
+        )
+      ) : (
+        renderContent()
+      )}
     </AnimatedThemedView>
   );
 }
@@ -212,6 +240,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  centerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
   },
   counter: {
     position: 'absolute',

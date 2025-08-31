@@ -1,4 +1,5 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
@@ -13,6 +14,7 @@ import { useEquationsStore } from '@/store/equations-store';
 
 export default function EquationsScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const bottomTabBarHeight = useBottomTabBarHeight();
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
@@ -29,14 +31,26 @@ export default function EquationsScreen() {
       typeof markSessionCompleted
     >[0];
 
-    // Navigation placeholder for future implementation
-    // if (content === 'subitizing') {
-    //   // TODO: Navigate to subitizing view for equations (e.g., sets-based visualization)
-    //   // router.push({ pathname: '/equations-subitizing', params: { ... } });
-    // } else {
-    //   // TODO: Navigate to equations display screen showing left/right sides
-    //   // router.push({ pathname: '/equations-display', params: { ... } });
-    // }
+    if (content === 'subitizing') {
+      router.push({
+        pathname: '/set-display',
+        params: {
+          numbers: JSON.stringify([...new Array(10)].map(() => Math.floor(Math.random() * 150))),
+          shape: selectedShape,
+          color: selectedColor,
+          showNumberFollowups: 'true',
+        },
+      });
+    } else {
+      router.push({
+        pathname: '/equations-display',
+        params: {
+          pairs: JSON.stringify(dailyData.equations),
+          color: selectedColor,
+          sessionType: token,
+        },
+      });
+    }
 
     setTimeout(() => {
       markSessionCompleted(token);
