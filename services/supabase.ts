@@ -48,6 +48,16 @@ export class SupabaseService {
           interval: settings.drawings_interval,
           randomOrder: settings.drawings_random_order,
         },
+        math: {
+          equations: {
+            interval: settings.math_equations_interval ?? 1500,
+            equationCount: settings.math_equations_equation_count ?? 5,
+          },
+          numbers: {
+            interval: settings.math_numbers_interval ?? 1000,
+            numberCount: settings.math_numbers_number_count ?? 10,
+          },
+        },
       };
     }
 
@@ -73,6 +83,16 @@ export class SupabaseService {
         interval: settings.drawings_interval,
         randomOrder: settings.drawings_random_order,
       },
+      math: {
+        equations: {
+          interval: settings.math_equations_interval ?? 1500,
+          equationCount: settings.math_equations_equation_count ?? 5,
+        },
+        numbers: {
+          interval: settings.math_numbers_interval ?? 1000,
+          numberCount: settings.math_numbers_number_count ?? 10,
+        },
+      },
     };
   }
 
@@ -89,6 +109,10 @@ export class SupabaseService {
         drawings_show_captions: settings.drawings.showCaptions,
         drawings_interval: settings.drawings.interval,
         drawings_random_order: settings.drawings.randomOrder,
+        math_equations_interval: settings.math?.equations?.interval ?? 1500,
+        math_equations_equation_count: settings.math?.equations?.equationCount ?? 5,
+        math_numbers_interval: settings.math?.numbers?.interval ?? 1000,
+        math_numbers_number_count: settings.math?.numbers?.numberCount ?? 10,
       })
       .eq('id', 1);
 

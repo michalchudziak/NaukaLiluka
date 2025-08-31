@@ -24,6 +24,7 @@ import {
 } from '@/components/shapes';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useSettingsStore } from '@/store/settings-store';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
@@ -36,6 +37,7 @@ export default function SetDisplayScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { math } = useSettingsStore();
   const [currentIndex, setCurrentIndex] = useState(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { width, height } = useWindowDimensions();
@@ -164,14 +166,14 @@ export default function SetDisplayScreen() {
       fadeTransition(() => {
         setCurrentIndex((prevIndex) => prevIndex + 1);
       });
-    }, 1000);
+    }, math.numbers.interval);
 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [numbers.length, fadeTransition]);
+  }, [numbers.length, fadeTransition, math.numbers.interval]);
 
   useEffect(() => {
     if (currentIndex >= numbers.length) {

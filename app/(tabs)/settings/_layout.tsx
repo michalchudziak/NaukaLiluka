@@ -62,6 +62,14 @@ export default function SettingsLayout() {
         }}
       />
       <Stack.Screen
+        name="math"
+        options={{
+          title: t('settings.math.settings'),
+          headerShown: true,
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
         name="cloud-data"
         options={{
           title: t('settings.drawings.settings'),

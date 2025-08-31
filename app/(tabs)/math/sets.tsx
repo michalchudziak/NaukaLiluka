@@ -11,6 +11,7 @@ import { WordColors } from '@/constants/WordColors';
 import type { SessionContent } from '@/content/math/learning-scheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useMathStore } from '@/store/math-store';
+import { useSettingsStore } from '@/store/settings-store';
 
 export default function SetsScreen() {
   const { t } = useTranslation();
@@ -19,6 +20,7 @@ export default function SetsScreen() {
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { getDailyData, markSessionCompleted, isSessionCompletedToday } = useMathStore();
+  const { math } = useSettingsStore();
 
   const dailyData = getDailyData();
 
@@ -52,6 +54,7 @@ export default function SetsScreen() {
           items: JSON.stringify(numbers.map((n) => n.toString())),
           type: 'words',
           color: selectedColor,
+          interval: String(math.numbers.interval),
           sessionType,
         },
       });

@@ -57,14 +57,15 @@ export default function DisplayScreen() {
     settings.hydrate().then(() => {
       if (itemsWithSpacing.length === 0) return;
 
-      intervalRef.current = setInterval(
-        () => {
-          fadeTransition(() => {
-            setCurrentIndex((prevIndex) => prevIndex + 1);
-          });
-        },
-        settings.reading.interval[params.type as 'words' | 'sentences']
-      );
+      const override = parseInt((params.interval as string) || '', 10);
+      const fallback = settings.reading.interval[params.type as 'words' | 'sentences'];
+      const interval = Number.isFinite(override) && override > 0 ? override : fallback;
+
+      intervalRef.current = setInterval(() => {
+        fadeTransition(() => {
+          setCurrentIndex((prevIndex) => prevIndex + 1);
+        });
+      }, interval);
     });
 
     return () => {
@@ -78,6 +79,7 @@ export default function DisplayScreen() {
     params.type,
     settings.hydrate,
     settings.reading.interval[params.type as 'words' | 'sentences'],
+    params.interval,
   ]);
 
   useEffect(() => {

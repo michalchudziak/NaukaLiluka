@@ -11,6 +11,7 @@ import { WordColors } from '@/constants/WordColors';
 import type { DailyData } from '@/content/math/equation-scheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useEquationsStore } from '@/store/equations-store';
+import { useSettingsStore } from '@/store/settings-store';
 
 export default function EquationsScreen() {
   const { t } = useTranslation();
@@ -20,6 +21,7 @@ export default function EquationsScreen() {
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { completedSessions, getDailyData, markSessionCompleted, isSessionCompletedToday } =
     useEquationsStore();
+  const { math } = useSettingsStore();
 
   // Keep local reference to data for rendering
   const dailyData: DailyData = getDailyData();
@@ -35,7 +37,9 @@ export default function EquationsScreen() {
       router.push({
         pathname: '/set-display',
         params: {
-          numbers: JSON.stringify([...new Array(10)].map(() => Math.floor(Math.random() * 150))),
+          numbers: JSON.stringify(
+            [...new Array(math.numbers.numberCount)].map(() => Math.floor(Math.random() * 150))
+          ),
           shape: selectedShape,
           color: selectedColor,
           showNumberFollowups: 'true',

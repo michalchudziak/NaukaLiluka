@@ -1,11 +1,8 @@
 import { isSameDay, isToday, parseISO } from 'date-fns';
 import { create } from 'zustand';
-import {
-  type DailyData,
-  getNumbersLearningScheme,
-  type SessionContent,
-} from '@/content/math/learning-scheme';
+import { type DailyData, getNumbersLearningScheme, type SessionContent } from '@/content/math/learning-scheme';
 import { HybridStorageService } from '@/services/hybrid-storage';
+import { useSettingsStore } from './settings-store';
 
 const STORAGE_KEYS = {
   MATH_PROGRESS: 'progress.math',
@@ -40,14 +37,15 @@ export const useMathStore = create<MathStore>((set, get) => ({
 
   getDailyData: () => {
     const { currentDay } = get();
-    return getNumbersLearningScheme(currentDay);
+    const count = useSettingsStore.getState().math.numbers.numberCount || 10;
+    return getNumbersLearningScheme(currentDay, count);
   },
 
   markSessionCompleted: async (session) => {
     const today = new Date().toISOString();
     const { lastSessionDate, completedSessions, currentDay } = get();
 
-    let newState;
+    let newState: Partial<MathStore> | undefined;
     if (!lastSessionDate || !isSameDay(parseISO(lastSessionDate), new Date())) {
       newState = {
         lastSessionDate: today,
@@ -88,7 +86,8 @@ export const useMathStore = create<MathStore>((set, get) => ({
       return false;
     }
 
-    const dailyData = getNumbersLearningScheme(currentDay);
+    const count = useSettingsStore.getState().math.numbers.numberCount || 10;
+    const dailyData = getNumbersLearningScheme(currentDay, count);
     const allSessions = dailyData.sessionContent.flat();
     const requiredSessions = allSessions.map(sessionContentToSession);
 
@@ -102,7 +101,8 @@ export const useMathStore = create<MathStore>((set, get) => ({
       return false;
     }
 
-    const dailyData = getNumbersLearningScheme(currentDay);
+    const count = useSettingsStore.getState().math.numbers.numberCount || 10;
+    const dailyData = getNumbersLearningScheme(currentDay, count);
     const sessionIndex = session === 'session1' ? 0 : 1;
 
     if (sessionIndex >= dailyData.sessionContent.length) {
@@ -129,7 +129,8 @@ export const useMathStore = create<MathStore>((set, get) => ({
     }
 
     // If last session was any day before today
-    const dailyData = getNumbersLearningScheme(currentDay);
+    const count = useSettingsStore.getState().math.numbers.numberCount || 10;
+    const dailyData = getNumbersLearningScheme(currentDay, count);
     const allSessions = dailyData.sessionContent.flat();
     const requiredSessions = allSessions.map(sessionContentToSession);
 

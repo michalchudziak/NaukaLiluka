@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -9,12 +9,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import { AutoSizeText } from '@/components/AutoSizeText';
 import { ThemedView } from '@/components/ThemedView';
+import { useSettingsStore } from '@/store/settings-store';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
 export default function EquationsDisplayScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
+  const { math } = useSettingsStore();
 
   const [currentIndex, setCurrentIndex] = useState(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -51,12 +53,12 @@ export default function EquationsDisplayScreen() {
       fadeTransition(() => {
         setCurrentIndex((prev) => prev + 1);
       });
-    }, 1000);
+    }, math.equations.interval);
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [equations.length, fadeTransition]);
+  }, [equations.length, fadeTransition, math.equations.interval, hydrate]);
 
   useEffect(() => {
     if (currentIndex >= equations.length) {

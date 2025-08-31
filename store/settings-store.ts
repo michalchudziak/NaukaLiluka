@@ -23,6 +23,16 @@ interface SettingsState {
     interval: number;
     randomOrder: boolean;
   };
+  math: {
+    equations: {
+      interval: number;
+      equationCount: number;
+    };
+    numbers: {
+      interval: number;
+      numberCount: number;
+    };
+  };
   useCloudData: boolean;
 
   updateReadingNoRepWords: (value: number) => void;
@@ -35,6 +45,10 @@ interface SettingsState {
   updateDrawingsInterval: (value: number) => void;
   updateDrawingsRandomOrder: (value: boolean) => void;
   updateUseCloudData: (value: boolean) => void;
+  updateMathEquationsInterval: (value: number) => void;
+  updateMathEquationsCount: (value: number) => void;
+  updateMathNumbersInterval: (value: number) => void;
+  updateMathNumbersCount: (value: number) => void;
   hydrate: () => Promise<void>;
 }
 
@@ -58,6 +72,16 @@ const defaultSettings = {
     interval: 1500,
     randomOrder: false,
   },
+  math: {
+    equations: {
+      interval: 1500,
+      equationCount: 5,
+    },
+    numbers: {
+      interval: 1000,
+      numberCount: 10,
+    },
+  },
   useCloudData: false,
 };
 
@@ -79,6 +103,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings,
+        math: newState.math,
       });
       return newState;
     });
@@ -99,6 +124,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings,
+        math: newState.math,
       });
       return newState;
     });
@@ -119,6 +145,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings,
+        math: newState.math,
       });
       return newState;
     });
@@ -139,6 +166,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings,
+        math: newState.math,
       });
       return newState;
     });
@@ -159,6 +187,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings,
+        math: newState.math,
       });
       return newState;
     });
@@ -176,6 +205,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings,
+        math: newState.math,
       });
       return newState;
     });
@@ -193,6 +223,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings,
+        math: newState.math,
       });
       return newState;
     });
@@ -210,6 +241,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings,
+        math: newState.math,
       });
       return newState;
     });
@@ -227,6 +259,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       HybridStorageService.writeSettings(STORAGE_KEY, {
         reading: newState.reading,
         drawings: newState.drawings,
+        math: newState.math,
       });
       return newState;
     });
@@ -241,6 +274,91 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     }
   },
 
+  // Math settings updaters
+  updateMathEquationsInterval: (value: number) => {
+    set((state) => {
+      const newState = {
+        ...state,
+        math: {
+          ...state.math,
+          equations: {
+            ...state.math.equations,
+            interval: value,
+          },
+        },
+      };
+      HybridStorageService.writeSettings(STORAGE_KEY, {
+        reading: newState.reading,
+        drawings: newState.drawings,
+        math: newState.math,
+      });
+      return newState;
+    });
+  },
+
+  updateMathEquationsCount: (value: number) => {
+    set((state) => {
+      const newState = {
+        ...state,
+        math: {
+          ...state.math,
+          equations: {
+            ...state.math.equations,
+            equationCount: value,
+          },
+        },
+      };
+      HybridStorageService.writeSettings(STORAGE_KEY, {
+        reading: newState.reading,
+        drawings: newState.drawings,
+        math: newState.math,
+      });
+      return newState;
+    });
+  },
+
+  updateMathNumbersInterval: (value: number) => {
+    set((state) => {
+      const newState = {
+        ...state,
+        math: {
+          ...state.math,
+          numbers: {
+            ...state.math.numbers,
+            interval: value,
+          },
+        },
+      };
+      HybridStorageService.writeSettings(STORAGE_KEY, {
+        reading: newState.reading,
+        drawings: newState.drawings,
+        math: newState.math,
+      });
+      return newState;
+    });
+  },
+
+  updateMathNumbersCount: (value: number) => {
+    set((state) => {
+      const newState = {
+        ...state,
+        math: {
+          ...state.math,
+          numbers: {
+            ...state.math.numbers,
+            numberCount: value,
+          },
+        },
+      };
+      HybridStorageService.writeSettings(STORAGE_KEY, {
+        reading: newState.reading,
+        drawings: newState.drawings,
+        math: newState.math,
+      });
+      return newState;
+    });
+  },
+
   hydrate: async () => {
     await HybridStorageService.initialize();
     const useCloudData = await HybridStorageService.getUseCloudData();
@@ -249,6 +367,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       set({
         reading: stored.reading || defaultSettings.reading,
         drawings: stored.drawings || defaultSettings.drawings,
+        math: stored.math || defaultSettings.math,
         useCloudData,
       });
     } else {

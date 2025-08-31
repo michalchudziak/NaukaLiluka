@@ -91,6 +91,16 @@
       "randomOrder": "Kolejność losowa",
       "randomOrderDescription": "Wyświetlaj obrazki w losowej kolejności."
     },
+    "math": {
+      "sectionTitle": "Ustawienia matematyki",
+      "settings": "Matematyka",
+      "settingsSubtitle": "Interwały i ilości",
+      "description": "Konfiguruj interwały i ilość elementów dla liczb i równań.",
+      "numbersInterval": "Czas wyświetlania liczb",
+      "numbersCount": "Ilość liczb na sesję",
+      "equationsInterval": "Czas wyświetlania równań",
+      "equationsCount": "Ilość równań na sesję"
+    },
     "storage": {
       "sectionTitle": "Zarządzanie danymi"
     },

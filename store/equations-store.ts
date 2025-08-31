@@ -1,6 +1,7 @@
 import { isSameDay, isToday, parseISO } from 'date-fns';
 import { create } from 'zustand';
 import { buildEquationScheme, type DailyData } from '@/content/math/equation-scheme';
+import { useSettingsStore } from './settings-store';
 import { HybridStorageService } from '@/services/hybrid-storage';
 
 type Session = 'subitizing1' | 'subitizing2' | 'equations1' | 'equations2';
@@ -64,8 +65,9 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
 
   getDailyData: () => {
     const { currentDay, currentCategory } = get();
-    // numberLimit and count kept simple and constant for now
-    return buildEquationScheme(currentDay, 100, 12, currentCategory);
+    // Pull count from settings
+    const eqCount = useSettingsStore.getState().math.equations.equationCount || 5;
+    return buildEquationScheme(currentDay, 100, eqCount, currentCategory);
   },
 
   markSessionCompleted: async (session) => {

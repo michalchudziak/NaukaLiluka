@@ -99,6 +99,19 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>{t('settings.math.sectionTitle')}</ThemedText>
+
+          <View style={styles.sectionContent}>
+            <SettingItem
+              title={t('settings.math.settings')}
+              subtitle={t('settings.math.settingsSubtitle')}
+              icon="calculator-outline"
+              onPress={() => router.push('/(tabs)/settings/math')}
+            />
+          </View>
+        </View>
+
+        <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>{t('settings.storage.sectionTitle')}</ThemedText>
 
           <View style={styles.sectionContent}>
