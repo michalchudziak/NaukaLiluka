@@ -150,7 +150,9 @@ export default function MathSettingsScreen() {
     <ThemedView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
-          <ThemedText style={styles.sectionDescription}>{t('settings.math.description')}</ThemedText>
+          <ThemedText style={styles.sectionDescription}>
+            {t('settings.math.description')}
+          </ThemedText>
 
           <View style={styles.settingsContent}>
             <NumberInput
@@ -237,7 +239,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonDisabled: { opacity: 0.5 },
-  inputWrapper: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 12 },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center' },
   input: {
     width: 60,
     height: 32,
@@ -246,8 +248,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#F2F2F7',
     paddingRight: 2,
+    marginHorizontal: 8,
   },
   suffix: { fontSize: 14, color: '#8E8E93', marginLeft: 4 },
   separator: { height: 0.5, backgroundColor: '#C8C7CC', marginLeft: 20 },
 });
-

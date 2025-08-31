@@ -13,6 +13,10 @@
       drawings_show_captions BOOLEAN DEFAULT true,
       drawings_interval INTEGER DEFAULT 1500,
       drawings_random_order BOOLEAN DEFAULT false,
+      math_equations_interval INTEGER DEFAULT 1500,
+      math_equations_equation_count INTEGER DEFAULT 5,
+      math_numbers_interval INTEGER DEFAULT 1000,
+      math_numbers_number_count INTEGER DEFAULT 10,
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
   );
@@ -160,6 +164,16 @@
   CREATE TRIGGER IF NOT EXISTS update_equations_progress_updated_at BEFORE UPDATE ON
   public.equations_progress
       FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+  -- Migration: add math settings columns if missing
+  ALTER TABLE public.settings
+    ADD COLUMN IF NOT EXISTS math_equations_interval INTEGER DEFAULT 1500;
+  ALTER TABLE public.settings
+    ADD COLUMN IF NOT EXISTS math_equations_equation_count INTEGER DEFAULT 5;
+  ALTER TABLE public.settings
+    ADD COLUMN IF NOT EXISTS math_numbers_interval INTEGER DEFAULT 1000;
+  ALTER TABLE public.settings
+    ADD COLUMN IF NOT EXISTS math_numbers_number_count INTEGER DEFAULT 10;
 
 
   -- Initialize default data
