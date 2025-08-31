@@ -16,7 +16,7 @@ export default function EquationsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const bottomTabBarHeight = useBottomTabBarHeight();
-  const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
+  const [selectedColor, setSelectedColor] = useState(WordColors[1].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { completedSessions, getDailyData, markSessionCompleted, isSessionCompletedToday } =
     useEquationsStore();
@@ -47,7 +47,6 @@ export default function EquationsScreen() {
         params: {
           pairs: JSON.stringify(dailyData.equations),
           color: selectedColor,
-          sessionType: token,
         },
       });
     }

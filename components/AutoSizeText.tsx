@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { Dimensions, StyleSheet, Text, type TextProps, View } from 'react-native';
 
 interface AutoSizeTextProps extends Omit<TextProps, 'style'> {
-  children: string;
+  children: React.ReactNode;
   color?: string;
   style?: any;
   maxLength?: number;
@@ -39,9 +39,10 @@ export const AutoSizeText: React.FC<AutoSizeTextProps> = ({
   const { width: screenWidth } = Dimensions.get('window');
 
   const fontSize = useMemo(() => {
-    const lengthToUse = maxLength ? Math.max(children.length, maxLength) : children.length;
+    const childLength = typeof children === 'string' ? children.length : 0;
+    const lengthToUse = maxLength ? Math.max(childLength, maxLength) : childLength;
     return getFontSizeForText('x'.repeat(lengthToUse), screenWidth);
-  }, [children.length, maxLength, screenWidth]);
+  }, [maxLength, screenWidth, children]);
 
   return (
     <View style={styles.container}>
