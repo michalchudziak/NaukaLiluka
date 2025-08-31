@@ -103,24 +103,25 @@ export const buildIntegerEquations = (day: number, numberLimit: number, count: n
 export const buildNegativeIntegerEquations = (day: number, numberLimit: number, count: number) => {
   const equations = [];
   const operators = [];
+  // Day 1 shows definitions; operators start from day 2
+  if (day === 1) {
+    return buildNegativeDefinitions(numberLimit, count);
+  }
   switch (day) {
-    case 1:
-      operators.push('+');
-      break;
     case 2:
-      operators.push('-');
+      operators.push('+');
       break;
     case 3:
-      operators.push('*');
+      operators.push('-');
       break;
     case 4:
-      operators.push('/');
+      operators.push('*');
       break;
     case 5:
-      operators.push('+');
-      operators.push('-');
-      operators.push('*');
       operators.push('/');
+      break;
+    default:
+      operators.push('+', '-', '*', '/');
       break;
   }
 
@@ -170,7 +171,47 @@ export const buildNegativeIntegerEquations = (day: number, numberLimit: number, 
   return equations;
 };
 
-export const buildDecimalDefinitions = (numberLimit: number, count: number) => {
+const buildNegativeDefinitions = (numberLimit: number, count: number) => {
+  // Simple negative number definitions: crossing zero and adding negatives
+  const equations: string[][] = [];
+  const maxN = Math.max(5, Math.min(numberLimit || 20, 20));
+
+  for (let i = 0; i < count; i++) {
+    const pattern = Math.floor(Math.random() * 3); // 0..2
+    let leftSide = '';
+
+    switch (pattern) {
+      case 0: {
+        // 0 - B => negative result
+        const b = Math.floor(Math.random() * maxN) + 1;
+        leftSide = `0 - ${b}`;
+        break;
+      }
+      case 1: {
+        // A - B with B > A (crosses zero)
+        const a = Math.floor(Math.random() * (maxN - 1)) + 1; // 1..maxN-1
+        const b = Math.floor(Math.random() * (maxN - a)) + a + 1; // a+1..maxN
+        leftSide = `${a} - ${b}`;
+        break;
+      }
+      default: {
+        // -A + B (adding a positive to a negative)
+        const a = Math.floor(Math.random() * (maxN - 1)) + 2; // 2..maxN to bias negative magnitude
+        const b = Math.floor(Math.random() * Math.max(1, a - 1)) + 1; // 1..a-1 (usually stays negative)
+        leftSide = `-${a} + ${b}`;
+        break;
+      }
+    }
+
+    const result = eval(leftSide);
+    const rightSide = `= ${result}`;
+    equations.push([leftSide, rightSide]);
+  }
+
+  return equations;
+};
+
+const buildDecimalDefinitions = (numberLimit: number, count: number) => {
   // Simple, illustrative decimal equations: divide by 5, 10, or 100
   const equations: string[][] = [];
   const divisors = [5, 10, 100];
@@ -200,7 +241,7 @@ export const buildDecimalEquations = (day: number, numberLimit: number, count: n
   const operators = [];
   // Day 1 shows definitions; operators start from day 2
   if (day === 1) {
-    return buildDecimalDefinitions(10, count);
+    return buildDecimalDefinitions(numberLimit, count);
   }
   switch (day) {
     case 2:
@@ -369,7 +410,7 @@ export const buildFractionEquations = (day: number, numberLimit: number, count: 
   return equations;
 };
 
-export const buildFractionDefinitions = (numberLimit: number, count: number) => {
+const buildFractionDefinitions = (numberLimit: number, count: number) => {
   // Simple fraction equations demonstrating like-denominator addition/subtraction
   // e.g., 1/4 + 2/4 = 3/4, 5/6 - 1/6 = 4/6 = 2/3
   const equations: string[][] = [];
@@ -396,8 +437,8 @@ export const buildFractionDefinitions = (numberLimit: number, count: number) => 
       }
     }
 
-    let resNum = op === '+' ? n1 + n2 : n1 - n2;
-    let resDen = d;
+    const resNum = op === '+' ? n1 + n2 : n1 - n2;
+    const resDen = d;
     const [sNum, sDen] = simplifyFraction(resNum, resDen);
 
     const leftSide = `${fractionToString(n1, d)} ${op} ${fractionToString(n2, d)}`;
@@ -413,8 +454,12 @@ export const buildPercentageEquations = (day: number, numberLimit: number, count
   // Ensure result (a% of b) is always an integer using gcd.
   const equations: string[][] = [];
 
-  const randInt = (min: number, max: number) =>
-    Math.floor(Math.random() * (max - min + 1)) + min;
+  // Day 1 shows simple definitions
+  if (day === 1) {
+    return buildPercentageDefinitions(numberLimit, count);
+  }
+
+  const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
   const maxBase = Math.max(1, Math.floor(numberLimit || 100));
   // Allow up to 1 occurrence of 100% per each 5 items
@@ -429,9 +474,10 @@ export const buildPercentageEquations = (day: number, numberLimit: number, count
   for (let i = 0; i < count; i++) {
     // Choose base b freely within limit
     const avoidHundred = usedHundreds >= allowedHundreds;
-    const b = avoidHundred && friendlyBases.length > 0
-      ? friendlyBases[randInt(1, friendlyBases.length) - 1]
-      : randInt(1, maxBase);
+    const b =
+      avoidHundred && friendlyBases.length > 0
+        ? friendlyBases[randInt(1, friendlyBases.length) - 1]
+        : randInt(1, maxBase);
     // Pick a so that (a*b) is divisible by 100
     const g = gcd(100, b);
     const step = 100 / g; // a must be a multiple of step
@@ -446,6 +492,32 @@ export const buildPercentageEquations = (day: number, numberLimit: number, count
     equations.push([leftSide, rightSide]);
 
     if (a === 100) usedHundreds += 1;
+  }
+
+  return equations;
+};
+
+const buildPercentageDefinitions = (numberLimit: number, count: number) => {
+  // Simple, well-known percentages with friendly bases
+  // e.g., 50% of even numbers, 25% of multiples of 4, 10% of multiples of 10, 5% of multiples of 20
+  const equations: string[][] = [];
+
+  const randInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+  const maxBase = Math.max(20, Math.floor(numberLimit || 100));
+  const percents = [5, 10, 20, 25, 50, 100];
+
+  for (let i = 0; i < count; i++) {
+    const a = percents[randInt(1, percents.length) - 1];
+    const step = 100 / gcd(100, a); // base must be multiple of step
+    const maxK = Math.max(1, Math.floor(maxBase / step));
+    const k = randInt(1, maxK);
+    const b = step * k;
+
+    const leftSide = `${a}% z ${b}`;
+    const result = (a * b) / 100; // integer due to construction
+    const rightSide = `= ${result}`;
+    equations.push([leftSide, rightSide]);
   }
 
   return equations;
