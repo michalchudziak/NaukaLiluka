@@ -8,6 +8,7 @@ import { TrackButton } from '@/components/TrackButton';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
 import { useDrawingsStore } from '@/store/drawings-store';
+import { useEquationsStore } from '@/store/equations-store';
 import { useMathStore } from '@/store/math-store';
 import { useNoRepStore } from '@/store/no-rep-store';
 
@@ -18,7 +19,8 @@ export default function MyDayScreen() {
   const { isNoRepPathCompletedToday } = useNoRepStore();
   const bookStore = useBookStore();
   const drawingsStore = useDrawingsStore();
-  const { isSessionCompletedToday } = useMathStore();
+  const { isSessionCompletedToday: isMathSessionCompletedToday, currentDay } = useMathStore();
+  const { isSessionCompletedToday: isEqSessionCompletedToday } = useEquationsStore();
 
   const [isNoRepCompleted, setIsNoRepCompleted] = useState(false);
   const [isSession1Completed, setIsSession1Completed] = useState(false);
@@ -27,6 +29,8 @@ export default function MyDayScreen() {
   const [isDrawingsCompleted, setIsDrawingsCompleted] = useState(false);
   const [isMathSession1Completed, setIsMathSession1Completed] = useState(false);
   const [isMathSession2Completed, setIsMathSession2Completed] = useState(false);
+  const [isEqSession1Completed, setIsEqSession1Completed] = useState(false);
+  const [isEqSession2Completed, setIsEqSession2Completed] = useState(false);
 
   useEffect(() => {
     const checkCompletions = async () => {
@@ -81,11 +85,23 @@ export default function MyDayScreen() {
       const routine5 = drawingsStore.getTodayPresentationCount() > 0;
       setIsDrawingsCompleted(routine5);
 
-      // Check math sessions
-      const mathSet1 = isSessionCompletedToday('session1');
-      const mathSet2 = isSessionCompletedToday('session2');
-      setIsMathSession1Completed(mathSet1);
-      setIsMathSession2Completed(mathSet2);
+      // Check math or equations sessions depending on progress
+      if (currentDay > 30) {
+        const eq1 = isEqSessionCompletedToday('session1');
+        const eq2 = isEqSessionCompletedToday('session2');
+        setIsEqSession1Completed(eq1);
+        setIsEqSession2Completed(eq2);
+        // Clear math flags to avoid confusion when switching
+        setIsMathSession1Completed(false);
+        setIsMathSession2Completed(false);
+      } else {
+        const mathSet1 = isMathSessionCompletedToday('session1');
+        const mathSet2 = isMathSessionCompletedToday('session2');
+        setIsMathSession1Completed(mathSet1);
+        setIsMathSession2Completed(mathSet2);
+        setIsEqSession1Completed(false);
+        setIsEqSession2Completed(false);
+      }
     };
 
     checkCompletions();
@@ -97,7 +113,9 @@ export default function MyDayScreen() {
     bookStore.bookTrackSessionCompletions,
     bookStore.dailyPlan,
     drawingsStore,
-    isSessionCompletedToday,
+    isMathSessionCompletedToday,
+    isEqSessionCompletedToday,
+    currentDay,
   ]);
 
   const navigateToNoRep = () => {
@@ -114,6 +132,10 @@ export default function MyDayScreen() {
 
   const navigateToSets = () => {
     router.push('/math/sets');
+  };
+
+  const navigateToEquations = () => {
+    router.push('/math/equations');
   };
 
   return (
@@ -147,16 +169,33 @@ export default function MyDayScreen() {
           isCompleted={isDrawingsCompleted}
           onPress={navigateToDrawings}
         />
-        <TrackButton
-          title={t('myDay.mathSet1')}
-          isCompleted={isMathSession1Completed}
-          onPress={navigateToSets}
-        />
-        <TrackButton
-          title={t('myDay.mathSet2')}
-          isCompleted={isMathSession2Completed}
-          onPress={navigateToSets}
-        />
+        {currentDay > 30 ? (
+          <>
+            <TrackButton
+              title={t('myDay.equationsSet1')}
+              isCompleted={isEqSession1Completed}
+              onPress={navigateToEquations}
+            />
+            <TrackButton
+              title={t('myDay.equationsSet2')}
+              isCompleted={isEqSession2Completed}
+              onPress={navigateToEquations}
+            />
+          </>
+        ) : (
+          <>
+            <TrackButton
+              title={t('myDay.mathSet1')}
+              isCompleted={isMathSession1Completed}
+              onPress={navigateToSets}
+            />
+            <TrackButton
+              title={t('myDay.mathSet2')}
+              isCompleted={isMathSession2Completed}
+              onPress={navigateToSets}
+            />
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

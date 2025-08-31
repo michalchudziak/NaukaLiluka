@@ -199,7 +199,9 @@
     "routine4": "Książki - Sesja 3",
     "routine5": "Prezentacja Obrazków",
     "mathSet1": "Liczby - Sesja 1",
-    "mathSet2": "Liczby - Sesja 2"
+    "mathSet2": "Liczby - Sesja 2",
+    "equationsSet1": "Równania - Sesja 1",
+    "equationsSet2": "Równania - Sesja 2"
   },
   "math": {
     "numberSets": "Liczby",
