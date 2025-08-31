@@ -3,6 +3,7 @@ import { SupabaseService } from './supabase';
 
 const CLOUD_SETTINGS_KEY = 'settings.useCloudData';
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Static-only service aligns with app architecture
 export class HybridStorageService {
   private static useCloudData: boolean = false;
 

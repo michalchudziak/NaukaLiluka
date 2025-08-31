@@ -6,6 +6,7 @@ const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Static-only service aligns with app architecture
 export class SupabaseService {
   // Settings
   static async getSettings() {

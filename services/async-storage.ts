@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// biome-ignore lint/complexity/noStaticOnlyClass: Intentional static utility holder for API stability
 export class AsyncStorageService {
   static async read(key: string): Promise<any> {
     try {

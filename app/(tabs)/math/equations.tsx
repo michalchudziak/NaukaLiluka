@@ -19,8 +19,7 @@ export default function EquationsScreen() {
   const bottomTabBarHeight = useBottomTabBarHeight();
   const [selectedColor, setSelectedColor] = useState(WordColors[1].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
-  const { completedSessions, getDailyData, markSessionCompleted, isSessionCompletedToday } =
-    useEquationsStore();
+  const { completedSessions, getDailyData, markSessionCompleted } = useEquationsStore();
   const { math } = useSettingsStore();
 
   // Keep local reference to data for rendering

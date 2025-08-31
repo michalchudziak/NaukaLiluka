@@ -58,7 +58,7 @@ export default function EquationsDisplayScreen() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [equations.length, fadeTransition, math.equations.interval, hydrate]);
+  }, [equations.length, fadeTransition, math.equations.interval]);
 
   useEffect(() => {
     if (currentIndex >= equations.length) {

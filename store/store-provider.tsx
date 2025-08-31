@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import { useBookStore } from './book-store';
 import { useDrawingsStore } from './drawings-store';
@@ -11,7 +11,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
   const appState = useRef(AppState.currentState);
 
-  const hydrateStores = async () => {
+  const hydrateStores = useCallback(async () => {
     await Promise.all([
       useNoRepStore.getState().hydrate(),
       useBookStore.getState().hydrate(),
@@ -20,7 +20,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       useSettingsStore.getState().hydrate(),
       useEquationsStore.getState().hydrate(),
     ]);
-  };
+  }, []);
 
   // Initial hydration on mount
   useEffect(() => {
@@ -30,7 +30,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     };
 
     initialHydrate();
-  }, []);
+  }, [hydrateStores]);
 
   // Rehydrate when app comes from background
   useEffect(() => {
@@ -47,7 +47,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.remove();
     };
-  }, []);
+  }, [hydrateStores]);
 
   if (!isHydrated) {
     return null;

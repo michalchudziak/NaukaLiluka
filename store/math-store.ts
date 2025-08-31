@@ -1,6 +1,10 @@
 import { isSameDay, isToday, parseISO } from 'date-fns';
 import { create } from 'zustand';
-import { type DailyData, getNumbersLearningScheme, type SessionContent } from '@/content/math/learning-scheme';
+import {
+  type DailyData,
+  getNumbersLearningScheme,
+  type SessionContent,
+} from '@/content/math/learning-scheme';
 import { HybridStorageService } from '@/services/hybrid-storage';
 import { useSettingsStore } from './settings-store';
 

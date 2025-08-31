@@ -1,8 +1,8 @@
 import { isSameDay, isToday, parseISO } from 'date-fns';
 import { create } from 'zustand';
 import { buildEquationScheme, type DailyData } from '@/content/math/equation-scheme';
-import { useSettingsStore } from './settings-store';
 import { HybridStorageService } from '@/services/hybrid-storage';
+import { useSettingsStore } from './settings-store';
 
 type Session = 'subitizing1' | 'subitizing2' | 'equations1' | 'equations2';
 

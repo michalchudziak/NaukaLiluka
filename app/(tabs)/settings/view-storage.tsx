@@ -184,7 +184,7 @@ export default function ViewStorageScreen() {
       }
 
       return (
-        <View key={index} style={styles.bookItem}>
+        <View key={bookProgress.bookId ?? index} style={styles.bookItem}>
           <ThemedText style={styles.bookName}>{bookProgress.bookId}</ThemedText>
           <View style={styles.progressInfo}>
             {completedWords.length > 0 && (
@@ -193,8 +193,8 @@ export default function ViewStorageScreen() {
                   {t('settings.viewStorage.completedWords')} ({completedWords.length}):
                 </ThemedText>
                 <View style={styles.itemsList}>
-                  {completedWords.slice(0, 6).map((word, idx) => (
-                    <ThemedText key={idx} style={styles.completedItem}>
+                  {completedWords.slice(0, 6).map((word) => (
+                    <ThemedText key={`${bookProgress.bookId}-${word}`} style={styles.completedItem}>
                       • {word}
                     </ThemedText>
                   ))}
@@ -213,8 +213,11 @@ export default function ViewStorageScreen() {
                   {t('settings.viewStorage.completedSentences')} ({completedSentences.length}):
                 </ThemedText>
                 <View style={styles.itemsList}>
-                  {completedSentences.slice(0, 3).map((sentence, idx) => (
-                    <ThemedText key={idx} style={styles.completedItem}>
+                  {completedSentences.slice(0, 3).map((sentence) => (
+                    <ThemedText
+                      key={`${bookProgress.bookId}-${sentence}`}
+                      style={styles.completedItem}
+                    >
                       • {sentence}
                     </ThemedText>
                   ))}
@@ -344,8 +347,8 @@ export default function ViewStorageScreen() {
               {words
                 .slice(-10)
                 .reverse()
-                .map((word, index) => (
-                  <ThemedText key={index} style={styles.listItem}>
+                .map((word) => (
+                  <ThemedText key={word} style={styles.listItem}>
                     • {word}
                   </ThemedText>
                 ))}
@@ -362,8 +365,8 @@ export default function ViewStorageScreen() {
               {sentences
                 .slice(-10)
                 .reverse()
-                .map((sentence, index) => (
-                  <ThemedText key={index} style={styles.listItem}>
+                .map((sentence) => (
+                  <ThemedText key={sentence} style={styles.listItem}>
                     • {sentence}
                   </ThemedText>
                 ))}
@@ -446,7 +449,10 @@ export default function ViewStorageScreen() {
               .slice(-10)
               .reverse()
               .map((presentation, index) => (
-                <View key={index} style={styles.dataRow}>
+                <View
+                  key={`${presentation.setTitle}-${presentation.timestamp ?? index}`}
+                  style={styles.dataRow}
+                >
                   <ThemedText style={styles.listItem}>• {presentation.setTitle}</ThemedText>
                   <ThemedText style={styles.dataValue}>
                     {formatDate(presentation.timestamp)}

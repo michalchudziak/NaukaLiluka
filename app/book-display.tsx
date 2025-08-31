@@ -98,9 +98,9 @@ export default function BookDisplayScreen() {
     if (displayState === 'sentences') {
       return (
         <ThemedView style={styles.sentencesContainer}>
-          {currentPage.sentences.map((sentence, index) => (
+          {currentPage.sentences.map((sentence) => (
             <AutoSizeText
-              key={index}
+              key={sentence}
               color="#000000"
               style={styles.sentenceText}
               maxLength={Math.max(...currentPage.sentences.map((s) => applyWordSpacing(s).length))}
@@ -131,9 +131,9 @@ export default function BookDisplayScreen() {
           </ThemedText>
           <ThemedView style={styles.summaryTextContainer}>
             <ThemedView>
-              {allSentences.map((sentence, index) => (
+              {allSentences.map((sentence) => (
                 <ThemedText
-                  key={index}
+                  key={sentence}
                   style={styles.summaryText}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
