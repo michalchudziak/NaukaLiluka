@@ -1,3 +1,10 @@
+export type DailyData = {
+  activeDay: number;
+  category: 'integer' | 'fraction' | 'decimal' | 'negative' | 'percentage';
+  equations: string[][];
+  sessionContent: ('subitizing' | 'equations')[][];
+};
+
 const findDivisors = (number: number): number[] => {
   const divisors = [];
   for (let i = 1; i <= number; i++) {
@@ -51,7 +58,7 @@ const fractionToMixedString = (num: number, den: number): string => {
   return `${sign}${whole} ${rem}/${d}`;
 };
 
-export const buildIntegerEquations = (day: number, numberLimit: number, count: number) => {
+const buildIntegerEquations = (day: number, numberLimit: number, count: number) => {
   const equations = [];
   const operators = [];
   switch (day) {
@@ -100,7 +107,7 @@ export const buildIntegerEquations = (day: number, numberLimit: number, count: n
   return equations;
 };
 
-export const buildNegativeIntegerEquations = (day: number, numberLimit: number, count: number) => {
+const buildNegativeIntegerEquations = (day: number, numberLimit: number, count: number) => {
   const equations = [];
   const operators = [];
   // Day 1 shows definitions; operators start from day 2
@@ -236,7 +243,7 @@ const buildDecimalDefinitions = (numberLimit: number, count: number) => {
   return equations;
 };
 
-export const buildDecimalEquations = (day: number, numberLimit: number, count: number) => {
+const buildDecimalEquations = (day: number, numberLimit: number, count: number) => {
   const equations = [];
   const operators = [];
   // Day 1 shows definitions; operators start from day 2
@@ -314,7 +321,7 @@ export const buildDecimalEquations = (day: number, numberLimit: number, count: n
   return equations;
 };
 
-export const buildFractionEquations = (day: number, numberLimit: number, count: number) => {
+const buildFractionEquations = (day: number, numberLimit: number, count: number) => {
   const equations: string[][] = [];
   const operators: Array<'+' | '-' | '*' | '/'> = [];
   // Day 1 shows definitions; operators start from day 2
@@ -449,7 +456,7 @@ const buildFractionDefinitions = (numberLimit: number, count: number) => {
   return equations;
 };
 
-export const buildPercentageEquations = (day: number, numberLimit: number, count: number) => {
+const buildPercentageEquations = (day: number, numberLimit: number, count: number) => {
   // Only one operator for percentages: "z" ("from" in Polish)
   // Ensure result (a% of b) is always an integer using gcd.
   const equations: string[][] = [];
@@ -521,4 +528,49 @@ const buildPercentageDefinitions = (numberLimit: number, count: number) => {
   }
 
   return equations;
+};
+
+export const buildEquationScheme = (
+  day: number,
+  numberLimit: number,
+  count: number,
+  category: 'integer' | 'fraction' | 'decimal' | 'negative' | 'percentage'
+): DailyData => {
+  switch (category) {
+    case 'integer':
+      return {
+        activeDay: day,
+        category: 'integer',
+        equations: buildIntegerEquations(day, numberLimit, count),
+        sessionContent: day === 1 ? [['subitizing', 'equations']] : [['equations']],
+      };
+    case 'fraction':
+      return {
+        activeDay: day,
+        category: 'fraction',
+        equations: buildFractionEquations(day, numberLimit, count),
+        sessionContent: day === 2 ? [['subitizing', 'equations']] : [['equations']],
+      };
+    case 'decimal':
+      return {
+        activeDay: day,
+        category: 'decimal',
+        equations: buildDecimalEquations(day, numberLimit, count),
+        sessionContent: day === 2 ? [['subitizing', 'equations']] : [['equations']],
+      };
+    case 'negative':
+      return {
+        activeDay: day,
+        category: 'negative',
+        equations: buildNegativeIntegerEquations(day, numberLimit, count),
+        sessionContent: day === 2 ? [['subitizing', 'equations']] : [['equations']],
+      };
+    case 'percentage':
+      return {
+        activeDay: day,
+        category: 'percentage',
+        equations: buildPercentageEquations(day, numberLimit, count),
+        sessionContent: day === 2 ? [['subitizing', 'equations']] : [['equations']],
+      };
+  }
 };

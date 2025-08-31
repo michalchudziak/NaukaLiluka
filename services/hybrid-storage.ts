@@ -373,6 +373,69 @@ export class HybridStorageService {
     }
   }
 
+  // Equations Progress
+  static async readEquationsProgress(key: string): Promise<any> {
+    const localData = await AsyncStorageService.read(key);
+
+    if (HybridStorageService.useCloudData) {
+      try {
+        const cloudData = await SupabaseService.getEquationsProgress();
+        if (cloudData !== null && cloudData !== undefined) {
+          return cloudData;
+        }
+      } catch (error) {
+        console.error('Failed to fetch equations progress from cloud, using local data:', error);
+      }
+    }
+
+    return localData;
+  }
+
+  static async writeEquationsProgress(key: string, value: any) {
+    await AsyncStorageService.write(key, value);
+
+    if (HybridStorageService.useCloudData) {
+      try {
+        await SupabaseService.updateEquationsProgress(value);
+      } catch (error) {
+        console.error('Failed to save equations progress to cloud:', error);
+      }
+    }
+  }
+
+  // Equations Session Completions
+  static async readEquationsSessionCompletions(key: string): Promise<any> {
+    const localData = await AsyncStorageService.read(key);
+
+    if (HybridStorageService.useCloudData) {
+      try {
+        const cloudData = await SupabaseService.getEquationsSessionCompletions();
+        if (cloudData !== null && cloudData !== undefined) {
+          return cloudData;
+        }
+      } catch (error) {
+        console.error(
+          'Failed to fetch equations session completions from cloud, using local data:',
+          error
+        );
+      }
+    }
+
+    return localData;
+  }
+
+  static async writeEquationsSessionCompletions(key: string, value: any) {
+    await AsyncStorageService.write(key, value);
+
+    if (HybridStorageService.useCloudData && value) {
+      try {
+        await SupabaseService.saveEquationsSessionCompletion(value);
+      } catch (error) {
+        console.error('Failed to save equations session completion to cloud:', error);
+      }
+    }
+  }
+
   // Generic clear (only clears local storage)
   static async clear(key: string) {
     await AsyncStorageService.clear(key);

@@ -175,7 +175,7 @@
             "noUnsafeNegation": "off",
             "useGetterReturn": "off"
           },
-          "style": {
+          "security": {
             "noGlobalEval": "off"
           }
         }

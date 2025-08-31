@@ -372,6 +372,90 @@ export class SupabaseService {
     }
   }
 
+  // Equations Progress
+  static async getEquationsProgress() {
+    const { data, error } = await supabase.from('equations_progress').select('*').eq('id', 1);
+
+    if (error) {
+      console.error('Error fetching equations progress from Supabase:', error);
+      return null;
+    }
+
+    if (!data || data.length === 0) {
+      const { data: newProgress, error: insertError } = await supabase
+        .from('equations_progress')
+        .insert({ id: 1, current_day: 1, current_category: 'integer', last_session_date: null, completed_sessions: [] })
+        .select();
+
+      if (insertError || !newProgress || newProgress.length === 0) {
+        return null;
+      }
+
+      return {
+        currentDay: newProgress[0].current_day,
+        currentCategory: newProgress[0].current_category,
+        lastSessionDate: newProgress[0].last_session_date,
+        completedSessions: newProgress[0].completed_sessions || [],
+      };
+    }
+
+    return {
+      currentDay: data[0].current_day,
+      currentCategory: data[0].current_category,
+      lastSessionDate: data[0].last_session_date,
+      completedSessions: data[0].completed_sessions || [],
+    };
+  }
+
+  static async updateEquationsProgress(progress: any) {
+    const { error } = await supabase
+      .from('equations_progress')
+      .update({
+        current_day: progress.currentDay,
+        current_category: progress.currentCategory,
+        last_session_date: progress.lastSessionDate,
+        completed_sessions: progress.completedSessions,
+      })
+      .eq('id', 1);
+
+    if (error) {
+      console.error('Error updating equations progress in Supabase:', error);
+    }
+  }
+
+  // Equations Session Completions
+  static async getEquationsSessionCompletions() {
+    const { data, error } = await supabase
+      .from('equations_session_completions')
+      .select('*')
+      .order('completed_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching equations session completions from Supabase:', error);
+      return [];
+    }
+
+    return data.map((item) => ({
+      session: item.session_type,
+      day: item.day_number,
+      category: item.category,
+      timestamp: new Date(item.completed_at).getTime(),
+    }));
+  }
+
+  static async saveEquationsSessionCompletion(completionData: any) {
+    const { error } = await supabase.from('equations_session_completions').insert({
+      session_type: completionData.session,
+      day_number: completionData.day,
+      category: completionData.category,
+      completed_at: new Date(completionData.timestamp || Date.now()).toISOString(),
+    });
+
+    if (error) {
+      console.error('Error saving equations session completion to Supabase:', error);
+    }
+  }
+
   // Drawing Presentations
   static async getDrawingPresentations() {
     const { data, error } = await supabase
