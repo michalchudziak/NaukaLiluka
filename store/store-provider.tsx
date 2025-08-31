@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AppState, type AppStateStatus } from 'react-native';
 import { useBookStore } from './book-store';
 import { useDrawingsStore } from './drawings-store';
+import { useEquationsStore } from './equations-store';
 import { useMathStore } from './math-store';
 import { useNoRepStore } from './no-rep-store';
 import { useSettingsStore } from './settings-store';
@@ -17,6 +18,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       useDrawingsStore.getState().hydrate(),
       useMathStore.getState().hydrate(),
       useSettingsStore.getState().hydrate(),
+      useEquationsStore.getState().hydrate(),
     ]);
   };
 

@@ -97,7 +97,7 @@ export default function ViewStorageScreen() {
         HybridStorageService.readDailyPlan('progress.books.daily-plan'),
         HybridStorageService.readBookTrackSessions('progress.books.track'),
         HybridStorageService.readMathProgress('progress.math'),
-        HybridStorageService.readMathSessions('routines.math.sessions'),
+        HybridStorageService.readMathSessionCompletions('routines.math.sessions'),
         HybridStorageService.readNoRepWords('progress.reading.no-rep.words'),
         HybridStorageService.readNoRepSentences('progress.reading.no-rep.sentences'),
         HybridStorageService.readNoRepWordCompletions('routines.reading.no-rep.words'),

@@ -16,12 +16,11 @@ export default function EquationsScreen() {
   const bottomTabBarHeight = useBottomTabBarHeight();
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
-  const { getDailyData, markSessionCompleted, isSessionCompletedToday } = useEquationsStore();
+  const { completedSessions, getDailyData, markSessionCompleted, isSessionCompletedToday } =
+    useEquationsStore();
 
   // Keep local reference to data for rendering
   const dailyData: DailyData = getDailyData();
-
-  console.log(dailyData);
 
   const handleSessionPress = async (content: 'subitizing' | 'equations', sessionIndex: number) => {
     if (!dailyData) return;
@@ -48,7 +47,8 @@ export default function EquationsScreen() {
     const sessionKey = `session${sessionNumber}`;
     const sessionIndex = sessionNumber - 1;
 
-    const isCompleted = isSessionCompletedToday(sessionKey as 'session1' | 'session2');
+    const isRoutineCompleted = (routine: 'subitizing' | 'equations', index: number) =>
+      completedSessions.includes(`${routine}${index === 0 ? '1' : '2'}`);
 
     return (
       <View key={sessionKey} style={styles.sessionRow}>
@@ -60,7 +60,7 @@ export default function EquationsScreen() {
             <TrackButton
               key={`${item}`}
               title={t(`math.equations.${item}`)}
-              isCompleted={isCompleted}
+              isCompleted={isRoutineCompleted(item, sessionIndex)}
               onPress={() => handleSessionPress(item, sessionIndex)}
             />
           ))}
