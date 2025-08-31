@@ -39,6 +39,18 @@ const fractionToString = (num: number, den: number): string => {
   return `${n}/${d}`;
 };
 
+const fractionToMixedString = (num: number, den: number): string => {
+  const [n, d] = simplifyFraction(num, den);
+  if (d === 1) return `${n}`;
+  const absN = Math.abs(n);
+  const whole = Math.floor(absN / d);
+  const rem = absN % d;
+  const sign = n < 0 ? '-' : '';
+  if (whole === 0) return `${n}/${d}`; // proper fraction (keeps sign on numerator)
+  if (rem === 0) return `${sign}${whole}`; // exact integer
+  return `${sign}${whole} ${rem}/${d}`;
+};
+
 export const buildIntegerEquations = (day: number, numberLimit: number, count: number) => {
   const equations = [];
   const operators = [];
@@ -188,7 +200,7 @@ export const buildDecimalEquations = (day: number, numberLimit: number, count: n
   const operators = [];
   // Day 1 shows definitions; operators start from day 2
   if (day === 1) {
-    return buildDecimalDefinitions(numberLimit, count);
+    return buildDecimalDefinitions(10, count);
   }
   switch (day) {
     case 2:
@@ -264,20 +276,24 @@ export const buildDecimalEquations = (day: number, numberLimit: number, count: n
 export const buildFractionEquations = (day: number, numberLimit: number, count: number) => {
   const equations: string[][] = [];
   const operators: Array<'+' | '-' | '*' | '/'> = [];
+  // Day 1 shows definitions; operators start from day 2
+  if (day === 1) {
+    return buildFractionDefinitions(numberLimit, count);
+  }
   switch (day) {
-    case 1:
+    case 2:
       operators.push('+');
       break;
-    case 2:
+    case 3:
       operators.push('-');
       break;
-    case 3:
+    case 4:
       operators.push('*');
       break;
-    case 4:
+    case 5:
       operators.push('/');
       break;
-    case 5:
+    default:
       operators.push('+', '-', '*', '/');
       break;
   }
@@ -346,7 +362,46 @@ export const buildFractionEquations = (day: number, numberLimit: number, count: 
 
     const [sNum, sDen] = simplifyFraction(resNum, resDen);
     const leftSide = `${fractionToString(n1, d1)} ${operator} ${fractionToString(n2, d2)}`;
-    const rightSide = `= ${fractionToString(sNum, sDen)}`;
+    const rightSide = `= ${fractionToMixedString(sNum, sDen)}`;
+    equations.push([leftSide, rightSide]);
+  }
+
+  return equations;
+};
+
+export const buildFractionDefinitions = (numberLimit: number, count: number) => {
+  // Simple fraction equations demonstrating like-denominator addition/subtraction
+  // e.g., 1/4 + 2/4 = 3/4, 5/6 - 1/6 = 4/6 = 2/3
+  const equations: string[][] = [];
+
+  const maxDen = Math.max(2, Math.min(numberLimit || 12, 12));
+  const preferred = [2, 3, 4, 5, 6, 8, 10, 12].filter((d) => d <= maxDen);
+  const pickDen = () => preferred[Math.floor(Math.random() * preferred.length)] || 2;
+
+  for (let i = 0; i < count; i++) {
+    const d = pickDen();
+    const op: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
+    let n1 = Math.max(1, Math.floor(Math.random() * (d - 1)));
+    let n2: number;
+    if (op === '+') {
+      // Usually keep simple sums (n1 + n2 <= d),
+      // sometimes allow improper to demonstrate mixed numbers.
+      const allowImproper = Math.random() < 0.35; // 35% chance
+      const maxN2 = allowImproper ? d - 1 : Math.max(1, d - n1);
+      n2 = Math.max(1, Math.floor(Math.random() * maxN2));
+    } else {
+      n2 = Math.max(1, Math.floor(Math.random() * (d - 1)));
+      if (n1 < n2) {
+        [n1, n2] = [n2, n1];
+      }
+    }
+
+    let resNum = op === '+' ? n1 + n2 : n1 - n2;
+    let resDen = d;
+    const [sNum, sDen] = simplifyFraction(resNum, resDen);
+
+    const leftSide = `${fractionToString(n1, d)} ${op} ${fractionToString(n2, d)}`;
+    const rightSide = `= ${fractionToMixedString(sNum, sDen)}`;
     equations.push([leftSide, rightSide]);
   }
 
