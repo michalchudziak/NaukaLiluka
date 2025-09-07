@@ -51,9 +51,6 @@ export default function ClearStorageScreen() {
                 mathStore.hydrate(),
               ]);
 
-              // Reset stores to ensure clean state
-              bookStore.initializeBookProgress();
-
               Alert.alert(
                 t('settings.clearStorage.successTitle'),
                 t('settings.clearStorage.successMessage'),
@@ -96,7 +93,6 @@ export default function ClearStorageScreen() {
 
               // Reinitialize book store
               await bookStore.hydrate();
-              bookStore.initializeBookProgress();
 
               Alert.alert(
                 t('settings.clearStorage.successTitle'),

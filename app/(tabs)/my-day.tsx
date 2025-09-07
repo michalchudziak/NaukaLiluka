@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
 import { isToday } from 'date-fns';
-import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
@@ -14,7 +14,7 @@ import { useNoRepStore } from '@/store/no-rep-store';
 
 export default function MyDayScreen() {
   const { t } = useTranslation();
-  const router = useRouter();
+  const navigation = useNavigation<any>();
   const bottomTabBarHeight = useBottomTabBarHeight();
   const { isNoRepPathCompletedToday } = useNoRepStore();
   const bookStore = useBookStore();
@@ -37,9 +37,7 @@ export default function MyDayScreen() {
       const routine1 = isNoRepPathCompletedToday();
       setIsNoRepCompleted(routine1);
 
-      const todayCompletions = bookStore.completedSessions.filter((c) =>
-        isToday(c.timestamp)
-      );
+      const todayCompletions = bookStore.completedSessions.filter((c) => isToday(c.timestamp));
       const plan = bookStore.getDailyData();
 
       let routine2 = false;
@@ -112,31 +110,91 @@ export default function MyDayScreen() {
     isNoRepPathCompletedToday,
     bookStore.completedSessions,
     bookStore.getDailyData,
-    bookStore.activeBookProgress,
     drawingsStore,
     isMathSessionCompletedToday,
     isEqSessionCompletedToday,
     currentDay,
   ]);
 
+  // Helper to reset into Tabs with a specific tab active and optional nested stack
+  // Keeps all tabs present to avoid affecting the TabBar.
+  type TabName = 'my-day' | 'reading' | 'math' | 'drawings' | 'settings';
+
+  const resetToTab = (
+    tab: TabName,
+    nestedState?: { routes: Array<{ name: string; params?: any }>; index?: number }
+  ) => {
+    const tabIndexMap: Record<TabName, number> = {
+      'my-day': 1,
+      reading: 2,
+      math: 3,
+      drawings: 4,
+      settings: 5,
+    } as const;
+
+    const routes = [
+      { name: 'index' },
+      { name: 'my-day' },
+      { name: 'reading' as const },
+      { name: 'math' as const },
+      { name: 'drawings' as const },
+      { name: 'settings' as const },
+    ].map((r) => {
+      if (r.name === tab && nestedState) {
+        return { ...r, state: { ...nestedState } } as any;
+      }
+      return r as any;
+    });
+
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          name: '(tabs)',
+          state: {
+            index: tabIndexMap[tab],
+            routes,
+          },
+        },
+      ],
+    });
+  };
+
   const navigateToNoRep = () => {
-    router.push('/reading/no-rep-track');
+    // Reading stack: Reading index -> No-Rep Track
+    resetToTab('reading', {
+      routes: [{ name: 'index' }, { name: 'no-rep-track' }],
+      index: 1,
+    });
   };
 
   const navigateToBooksDaily = () => {
-    router.push('/reading/books-daily');
+    // Reading stack: Book Track -> Books Daily
+    resetToTab('reading', {
+      routes: [{ name: 'index' }, { name: 'book-track' }, { name: 'books-daily' }],
+      index: 1,
+    });
   };
 
   const navigateToDrawings = () => {
-    router.push('/drawings');
+    // Switch to Drawings tab (list). No nested stack needed here.
+    resetToTab('drawings');
   };
 
   const navigateToSets = () => {
-    router.push('/math/sets');
+    // Math stack: Math index -> Sets
+    resetToTab('math', {
+      routes: [{ name: 'index' }, { name: 'sets' }],
+      index: 1,
+    });
   };
 
   const navigateToEquations = () => {
-    router.push('/math/equations');
+    // Math stack: Math index -> Equations
+    resetToTab('math', {
+      routes: [{ name: 'index' }, { name: 'equations' }],
+      index: 1,
+    });
   };
 
   return (

@@ -111,9 +111,24 @@ export const useBookStore = create<BookStore>((set, get) => ({
         selectedWordTripleIndex: 0,
         selectedSentenceTripleIndex: 0,
         sessions: {
-          session1: { words: [], sentences: [], isWordsCompleted: false, isSentencesCompleted: false },
-          session2: { words: [], sentences: [], isWordsCompleted: false, isSentencesCompleted: false },
-          session3: { words: [], sentences: [], isWordsCompleted: false, isSentencesCompleted: false },
+          session1: {
+            words: [],
+            sentences: [],
+            isWordsCompleted: false,
+            isSentencesCompleted: false,
+          },
+          session2: {
+            words: [],
+            sentences: [],
+            isWordsCompleted: false,
+            isSentencesCompleted: false,
+          },
+          session3: {
+            words: [],
+            sentences: [],
+            isWordsCompleted: false,
+            isSentencesCompleted: false,
+          },
         },
       };
     }
@@ -176,11 +191,16 @@ export const useBookStore = create<BookStore>((set, get) => ({
 
   markSessionItemCompleted: (session, type) => {
     const prev = get().completedSessions;
-    const already = prev.some((c) => c.session === session && c.type === type && isToday(c.timestamp));
+    const already = prev.some(
+      (c) => c.session === session && c.type === type && isToday(c.timestamp)
+    );
     if (!already) {
       const updated = [...prev, { session, type, timestamp: Date.now() }];
       set({ completedSessions: updated });
-      HybridStorageService.writeBookTrackSessions(STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS, updated);
+      HybridStorageService.writeBookTrackSessions(
+        STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS,
+        updated
+      );
     }
 
     // Update book progress after marking
@@ -258,7 +278,10 @@ export const useBookStore = create<BookStore>((set, get) => ({
   isDayCompleted: () => {
     const daily = get().getDailyData();
     const todays = get().completedSessions.filter((c) => isToday(c.timestamp));
-    const required: { session: 'session1' | 'session2' | 'session3'; type: 'words' | 'sentences' }[] = [
+    const required: {
+      session: 'session1' | 'session2' | 'session3';
+      type: 'words' | 'sentences';
+    }[] = [
       { session: 'session1', type: 'words' },
       { session: 'session2', type: 'words' },
       { session: 'session3', type: 'words' },

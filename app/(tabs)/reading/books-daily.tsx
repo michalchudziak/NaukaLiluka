@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ThemedText } from '@/components/ThemedText';
@@ -16,10 +16,7 @@ export default function BooksDailyScreen() {
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const { getDailyData, markSessionItemCompleted, isSessionItemCompletedToday } = useBookStore();
-  // Subscribe to slices to trigger recomputation on changes
-  const activeBook = useBookStore((s) => s.activeBookProgress);
-  const completedSessions = useBookStore((s) => s.completedSessions);
-  const dailyPlan = useMemo(() => getDailyData(), [getDailyData, activeBook, completedSessions]);
+  const dailyPlan = getDailyData();
   const [isLoading] = useState(false);
 
   const handleTrackPress = (

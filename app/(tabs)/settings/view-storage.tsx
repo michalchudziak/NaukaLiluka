@@ -178,7 +178,7 @@ export default function ViewStorageScreen() {
       }
 
       return (
-        <View key={(bookProgress.bookTitle ?? bookProgress.bookId) ?? index} style={styles.bookItem}>
+        <View key={bookProgress.bookTitle ?? bookProgress.bookId ?? index} style={styles.bookItem}>
           <ThemedText style={styles.bookName}>
             {bookProgress.bookTitle || String(bookProgress.bookId)}
           </ThemedText>
@@ -236,81 +236,6 @@ export default function ViewStorageScreen() {
         </View>
       );
     });
-  };
-
-  const renderDailyPlan = () => {
-    const plan = data?.bookStore.dailyPlan;
-    if (!plan) {
-      return (
-        <ThemedText style={styles.emptyText}>{t('settings.viewStorage.noDailyPlan')}</ThemedText>
-      );
-    }
-
-    const today = new Date().toISOString().split('T')[0];
-    const isActive = plan.date === today;
-
-    return (
-      <View>
-        <DataRow
-          label={t('settings.viewStorage.planDate')}
-          value={isActive ? t('settings.viewStorage.today') : plan.date}
-          valueStyle={isActive ? styles.activeText : undefined}
-        />
-        <DataRow label={t('settings.viewStorage.book')} value={plan.bookId} />
-
-        <View style={styles.sessionsContainer}>
-          {['session1', 'session2', 'session3'].map((sessionKey) => {
-            const session = plan.sessions[sessionKey];
-            const hasWords = session.words?.length > 0;
-            const hasSentences = session.sentences?.length > 0;
-
-            return (
-              <View key={sessionKey} style={styles.sessionItem}>
-                <ThemedText style={styles.sessionName}>{t(`booksDaily.${sessionKey}`)}</ThemedText>
-                <View style={styles.sessionStatus}>
-                  {hasWords && (
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        session.isWordsCompleted && styles.completedStatusBadge,
-                      ]}
-                    >
-                      <ThemedText
-                        style={[
-                          styles.statusText,
-                          session.isWordsCompleted && styles.completedStatusText,
-                        ]}
-                      >
-                        {t('settings.viewStorage.words')}{' '}
-                        {session.isWordsCompleted ? '✓' : `(${session.words.length})`}
-                      </ThemedText>
-                    </View>
-                  )}
-                  {hasSentences && (
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        session.isSentencesCompleted && styles.completedStatusBadge,
-                      ]}
-                    >
-                      <ThemedText
-                        style={[
-                          styles.statusText,
-                          session.isSentencesCompleted && styles.completedStatusText,
-                        ]}
-                      >
-                        {t('settings.viewStorage.sentences')}{' '}
-                        {session.isSentencesCompleted ? '✓' : `(${session.sentences.length})`}
-                      </ThemedText>
-                    </View>
-                  )}
-                </View>
-              </View>
-            );
-          })}
-        </View>
-      </View>
-    );
   };
 
   const renderNoRepProgress = () => {
