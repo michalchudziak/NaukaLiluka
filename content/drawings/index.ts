@@ -158,4 +158,49 @@ export default [
       },
     ],
   },
+  {
+    title: 'Owoce',
+    images: [
+      {
+        image: require('./fruits/apple.png'),
+        description: 'Jabłko',
+      },
+      {
+        image: require('./fruits/banana.png'),
+        description: 'Banan',
+      },
+      {
+        image: require('./fruits/cherry.png'),
+        description: 'Wiśnia',
+      },
+      {
+        image: require('./fruits/grape.png'),
+        description: 'Winogrono',
+      },
+      {
+        image: require('./fruits/lemon.png'),
+        description: 'Cytryna',
+      },
+      {
+        image: require('./fruits/orange.png'),
+        description: 'Pomarańcza',
+      },
+      {
+        image: require('./fruits/pear.png'),
+        description: 'Gruszka',
+      },
+      {
+        image: require('./fruits/pineapple.png'),
+        description: 'Ananas',
+      },
+      {
+        image: require('./fruits/strawberry.png'),
+        description: 'Truskawka',
+      },
+      {
+        image: require('./fruits/watermelon.png'),
+        description: 'Arbuz',
+      },
+    ],
+  },
 ];
