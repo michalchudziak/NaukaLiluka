@@ -132,9 +132,13 @@ export class SupabaseService {
     }
 
     return data.map((item) => ({
-      bookId: item.book_id,
+      bookId: typeof item.book_index === 'number' ? item.book_index : 0,
+      bookTitle: item.book_title || item.book_id, // fallback for old schema
       completedWordTriples: item.completed_word_triples || [],
       completedSentenceTriples: item.completed_sentence_triples || [],
+      progressTimestamp: item.progress_timestamp
+        ? new Date(item.progress_timestamp).getTime()
+        : 0,
       isCompleted: item.is_completed,
     }));
   }
@@ -143,13 +147,19 @@ export class SupabaseService {
     for (const progress of bookProgress) {
       const { error } = await supabase.from('book_progress').upsert(
         {
-          book_id: progress.bookId,
+          // Use new identity columns only
+          book_index: progress.bookId,
+          book_title: progress.bookTitle || String(progress.bookId),
           completed_word_triples: progress.completedWordTriples,
           completed_sentence_triples: progress.completedSentenceTriples,
+          progress_timestamp: progress.progressTimestamp
+            ? new Date(progress.progressTimestamp).toISOString()
+            : null,
           is_completed: progress.isCompleted,
         },
         {
-          onConflict: 'book_id',
+          // Conflict on new unique column
+          onConflict: 'book_title',
         }
       );
 

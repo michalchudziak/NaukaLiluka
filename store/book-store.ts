@@ -5,14 +5,15 @@ import { HybridStorageService } from '@/services/hybrid-storage';
 
 const STORAGE_KEYS = {
   BOOK_PROGRESS: 'progress.books',
-  DAILY_PLAN: 'progress.books.daily-plan',
   ROUTINES_BOOK_TRACK_SESSIONS: 'routines.reading.book-track.sessions',
 } as const;
 
 interface BookProgress {
-  bookId: string;
+  bookId: number;
+  bookTitle: string;
   completedWordTriples: number[]; // indices of completed word triples
   completedSentenceTriples: number[]; // indices of completed sentence triples
+  progressTimestamp: number;
   isCompleted: boolean;
 }
 
@@ -29,7 +30,7 @@ export interface SessionContent {
   isSentencesCompleted: boolean;
 }
 
-export interface DailyPlan {
+export interface DailyData {
   timestamp: number;
   bookId: string;
   selectedWordTripleIndex: number;
@@ -42,33 +43,20 @@ export interface DailyPlan {
 }
 
 interface BookStore {
-  bookProgress: BookProgress[];
-  dailyPlan: DailyPlan | null;
-  bookTrackSessionCompletions: BookTrackSessionCompletion[];
+  activeBookProgress: BookProgress;
+  completedSessions: BookTrackSessionCompletion[];
 
-  initializeBookProgress: () => void;
-  updateBookProgress: (
-    bookId: string,
-    wordTripleIndex: number,
-    sentenceTripleIndex: number
-  ) => void;
-  getDailyContent: () => Promise<DailyPlan | null>;
+  getDailyData: () => DailyData;
   markSessionItemCompleted: (
     session: 'session1' | 'session2' | 'session3',
     type: 'words' | 'sentences'
   ) => void;
-  markBookTrackSessionCompleted: (
-    session: 'session1' | 'session2' | 'session3',
-    type: 'words' | 'sentences'
-  ) => void;
-  isDailyPlanCompleted: () => boolean;
-  isBookTrackCompletedToday: () => boolean;
+  isDayCompleted: () => boolean;
   isSessionItemCompletedToday: (
     session: 'session1' | 'session2' | 'session3',
     type: 'words' | 'sentences'
   ) => boolean;
   hydrate: () => Promise<void>;
-  clearDailyPlan: () => void;
 }
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -99,294 +87,263 @@ function getUniquePermutations<T>(array: T[]): T[][] {
 }
 
 export const useBookStore = create<BookStore>((set, get) => ({
-  bookProgress: [],
-  dailyPlan: null,
-  bookTrackSessionCompletions: [],
-
-  initializeBookProgress: () => {
-    const currentProgress = get().bookProgress;
-
-    const updatedProgress = books.map((book) => {
-      const existing = currentProgress.find((p) => p.bookId === book.book.title);
-      if (existing) return existing;
-
-      return {
-        bookId: book.book.title,
-        completedWordTriples: [],
-        completedSentenceTriples: [],
-        isCompleted: false,
-      };
-    });
-
-    set({ bookProgress: updatedProgress });
-    HybridStorageService.writeBookProgress(STORAGE_KEYS.BOOK_PROGRESS, updatedProgress);
+  activeBookProgress: {
+    bookId: 0,
+    bookTitle: books[0]?.book.title || 'Unknown',
+    completedWordTriples: [],
+    completedSentenceTriples: [],
+    progressTimestamp: 0,
+    isCompleted: false,
   },
+  completedSessions: [],
 
-  updateBookProgress: (bookId: string, wordTripleIndex: number, sentenceTripleIndex: number) => {
-    const currentProgress = get().bookProgress;
-    const book = books.find((b) => b.book.title === bookId);
-
-    if (!book) return;
-
-    const updatedProgress = currentProgress.map((progress) => {
-      if (progress.bookId !== bookId) return progress;
-
-      const updatedCompletedWordTriples = Array.from(
-        new Set([...progress.completedWordTriples, wordTripleIndex])
-      );
-      const updatedCompletedSentenceTriples = Array.from(
-        new Set([...progress.completedSentenceTriples, sentenceTripleIndex])
-      );
-
-      // Check if all triples are completed
-      const totalWordTriples = book.words.length;
-      const totalSentenceTriples = book.sentences.length;
-
-      const isCompleted =
-        updatedCompletedWordTriples.length >= totalWordTriples &&
-        updatedCompletedSentenceTriples.length >= totalSentenceTriples;
-
-      return {
-        ...progress,
-        completedWordTriples: updatedCompletedWordTriples,
-        completedSentenceTriples: updatedCompletedSentenceTriples,
-        isCompleted,
-      };
-    });
-
-    set({ bookProgress: updatedProgress });
-    HybridStorageService.writeBookProgress(STORAGE_KEYS.BOOK_PROGRESS, updatedProgress);
-  },
-
-  getDailyContent: async () => {
+  getDailyData: () => {
     const state = get();
 
-    // Check if we already have a plan for today
-    if (state.dailyPlan && isToday(state.dailyPlan.timestamp)) {
-      return state.dailyPlan;
+    // Determine active book progress (first not completed book)
+    const active = state.activeBookProgress;
+    const bookIndex = active.bookId;
+    const chosenBook = books[bookIndex];
+
+    // Fallback in case of out-of-bounds
+    if (!chosenBook) {
+      return {
+        timestamp: Date.now(),
+        bookId: 'N/A',
+        selectedWordTripleIndex: 0,
+        selectedSentenceTripleIndex: 0,
+        sessions: {
+          session1: { words: [], sentences: [], isWordsCompleted: false, isSentencesCompleted: false },
+          session2: { words: [], sentences: [], isWordsCompleted: false, isSentencesCompleted: false },
+          session3: { words: [], sentences: [], isWordsCompleted: false, isSentencesCompleted: false },
+        },
+      };
     }
 
-    // Initialize book progress if needed
-    if (state.bookProgress.length === 0) {
-      state.initializeBookProgress();
-    }
+    const wordsTriples = chosenBook.words;
+    const sentencesTriples = chosenBook.sentences;
 
-    // Find the first not completed book
-    const activeBookProgress = state.bookProgress.find((p) => !p.isCompleted);
-    if (!activeBookProgress) {
-      return null; // All books completed
-    }
+    // Decide which triple indices to use
+    const today = new Date();
+    const reuseToday = active.progressTimestamp && isToday(active.progressTimestamp);
 
-    const activeBook = books.find((b) => b.book.title === activeBookProgress.bookId);
-    if (!activeBook) {
-      return null;
-    }
-
-    // Find first uncompleted word triple and sentence triple
-    let selectedWordTripleIndex = -1;
-    let selectedSentenceTripleIndex = -1;
-
-    // Find first uncompleted word triple
-    for (let i = 0; i < activeBook.words.length; i++) {
-      if (!activeBookProgress.completedWordTriples.includes(i)) {
-        selectedWordTripleIndex = i;
-        break;
+    const nextWordIndex = (() => {
+      if (reuseToday && active.completedWordTriples.length > 0) {
+        return active.completedWordTriples[active.completedWordTriples.length - 1];
       }
-    }
-
-    // Find first uncompleted sentence triple
-    for (let i = 0; i < activeBook.sentences.length; i++) {
-      if (!activeBookProgress.completedSentenceTriples.includes(i)) {
-        selectedSentenceTripleIndex = i;
-        break;
+      // next undone index
+      for (let i = 0; i < wordsTriples.length; i++) {
+        if (!active.completedWordTriples.includes(i)) return i;
       }
-    }
+      // if everything is completed, stick to the last one
+      return Math.max(0, wordsTriples.length - 1);
+    })();
 
-    if (selectedWordTripleIndex === -1 || selectedSentenceTripleIndex === -1) {
-      // Mark book as completed if no more content
-      state.updateBookProgress(activeBookProgress.bookId, -1, -1);
-      return state.getDailyContent(); // Recursively try next book
-    }
+    const nextSentenceIndex = (() => {
+      if (reuseToday && active.completedSentenceTriples.length > 0) {
+        return active.completedSentenceTriples[active.completedSentenceTriples.length - 1];
+      }
+      for (let i = 0; i < sentencesTriples.length; i++) {
+        if (!active.completedSentenceTriples.includes(i)) return i;
+      }
+      return Math.max(0, sentencesTriples.length - 1);
+    })();
 
-    const selectedWords = activeBook.words[selectedWordTripleIndex];
-    const selectedSentences = activeBook.sentences[selectedSentenceTripleIndex];
+    // Build session content. Words appear in all three sessions with different orderings.
+    const wordTriple = wordsTriples[nextWordIndex] || [];
+    const sentenceTriple = sentencesTriples[nextSentenceIndex] || [];
+    const permutations = getUniquePermutations(wordTriple);
 
-    // Create sessions with guaranteed unique permutations of the same words
-    const wordPermutations = getUniquePermutations(selectedWords);
-    const session1Words = wordPermutations[0];
-    const session2Words = wordPermutations[1];
-    const session3Words = wordPermutations[2];
+    const todays = state.completedSessions.filter((c) => isToday(c.timestamp));
 
-    const dailyPlan: DailyPlan = {
-      timestamp: Date.now(),
-      bookId: activeBookProgress.bookId,
-      selectedWordTripleIndex,
-      selectedSentenceTripleIndex,
+    const makeFlags = (session: 'session1' | 'session2' | 'session3') => ({
+      isWordsCompleted: todays.some((c) => c.session === session && c.type === 'words'),
+      isSentencesCompleted: todays.some((c) => c.session === session && c.type === 'sentences'),
+    });
+
+    return {
+      timestamp: today.getTime(),
+      bookId: chosenBook.book.title,
+      selectedWordTripleIndex: nextWordIndex,
+      selectedSentenceTripleIndex: nextSentenceIndex,
       sessions: {
         session1: {
-          words: session1Words, // Unique permutation 1
-          sentences: [], // No sentences in session 1
-          isWordsCompleted: false,
-          isSentencesCompleted: true, // No sentences to complete
+          words: permutations[0] || [],
+          sentences: [],
+          ...makeFlags('session1'),
         },
         session2: {
-          words: session2Words, // Unique permutation 2
-          sentences: [], // No sentences in session 2
-          isWordsCompleted: false,
-          isSentencesCompleted: true, // No sentences to complete
+          words: permutations[1] || [],
+          sentences: [],
+          ...makeFlags('session2'),
         },
         session3: {
-          words: session3Words, // Unique permutation 3
-          sentences: selectedSentences, // Sentences not shuffled
-          isWordsCompleted: false,
-          isSentencesCompleted: false,
+          words: permutations[2] || [],
+          sentences: sentenceTriple || [],
+          ...makeFlags('session3'),
         },
       },
     };
-
-    // Mark the selected triples as completed in book progress
-    state.updateBookProgress(
-      activeBookProgress.bookId,
-      selectedWordTripleIndex,
-      selectedSentenceTripleIndex
-    );
-
-    set({ dailyPlan });
-    HybridStorageService.writeDailyPlan(STORAGE_KEYS.DAILY_PLAN, dailyPlan);
-
-    return dailyPlan;
   },
 
-  markSessionItemCompleted: (
-    session: 'session1' | 'session2' | 'session3',
-    type: 'words' | 'sentences'
-  ) => {
-    const currentPlan = get().dailyPlan;
-    if (!currentPlan) return;
+  markSessionItemCompleted: (session, type) => {
+    const prev = get().completedSessions;
+    const already = prev.some((c) => c.session === session && c.type === type && isToday(c.timestamp));
+    if (!already) {
+      const updated = [...prev, { session, type, timestamp: Date.now() }];
+      set({ completedSessions: updated });
+      HybridStorageService.writeBookTrackSessions(STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS, updated);
+    }
 
-    const updatedPlan = {
-      ...currentPlan,
-      sessions: {
-        ...currentPlan.sessions,
-        [session]: {
-          ...currentPlan.sessions[session],
-          [type === 'words' ? 'isWordsCompleted' : 'isSentencesCompleted']: true,
-        },
-      },
-    };
+    // Update book progress after marking
+    const daily = get().getDailyData();
+    const active = get().activeBookProgress;
+    const book = books[active.bookId];
+    if (!book) return;
 
-    set({ dailyPlan: updatedPlan });
-    HybridStorageService.writeDailyPlan(STORAGE_KEYS.DAILY_PLAN, updatedPlan);
+    const nextState = { ...active };
 
-    // Mark completion with timestamp
-    get().markBookTrackSessionCompleted(session, type);
+    if (type === 'words') {
+      // Check if all word sessions are completed today
+      const todays = get().completedSessions.filter((c) => isToday(c.timestamp));
+      const wordsDone = ['session1', 'session2', 'session3'].every((s) =>
+        todays.some((c) => c.session === (s as any) && c.type === 'words')
+      );
+      if (wordsDone && !nextState.completedWordTriples.includes(daily.selectedWordTripleIndex)) {
+        nextState.completedWordTriples = [
+          ...nextState.completedWordTriples,
+          daily.selectedWordTripleIndex,
+        ];
+        nextState.progressTimestamp = Date.now();
+      }
+    } else if (type === 'sentences') {
+      if (!nextState.completedSentenceTriples.includes(daily.selectedSentenceTripleIndex)) {
+        nextState.completedSentenceTriples = [
+          ...nextState.completedSentenceTriples,
+          daily.selectedSentenceTripleIndex,
+        ];
+      }
+    }
+
+    // Determine if book is completed (count only non-empty triples)
+    const totalWordTriples = book.words.filter((w) => (w?.length || 0) > 0).length;
+    const totalSentenceTriples = book.sentences.filter((s) => (s?.length || 0) > 0).length;
+    const wordsCompletedCount = nextState.completedWordTriples.length;
+    const sentencesCompletedCount = nextState.completedSentenceTriples.length;
+    nextState.isCompleted =
+      wordsCompletedCount >= totalWordTriples && sentencesCompletedCount >= totalSentenceTriples;
+
+    set({ activeBookProgress: nextState });
+
+    // Persist full progress list: we store one record per book in storage
+    // Read existing progress, merge/replace current, save back
+    (async () => {
+      const stored: BookProgress[] =
+        (await HybridStorageService.readBookProgress(STORAGE_KEYS.BOOK_PROGRESS)) || [];
+      // Ensure progress for all books exists
+      const merged: BookProgress[] = books.map((b, idx) => {
+        const found = stored.find((p: any) => p.bookId === idx || p.bookTitle === b.book.title);
+        if (found && (found.bookId === idx || found.bookTitle === b.book.title)) {
+          // Normalize shape
+          return {
+            bookId: typeof found.bookId === 'number' ? found.bookId : idx,
+            bookTitle: found.bookTitle || b.book.title,
+            completedWordTriples: found.completedWordTriples || [],
+            completedSentenceTriples: found.completedSentenceTriples || [],
+            progressTimestamp: found.progressTimestamp || 0,
+            isCompleted: !!found.isCompleted,
+          };
+        }
+        return {
+          bookId: idx,
+          bookTitle: b.book.title,
+          completedWordTriples: [],
+          completedSentenceTriples: [],
+          progressTimestamp: 0,
+          isCompleted: false,
+        };
+      });
+
+      merged[nextState.bookId] = nextState;
+
+      await HybridStorageService.writeBookProgress(STORAGE_KEYS.BOOK_PROGRESS, merged);
+
+      // If current became completed, we could move to next book for future sessions
+      if (nextState.isCompleted) {
+        const nextIndex = merged.findIndex((p) => !p.isCompleted);
+        if (nextIndex !== -1) {
+          set({ activeBookProgress: merged[nextIndex] });
+        }
+      }
+    })();
   },
 
-  markBookTrackSessionCompleted: (
-    session: 'session1' | 'session2' | 'session3',
-    type: 'words' | 'sentences'
-  ) => {
-    const newCompletion: BookTrackSessionCompletion = {
-      session,
-      type,
-      timestamp: Date.now(),
-    };
-    const newCompletions = [...get().bookTrackSessionCompletions, newCompletion];
-    set({ bookTrackSessionCompletions: newCompletions });
-    HybridStorageService.writeBookTrackSessions(
-      STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS,
-      newCompletions
-    );
+  isDayCompleted: () => {
+    const daily = get().getDailyData();
+    const todays = get().completedSessions.filter((c) => isToday(c.timestamp));
+    const required: { session: 'session1' | 'session2' | 'session3'; type: 'words' | 'sentences' }[] = [
+      { session: 'session1', type: 'words' },
+      { session: 'session2', type: 'words' },
+      { session: 'session3', type: 'words' },
+    ];
+    if ((daily.sessions.session3.sentences?.length || 0) > 0) {
+      required.push({ session: 'session3', type: 'sentences' });
+    }
+    return required.every((r) => todays.some((c) => c.session === r.session && c.type === r.type));
   },
 
-  isDailyPlanCompleted: () => {
-    const state = get();
-    const plan = state.dailyPlan;
-    if (!plan) return false;
-
-    const { session1, session2, session3 } = plan.sessions;
-    const todayCompletions = state.bookTrackSessionCompletions.filter((c) => isToday(c.timestamp));
-
-    // Check if all required items in each session are completed today
-    const isSessionItemCompleted = (
-      session: 'session1' | 'session2' | 'session3',
-      type: 'words' | 'sentences'
-    ) => {
-      return todayCompletions.some((c) => c.session === session && c.type === type);
-    };
-
-    const session1Complete =
-      (session1.words.length === 0 || isSessionItemCompleted('session1', 'words')) &&
-      (session1.sentences.length === 0 || isSessionItemCompleted('session1', 'sentences'));
-
-    const session2Complete =
-      (session2.words.length === 0 || isSessionItemCompleted('session2', 'words')) &&
-      (session2.sentences.length === 0 || isSessionItemCompleted('session2', 'sentences'));
-
-    const session3Complete =
-      (session3.words.length === 0 || isSessionItemCompleted('session3', 'words')) &&
-      (session3.sentences.length === 0 || isSessionItemCompleted('session3', 'sentences'));
-
-    return session1Complete && session2Complete && session3Complete;
-  },
-
-  isBookTrackCompletedToday: () => {
-    const state = get();
-    const plan = state.dailyPlan;
-    if (!plan) return false;
-
-    // Check if the plan is for today
-    if (!isToday(plan.timestamp)) return false;
-
-    // Check if all sessions are completed
-    return state.isDailyPlanCompleted();
-  },
-
-  isSessionItemCompletedToday: (
-    session: 'session1' | 'session2' | 'session3',
-    type: 'words' | 'sentences'
-  ) => {
-    const state = get();
-    const todayCompletions = state.bookTrackSessionCompletions.filter((c) => isToday(c.timestamp));
-    return todayCompletions.some((c) => c.session === session && c.type === type);
+  isSessionItemCompletedToday: (session, type) => {
+    const todays = get().completedSessions.filter((c) => isToday(c.timestamp));
+    return todays.some((c) => c.session === session && c.type === type);
   },
 
   hydrate: async () => {
     await HybridStorageService.initialize();
-    const [storedProgress, storedPlan, storedBookTrackSessions] = await Promise.all([
-      HybridStorageService.readBookProgress(STORAGE_KEYS.BOOK_PROGRESS),
-      HybridStorageService.readDailyPlan(STORAGE_KEYS.DAILY_PLAN),
-      HybridStorageService.readBookTrackSessions(STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS),
-    ]);
 
-    const state: Partial<BookStore> = {};
+    // Load completions
+    const completions =
+      (await HybridStorageService.readBookTrackSessions(
+        STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS
+      )) || [];
 
-    if (storedProgress) {
-      state.bookProgress = storedProgress;
-    } else {
-      // Initialize if no stored progress
-      get().initializeBookProgress();
-    }
-
-    if (storedPlan) {
-      // Only use stored plan if it's for today
-      if (isToday(storedPlan.timestamp)) {
-        state.dailyPlan = storedPlan;
+    // Load progress list and resolve active book
+    const stored: BookProgress[] =
+      (await HybridStorageService.readBookProgress(STORAGE_KEYS.BOOK_PROGRESS)) || [];
+    const progressList: BookProgress[] = books.map((b, idx) => {
+      const found = stored.find((p) => p.bookId === idx || p.bookTitle === b.book.title);
+      if (found) {
+        return {
+          bookId: typeof found.bookId === 'number' ? found.bookId : idx,
+          bookTitle: found.bookTitle || b.book.title,
+          completedWordTriples: found.completedWordTriples || [],
+          completedSentenceTriples: found.completedSentenceTriples || [],
+          progressTimestamp: found.progressTimestamp || 0,
+          isCompleted: !!found.isCompleted,
+        };
       }
-      // If plan is from a previous day, don't load it - getDailyContent will generate a new one
+      return {
+        bookId: idx,
+        bookTitle: b.book.title,
+        completedWordTriples: [],
+        completedSentenceTriples: [],
+        progressTimestamp: 0,
+        isCompleted: false,
+      };
+    });
+
+    // Determine which books are completed based on current content lengths (normalize)
+    for (const p of progressList) {
+      const book = books[p.bookId];
+      if (!book) continue;
+      const totalWordTriples = book.words.filter((w) => (w?.length || 0) > 0).length;
+      const totalSentenceTriples = book.sentences.filter((s) => (s?.length || 0) > 0).length;
+      p.isCompleted =
+        (p.completedWordTriples?.length || 0) >= totalWordTriples &&
+        (p.completedSentenceTriples?.length || 0) >= totalSentenceTriples;
     }
 
-    if (storedBookTrackSessions) {
-      state.bookTrackSessionCompletions = storedBookTrackSessions;
-    }
+    const active = progressList.find((p) => !p.isCompleted) || progressList[0];
 
-    if (Object.keys(state).length > 0) {
-      set(state);
-    }
-  },
-
-  clearDailyPlan: () => {
-    set({ dailyPlan: null });
-    HybridStorageService.clear(STORAGE_KEYS.DAILY_PLAN);
+    set({ activeBookProgress: active, completedSessions: completions });
   },
 }));

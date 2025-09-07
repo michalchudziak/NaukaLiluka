@@ -14,7 +14,7 @@ export default function ReadingScreen() {
   const noRepStore = useNoRepStore();
   const bookStore = useBookStore();
   const isNoRepPathCompleted = noRepStore.isNoRepPathCompletedToday();
-  const isBookTrackCompleted = bookStore.isBookTrackCompletedToday();
+  const isBookTrackCompleted = bookStore.isDayCompleted();
 
   return (
     <ThemedView style={styles.container}>

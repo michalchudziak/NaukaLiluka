@@ -37,10 +37,10 @@ export default function MyDayScreen() {
       const routine1 = isNoRepPathCompletedToday();
       setIsNoRepCompleted(routine1);
 
-      const todayCompletions = bookStore.bookTrackSessionCompletions.filter((c) =>
+      const todayCompletions = bookStore.completedSessions.filter((c) =>
         isToday(c.timestamp)
       );
-      const plan = bookStore.dailyPlan;
+      const plan = bookStore.getDailyData();
 
       let routine2 = false;
       let routine3 = false;
@@ -110,8 +110,9 @@ export default function MyDayScreen() {
     return () => clearInterval(interval);
   }, [
     isNoRepPathCompletedToday,
-    bookStore.bookTrackSessionCompletions,
-    bookStore.dailyPlan,
+    bookStore.completedSessions,
+    bookStore.getDailyData,
+    bookStore.activeBookProgress,
     drawingsStore,
     isMathSessionCompletedToday,
     isEqSessionCompletedToday,

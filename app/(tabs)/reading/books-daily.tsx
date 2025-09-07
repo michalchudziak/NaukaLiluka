@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ThemedText } from '@/components/ThemedText';
@@ -15,28 +15,17 @@ export default function BooksDailyScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const { dailyPlan, getDailyContent, markSessionItemCompleted, isSessionItemCompletedToday } =
-    useBookStore();
-
-  useEffect(() => {
-    const initializeDaily = async () => {
-      setIsLoading(true);
-      await getDailyContent();
-      setIsLoading(false);
-    };
-
-    initializeDaily();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getDailyContent]);
+  const { getDailyData, markSessionItemCompleted, isSessionItemCompletedToday } = useBookStore();
+  // Subscribe to slices to trigger recomputation on changes
+  const activeBook = useBookStore((s) => s.activeBookProgress);
+  const completedSessions = useBookStore((s) => s.completedSessions);
+  const dailyPlan = useMemo(() => getDailyData(), [getDailyData, activeBook, completedSessions]);
+  const [isLoading] = useState(false);
 
   const handleTrackPress = (
     sessionId: 'session1' | 'session2' | 'session3',
     type: 'words' | 'sentences'
   ) => {
-    if (!dailyPlan) return;
-
     const sessionContent = dailyPlan.sessions[sessionId];
     const items = type === 'words' ? sessionContent.words : sessionContent.sentences;
 

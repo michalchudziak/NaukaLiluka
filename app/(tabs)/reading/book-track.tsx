@@ -13,8 +13,8 @@ export default function BookTrackScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
-  const isBookTrackCompletedToday = useBookStore((state) => state.isBookTrackCompletedToday);
-  const isTrainingCompleted = isBookTrackCompletedToday();
+  const isDayCompleted = useBookStore((state) => state.isDayCompleted);
+  const isTrainingCompleted = isDayCompleted();
 
   const handleTrainingPress = () => {
     router.push('/reading/books-daily');

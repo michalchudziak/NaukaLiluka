@@ -10,7 +10,7 @@ import type { Book } from '@/types/book';
 
 export default function BooksListScreen() {
   const router = useRouter();
-  const { bookProgress } = useBookStore();
+  const activeBook = useBookStore((s) => s.activeBookProgress);
   const settings = useSettingsStore();
   const bottomTabBarHeight = useBottomTabBarHeight();
 
@@ -19,8 +19,9 @@ export default function BooksListScreen() {
   };
 
   const renderBook = ({ item, index }: { item: Book; index: number }) => {
-    const progress = bookProgress.find((p) => p.bookId === item.book.title);
-    const isCompleted = progress?.isCompleted ?? false;
+    const isCompleted =
+      index < (activeBook?.bookId ?? 0) ||
+      (index === (activeBook?.bookId ?? 0) && (activeBook?.isCompleted ?? false));
     const allowAllBooks = settings.reading.books.allowAllBooks;
     const isAccessible = allowAllBooks || isCompleted;
 

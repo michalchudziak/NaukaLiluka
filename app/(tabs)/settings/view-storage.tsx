@@ -13,7 +13,6 @@ import { HybridStorageService } from '@/services/hybrid-storage';
 interface StorageData {
   bookStore: {
     bookProgress: any;
-    dailyPlan: any;
     trackSessions: any;
   };
   mathStore: {
@@ -81,7 +80,6 @@ export default function ViewStorageScreen() {
     try {
       const [
         bookProgress,
-        dailyPlan,
         trackSessions,
         mathProgress,
         mathSessions,
@@ -94,8 +92,7 @@ export default function ViewStorageScreen() {
         allKeys,
       ] = await Promise.all([
         HybridStorageService.readBookProgress('progress.books'),
-        HybridStorageService.readDailyPlan('progress.books.daily-plan'),
-        HybridStorageService.readBookTrackSessions('progress.books.track'),
+        HybridStorageService.readBookTrackSessions('routines.reading.book-track.sessions'),
         HybridStorageService.readMathProgress('progress.math'),
         HybridStorageService.readMathSessionCompletions('routines.math.sessions'),
         HybridStorageService.readNoRepWords('progress.reading.no-rep.words'),
@@ -110,7 +107,6 @@ export default function ViewStorageScreen() {
       setData({
         bookStore: {
           bookProgress: bookProgress || null,
-          dailyPlan: dailyPlan || null,
           trackSessions: trackSessions || null,
         },
         mathStore: {
@@ -163,7 +159,8 @@ export default function ViewStorageScreen() {
     }
 
     return progress.map((bookProgress: any, index: number) => {
-      const bookData = books.find((b) => b.book.title === bookProgress.bookId);
+      const byIndex = books[bookProgress.bookId];
+      const bookData = byIndex || books.find((b) => b.book.title === bookProgress.bookTitle);
 
       // Get completed words and sentences based on completed triple indices
       const completedWords: string[] = [];
@@ -184,8 +181,10 @@ export default function ViewStorageScreen() {
       }
 
       return (
-        <View key={bookProgress.bookId ?? index} style={styles.bookItem}>
-          <ThemedText style={styles.bookName}>{bookProgress.bookId}</ThemedText>
+        <View key={(bookProgress.bookTitle ?? bookProgress.bookId) ?? index} style={styles.bookItem}>
+          <ThemedText style={styles.bookName}>
+            {bookProgress.bookTitle || String(bookProgress.bookId)}
+          </ThemedText>
           <View style={styles.progressInfo}>
             {completedWords.length > 0 && (
               <View style={styles.completedSection}>
@@ -550,7 +549,7 @@ export default function ViewStorageScreen() {
           {renderBookProgress()}
         </InfoCard>
 
-        <InfoCard title={t('settings.viewStorage.dailyPlanTitle')}>{renderDailyPlan()}</InfoCard>
+        {/* Daily plan is now computed on the fly; no persisted plan to display */}
 
         <InfoCard title={t('settings.viewStorage.noRepProgressTitle')}>
           {renderNoRepProgress()}

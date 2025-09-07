@@ -25,8 +25,14 @@
   CREATE TABLE public.book_progress (
       id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
       book_id TEXT NOT NULL UNIQUE,
+      -- New schema fields (backward-compatible):
+      -- numeric index of the book in the app and human title
+      book_index INTEGER,
+      book_title TEXT,
       completed_word_triples INTEGER[] DEFAULT '{}',
       completed_sentence_triples INTEGER[] DEFAULT '{}',
+      -- timestamp of the last day when words progressed
+      progress_timestamp TIMESTAMPTZ,
       is_completed BOOLEAN DEFAULT false,
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -174,6 +180,14 @@
     ADD COLUMN IF NOT EXISTS math_numbers_interval INTEGER DEFAULT 1000;
   ALTER TABLE public.settings
     ADD COLUMN IF NOT EXISTS math_numbers_number_count INTEGER DEFAULT 10;
+
+  -- Migration: extend book_progress with new fields (backward-compatible)
+  ALTER TABLE public.book_progress
+    ADD COLUMN IF NOT EXISTS book_index INTEGER;
+  ALTER TABLE public.book_progress
+    ADD COLUMN IF NOT EXISTS book_title TEXT;
+  ALTER TABLE public.book_progress
+    ADD COLUMN IF NOT EXISTS progress_timestamp TIMESTAMPTZ;
 
 
   -- Initialize default data
