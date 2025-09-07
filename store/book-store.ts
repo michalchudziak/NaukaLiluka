@@ -11,8 +11,7 @@ const STORAGE_KEYS = {
 interface BookProgress {
   bookId: number;
   bookTitle: string;
-  completedWordTriples: number[]; // indices of completed word triples
-  completedSentenceTriples: number[]; // indices of completed sentence triples
+  completedTriples: number[]; // indices completed when day fully done
   progressTimestamp: number;
   isCompleted: boolean;
 }
@@ -90,8 +89,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
   activeBookProgress: {
     bookId: 0,
     bookTitle: books[0]?.book.title || 'Unknown',
-    completedWordTriples: [],
-    completedSentenceTriples: [],
+    completedTriples: [],
     progressTimestamp: 0,
     isCompleted: false,
   },
@@ -123,35 +121,25 @@ export const useBookStore = create<BookStore>((set, get) => ({
     const wordsTriples = chosenBook.words;
     const sentencesTriples = chosenBook.sentences;
 
-    // Decide which triple indices to use
+    // Decide which triple index to use for both words and sentences
     const today = new Date();
-    const reuseToday = active.progressTimestamp && isToday(active.progressTimestamp);
-
-    const nextWordIndex = (() => {
-      if (reuseToday && active.completedWordTriples.length > 0) {
-        return active.completedWordTriples[active.completedWordTriples.length - 1];
+    const reuseToday = !!active.progressTimestamp && isToday(active.progressTimestamp);
+    const nextTripleIndex = (() => {
+      if (reuseToday && active.completedTriples.length > 0) {
+        // Reuse last completed triple for today
+        return active.completedTriples[active.completedTriples.length - 1];
       }
-      // next undone index
-      for (let i = 0; i < wordsTriples.length; i++) {
-        if (!active.completedWordTriples.includes(i)) return i;
+      const maxLen = Math.max(wordsTriples.length, sentencesTriples.length);
+      for (let i = 0; i < maxLen; i++) {
+        if (!active.completedTriples.includes(i)) return i;
       }
       // if everything is completed, stick to the last one
-      return Math.max(0, wordsTriples.length - 1);
-    })();
-
-    const nextSentenceIndex = (() => {
-      if (reuseToday && active.completedSentenceTriples.length > 0) {
-        return active.completedSentenceTriples[active.completedSentenceTriples.length - 1];
-      }
-      for (let i = 0; i < sentencesTriples.length; i++) {
-        if (!active.completedSentenceTriples.includes(i)) return i;
-      }
-      return Math.max(0, sentencesTriples.length - 1);
+      return Math.max(0, maxLen - 1);
     })();
 
     // Build session content. Words appear in all three sessions with different orderings.
-    const wordTriple = wordsTriples[nextWordIndex] || [];
-    const sentenceTriple = sentencesTriples[nextSentenceIndex] || [];
+    const wordTriple = wordsTriples[nextTripleIndex] || [];
+    const sentenceTriple = sentencesTriples[nextTripleIndex] || [];
     const permutations = getUniquePermutations(wordTriple);
 
     const todays = state.completedSessions.filter((c) => isToday(c.timestamp));
@@ -164,8 +152,8 @@ export const useBookStore = create<BookStore>((set, get) => ({
     return {
       timestamp: today.getTime(),
       bookId: chosenBook.book.title,
-      selectedWordTripleIndex: nextWordIndex,
-      selectedSentenceTripleIndex: nextSentenceIndex,
+      selectedWordTripleIndex: nextTripleIndex,
+      selectedSentenceTripleIndex: nextTripleIndex,
       sessions: {
         session1: {
           words: permutations[0] || [],
@@ -203,35 +191,26 @@ export const useBookStore = create<BookStore>((set, get) => ({
 
     const nextState = { ...active };
 
-    if (type === 'words') {
-      // Check if all word sessions are completed today
-      const todays = get().completedSessions.filter((c) => isToday(c.timestamp));
-      const wordsDone = ['session1', 'session2', 'session3'].every((s) =>
-        todays.some((c) => c.session === (s as any) && c.type === 'words')
-      );
-      if (wordsDone && !nextState.completedWordTriples.includes(daily.selectedWordTripleIndex)) {
-        nextState.completedWordTriples = [
-          ...nextState.completedWordTriples,
-          daily.selectedWordTripleIndex,
-        ];
-        nextState.progressTimestamp = Date.now();
-      }
-    } else if (type === 'sentences') {
-      if (!nextState.completedSentenceTriples.includes(daily.selectedSentenceTripleIndex)) {
-        nextState.completedSentenceTriples = [
-          ...nextState.completedSentenceTriples,
-          daily.selectedSentenceTripleIndex,
-        ];
-      }
+    // Only mark the triple as completed when the full day is completed
+    const dayCompleted = get().isDayCompleted();
+    if (dayCompleted && !nextState.completedTriples.includes(daily.selectedWordTripleIndex)) {
+      nextState.completedTriples = [...nextState.completedTriples, daily.selectedWordTripleIndex];
+      // Do not update any other fields when partial; progressTimestamp intentionally unchanged on partials
+      nextState.progressTimestamp = Date.now();
     }
 
     // Determine if book is completed (count only non-empty triples)
-    const totalWordTriples = book.words.filter((w) => (w?.length || 0) > 0).length;
-    const totalSentenceTriples = book.sentences.filter((s) => (s?.length || 0) > 0).length;
-    const wordsCompletedCount = nextState.completedWordTriples.length;
-    const sentencesCompletedCount = nextState.completedSentenceTriples.length;
-    nextState.isCompleted =
-      wordsCompletedCount >= totalWordTriples && sentencesCompletedCount >= totalSentenceTriples;
+    const requiredDays = (() => {
+      const maxLen = Math.max(book.words.length, book.sentences.length);
+      let count = 0;
+      for (let i = 0; i < maxLen; i++) {
+        const hasWords = (book.words[i]?.length || 0) > 0;
+        const hasSentences = (book.sentences[i]?.length || 0) > 0;
+        if (hasWords || hasSentences) count++;
+      }
+      return count;
+    })();
+    nextState.isCompleted = (nextState.completedTriples.length || 0) >= requiredDays;
 
     set({ activeBookProgress: nextState });
 
@@ -248,8 +227,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
           return {
             bookId: typeof found.bookId === 'number' ? found.bookId : idx,
             bookTitle: found.bookTitle || b.book.title,
-            completedWordTriples: found.completedWordTriples || [],
-            completedSentenceTriples: found.completedSentenceTriples || [],
+            completedTriples: (found.completedTriples || []) as number[],
             progressTimestamp: found.progressTimestamp || 0,
             isCompleted: !!found.isCompleted,
           };
@@ -257,8 +235,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
         return {
           bookId: idx,
           bookTitle: b.book.title,
-          completedWordTriples: [],
-          completedSentenceTriples: [],
+          completedTriples: [],
           progressTimestamp: 0,
           isCompleted: false,
         };
@@ -315,8 +292,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
         return {
           bookId: typeof found.bookId === 'number' ? found.bookId : idx,
           bookTitle: found.bookTitle || b.book.title,
-          completedWordTriples: found.completedWordTriples || [],
-          completedSentenceTriples: found.completedSentenceTriples || [],
+          completedTriples: (found.completedTriples || []) as number[],
           progressTimestamp: found.progressTimestamp || 0,
           isCompleted: !!found.isCompleted,
         };
@@ -324,8 +300,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
       return {
         bookId: idx,
         bookTitle: b.book.title,
-        completedWordTriples: [],
-        completedSentenceTriples: [],
+        completedTriples: [],
         progressTimestamp: 0,
         isCompleted: false,
       };
@@ -335,11 +310,17 @@ export const useBookStore = create<BookStore>((set, get) => ({
     for (const p of progressList) {
       const book = books[p.bookId];
       if (!book) continue;
-      const totalWordTriples = book.words.filter((w) => (w?.length || 0) > 0).length;
-      const totalSentenceTriples = book.sentences.filter((s) => (s?.length || 0) > 0).length;
-      p.isCompleted =
-        (p.completedWordTriples?.length || 0) >= totalWordTriples &&
-        (p.completedSentenceTriples?.length || 0) >= totalSentenceTriples;
+      const requiredDays = (() => {
+        const maxLen = Math.max(book.words.length, book.sentences.length);
+        let count = 0;
+        for (let i = 0; i < maxLen; i++) {
+          const hasWords = (book.words[i]?.length || 0) > 0;
+          const hasSentences = (book.sentences[i]?.length || 0) > 0;
+          if (hasWords || hasSentences) count++;
+        }
+        return count;
+      })();
+      p.isCompleted = (p.completedTriples?.length || 0) >= requiredDays;
     }
 
     const active = progressList.find((p) => !p.isCompleted) || progressList[0];

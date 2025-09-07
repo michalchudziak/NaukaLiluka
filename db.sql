@@ -29,8 +29,8 @@
       -- numeric index of the book in the app and human title
       book_index INTEGER,
       book_title TEXT,
-      completed_word_triples INTEGER[] DEFAULT '{}',
-      completed_sentence_triples INTEGER[] DEFAULT '{}',
+      -- unified list of completed day indices (only when both words and sentences are completed that day)
+      completed_triples INTEGER[] DEFAULT '{}',
       -- timestamp of the last day when words progressed
       progress_timestamp TIMESTAMPTZ,
       is_completed BOOLEAN DEFAULT false,
@@ -188,6 +188,44 @@
     ADD COLUMN IF NOT EXISTS book_title TEXT;
   ALTER TABLE public.book_progress
     ADD COLUMN IF NOT EXISTS progress_timestamp TIMESTAMPTZ;
+
+  -- Migration: add unified completed_triples column and backfill from previous separate arrays
+  ALTER TABLE public.book_progress
+    ADD COLUMN IF NOT EXISTS completed_triples INTEGER[] DEFAULT '{}';
+
+  -- Backfill rule: set completed_triples to intersection of completed_word_triples and completed_sentence_triples
+  -- Note: cannot guarantee same-day completion historically; this approximates by requiring both present
+  DO $$
+  BEGIN
+    IF EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'book_progress' AND column_name = 'completed_word_triples'
+    ) AND EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = 'public' AND table_name = 'book_progress' AND column_name = 'completed_sentence_triples'
+    ) THEN
+      UPDATE public.book_progress bp
+      SET completed_triples = (
+        SELECT COALESCE(
+          ARRAY(
+            SELECT DISTINCT x
+            FROM UNNEST(COALESCE(bp.completed_word_triples, '{}')) AS x
+            WHERE x = ANY(COALESCE(bp.completed_sentence_triples, '{}'))
+            ORDER BY x
+          ),
+          '{}'
+        )
+      )
+      WHERE (bp.completed_triples IS NULL OR cardinality(bp.completed_triples) = 0);
+    END IF;
+  END $$;
+
+  -- Drop legacy columns now that data is unified
+  ALTER TABLE public.book_progress
+    DROP COLUMN IF EXISTS completed_word_triples,
+    DROP COLUMN IF EXISTS completed_sentence_triples;
 
 
   -- Initialize default data

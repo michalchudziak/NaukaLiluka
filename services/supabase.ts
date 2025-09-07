@@ -131,16 +131,17 @@ export class SupabaseService {
       return [];
     }
 
-    return data.map((item) => ({
-      bookId: typeof item.book_index === 'number' ? item.book_index : 0,
-      bookTitle: item.book_title || item.book_id, // fallback for old schema
-      completedWordTriples: item.completed_word_triples || [],
-      completedSentenceTriples: item.completed_sentence_triples || [],
-      progressTimestamp: item.progress_timestamp
-        ? new Date(item.progress_timestamp).getTime()
-        : 0,
-      isCompleted: item.is_completed,
-    }));
+    return data.map((item) => {
+      return {
+        bookId: typeof item.book_index === 'number' ? item.book_index : 0,
+        bookTitle: item.book_title || item.book_id, // fallback for old schema
+        completedTriples: item.completed_triples || [],
+        progressTimestamp: item.progress_timestamp
+          ? new Date(item.progress_timestamp).getTime()
+          : 0,
+        isCompleted: item.is_completed,
+      };
+    });
   }
 
   static async updateBookProgress(bookProgress: any[]) {
@@ -150,8 +151,7 @@ export class SupabaseService {
           // Use new identity columns only
           book_index: progress.bookId,
           book_title: progress.bookTitle || String(progress.bookId),
-          completed_word_triples: progress.completedWordTriples,
-          completed_sentence_triples: progress.completedSentenceTriples,
+          completed_triples: progress.completedTriples,
           progress_timestamp: progress.progressTimestamp
             ? new Date(progress.progressTimestamp).toISOString()
             : null,

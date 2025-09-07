@@ -167,13 +167,10 @@ export default function ViewStorageScreen() {
       const completedSentences: string[] = [];
 
       if (bookData) {
-        bookProgress.completedWordTriples?.forEach((tripleIndex: number) => {
+        (bookProgress.completedTriples || []).forEach((tripleIndex: number) => {
           if (bookData.words[tripleIndex]) {
             completedWords.push(...bookData.words[tripleIndex]);
           }
-        });
-
-        bookProgress.completedSentenceTriples?.forEach((tripleIndex: number) => {
           if (bookData.sentences[tripleIndex]) {
             completedSentences.push(...bookData.sentences[tripleIndex]);
           }
