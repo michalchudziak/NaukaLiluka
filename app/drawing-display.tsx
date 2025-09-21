@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Image, Pressable, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { AutoSizeText } from '@/components/AutoSizeText';
+import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import drawingSets from '@/content/drawings';
 import { useDrawingsStore } from '@/store/drawings-store';
@@ -25,6 +26,7 @@ export default function DrawingDisplayScreen() {
   const [imageOrder, setImageOrder] = useState<number[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasMarkedRef = useRef(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const opacity = useSharedValue(1);
 
@@ -73,11 +75,20 @@ export default function DrawingDisplayScreen() {
     [opacity]
   );
 
+  const clearCurrentInterval = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
-    if (!imageSet) {
+    if (!imageSet || isPaused) {
+      clearCurrentInterval();
       return;
     }
 
+    clearCurrentInterval();
     intervalRef.current = setInterval(() => {
       fadeTransition(() => {
         setCurrentImageIndex((prevIndex) => prevIndex + 1);
@@ -85,11 +96,9 @@ export default function DrawingDisplayScreen() {
     }, settings.drawings.interval);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      clearCurrentInterval();
     };
-  }, [imageSet, settings.drawings.interval, fadeTransition]);
+  }, [imageSet, settings.drawings.interval, fadeTransition, isPaused, clearCurrentInterval]);
 
   useEffect(() => {
     if (!imageSet || imageOrder.length === 0) {
@@ -104,33 +113,74 @@ export default function DrawingDisplayScreen() {
     }
   }, [currentImageIndex, imageOrder, imageSet, router.back]);
 
+  const currentImage =
+    imageSet && currentImageIndex >= 0 && currentImageIndex < imageOrder.length
+      ? imageSet.images[imageOrder[currentImageIndex]]
+      : null;
+
+  const factsToDisplay = useMemo(() => {
+    if (!settings.drawings.showFacts || !currentImage?.facts || currentImage.facts.length === 0) {
+      return [];
+    }
+
+    const pool = [...currentImage.facts];
+    const desiredCount = Math.min(3, pool.length);
+    const selected: string[] = [];
+
+    while (selected.length < desiredCount && pool.length > 0) {
+      const index = Math.floor(Math.random() * pool.length);
+      const [fact] = pool.splice(index, 1);
+      selected.push(fact);
+    }
+
+    return selected;
+  }, [currentImage, settings.drawings.showFacts]);
+
   if (!imageSet || imageOrder.length === 0 || currentImageIndex >= imageOrder.length) {
     return null;
   }
 
-  const handlePress = () => {
-    router.back();
+  const handlePressIn = () => {
+    setIsPaused(true);
+    clearCurrentInterval();
+  };
+
+  const handlePressOut = () => {
+    setIsPaused(false);
   };
 
   if (currentImageIndex === -1) {
     return (
-      <Pressable onPress={handlePress} style={styles.container}>
+      <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut} style={styles.container}>
         <AnimatedThemedView style={[styles.content, animatedStyle]} />
       </Pressable>
     );
   }
 
-  const currentImage = imageSet.images[imageOrder[currentImageIndex]];
+  if (!currentImage) {
+    return null;
+  }
 
   return (
-    <Pressable onPress={handlePress} style={styles.container}>
+    <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut} style={styles.container}>
       <AnimatedThemedView style={[styles.content, animatedStyle]}>
-        <Image source={currentImage.image} style={styles.image} resizeMode="contain" />
-        {settings.drawings.showCaptions && (
-          <ThemedView style={styles.captionContainer}>
-            <AutoSizeText color="#000000" style={styles.captionText}>
-              {currentImage.description}
-            </AutoSizeText>
+        <View style={[styles.mainContent]}>
+          <Image source={currentImage.image} style={styles.image} resizeMode="contain" />
+          {settings.drawings.showCaptions && (
+            <ThemedView style={styles.captionContainer}>
+              <AutoSizeText color="#000000" style={styles.captionText}>
+                {currentImage.description}
+              </AutoSizeText>
+            </ThemedView>
+          )}
+        </View>
+        {settings.drawings.showFacts && factsToDisplay.length > 0 && (
+          <ThemedView style={styles.factsSidebar}>
+            {factsToDisplay.map((fact, index) => (
+              <ThemedText key={`${currentImage.description}-${index}`} style={styles.factText}>
+                • {fact}
+              </ThemedText>
+            ))}
           </ThemedView>
         )}
       </AnimatedThemedView>
@@ -148,6 +198,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
+  mainContent: {
+    alignItems: 'center',
+  },
+  mainContentWithSidebar: {
+    width: '80%',
+  },
   image: {
     maxHeight: '70%',
     maxWidth: '90%',
@@ -160,5 +216,22 @@ const styles = StyleSheet.create({
   captionText: {
     fontSize: 24,
     fontWeight: '600',
+  },
+  factsSidebar: {
+    position: 'absolute',
+    right: 20,
+    top: 20,
+    bottom: 20,
+    maxWidth: '20%',
+    width: '20%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  factText: {
+    color: '#C3C3C3',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 12,
   },
 });

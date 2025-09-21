@@ -48,6 +48,7 @@ export class SupabaseService {
           showCaptions: settings.drawings_show_captions,
           interval: settings.drawings_interval,
           randomOrder: settings.drawings_random_order,
+          showFacts: settings.drawings_show_facts ?? false,
         },
         math: {
           equations: {
@@ -83,6 +84,7 @@ export class SupabaseService {
         showCaptions: settings.drawings_show_captions,
         interval: settings.drawings_interval,
         randomOrder: settings.drawings_random_order,
+        showFacts: settings.drawings_show_facts ?? false,
       },
       math: {
         equations: {
@@ -110,6 +112,7 @@ export class SupabaseService {
         drawings_show_captions: settings.drawings.showCaptions,
         drawings_interval: settings.drawings.interval,
         drawings_random_order: settings.drawings.randomOrder,
+        drawings_show_facts: settings.drawings.showFacts,
         math_equations_interval: settings.math?.equations?.interval ?? 1500,
         math_equations_equation_count: settings.math?.equations?.equationCount ?? 5,
         math_numbers_interval: settings.math?.numbers?.interval ?? 1000,

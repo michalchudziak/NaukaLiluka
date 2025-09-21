@@ -22,6 +22,7 @@ interface SettingsState {
     showCaptions: boolean;
     interval: number;
     randomOrder: boolean;
+    showFacts: boolean;
   };
   math: {
     equations: {
@@ -42,6 +43,7 @@ interface SettingsState {
   updateReadingBooksAllowAll: (value: boolean) => void;
   updateReadingWordSpacing: (value: number) => void;
   updateDrawingsShowCaptions: (value: boolean) => void;
+  updateDrawingsShowFacts: (value: boolean) => void;
   updateDrawingsInterval: (value: number) => void;
   updateDrawingsRandomOrder: (value: boolean) => void;
   updateUseCloudData: (value: boolean) => void;
@@ -71,6 +73,7 @@ const defaultSettings = {
     showCaptions: true,
     interval: 1500,
     randomOrder: false,
+    showFacts: false,
   },
   math: {
     equations: {
@@ -229,6 +232,24 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     });
   },
 
+  updateDrawingsShowFacts: (value: boolean) => {
+    set((state) => {
+      const newState = {
+        ...state,
+        drawings: {
+          ...state.drawings,
+          showFacts: value,
+        },
+      };
+      HybridStorageService.writeSettings(STORAGE_KEY, {
+        reading: newState.reading,
+        drawings: newState.drawings,
+        math: newState.math,
+      });
+      return newState;
+    });
+  },
+
   updateDrawingsInterval: (value: number) => {
     set((state) => {
       const newState = {
@@ -364,10 +385,45 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const useCloudData = await HybridStorageService.getUseCloudData();
     const stored = await HybridStorageService.readSettings(STORAGE_KEY);
     if (stored) {
+      const mergedReading = {
+        ...defaultSettings.reading,
+        ...stored.reading,
+        noRep: {
+          ...defaultSettings.reading.noRep,
+          ...(stored.reading?.noRep ?? {}),
+        },
+        interval: {
+          ...defaultSettings.reading.interval,
+          ...(stored.reading?.interval ?? {}),
+        },
+        books: {
+          ...defaultSettings.reading.books,
+          ...(stored.reading?.books ?? {}),
+        },
+      };
+
+      const mergedDrawings = {
+        ...defaultSettings.drawings,
+        ...(stored.drawings ?? {}),
+      };
+
+      const mergedMath = {
+        ...defaultSettings.math,
+        ...stored.math,
+        equations: {
+          ...defaultSettings.math.equations,
+          ...(stored.math?.equations ?? {}),
+        },
+        numbers: {
+          ...defaultSettings.math.numbers,
+          ...(stored.math?.numbers ?? {}),
+        },
+      };
+
       set({
-        reading: stored.reading || defaultSettings.reading,
-        drawings: stored.drawings || defaultSettings.drawings,
-        math: stored.math || defaultSettings.math,
+        reading: mergedReading,
+        drawings: mergedDrawings,
+        math: mergedMath,
         useCloudData,
       });
     } else {

@@ -87,6 +87,8 @@
       "description": "Zarządzaj ustawieniami wyświetlania obrazków.",
       "showCaptions": "Pokaż podpisy",
       "showCaptionsDescription": "Wyświetlaj podpisy pod obrazkami.",
+      "showFacts": "Pokaż ciekawostki",
+      "showFactsDescription": "Wyświetlaj losowe ciekawostki o aktualnym obrazku.",
       "interval": "Czas wyświetlania",
       "randomOrder": "Kolejność losowa",
       "randomOrderDescription": "Wyświetlaj obrazki w losowej kolejności."

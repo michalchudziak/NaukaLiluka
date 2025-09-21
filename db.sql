@@ -13,6 +13,7 @@
       drawings_show_captions BOOLEAN DEFAULT true,
       drawings_interval INTEGER DEFAULT 1500,
       drawings_random_order BOOLEAN DEFAULT false,
+      drawings_show_facts BOOLEAN DEFAULT false,
       math_equations_interval INTEGER DEFAULT 1500,
       math_equations_equation_count INTEGER DEFAULT 5,
       math_numbers_interval INTEGER DEFAULT 1000,

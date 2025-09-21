@@ -116,6 +116,7 @@ export default function DrawingsSettingsScreen() {
   const {
     drawings,
     updateDrawingsShowCaptions,
+    updateDrawingsShowFacts,
     updateDrawingsInterval,
     updateDrawingsRandomOrder,
     hydrate,
@@ -139,6 +140,15 @@ export default function DrawingsSettingsScreen() {
               description={t('settings.drawings.showCaptionsDescription')}
               value={drawings.showCaptions}
               onValueChange={updateDrawingsShowCaptions}
+            />
+
+            <View style={styles.separator} />
+
+            <SwitchSetting
+              label={t('settings.drawings.showFacts')}
+              description={t('settings.drawings.showFactsDescription')}
+              value={drawings.showFacts}
+              onValueChange={updateDrawingsShowFacts}
             />
 
             <View style={styles.separator} />

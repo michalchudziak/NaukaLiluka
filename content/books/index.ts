@@ -11,4 +11,16 @@ import wakacje from './wakacje/content';
 import zakupy from './zakupy/content';
 import zoo from './zoo/content';
 
-export const books: Book[] = [rodzina, dom, ogrod, las, wakacje, zoo, obiadUdziadkow, zakupy, placZabaw, kuchnia, urodziny];
+export const books: Book[] = [
+  rodzina,
+  dom,
+  ogrod,
+  las,
+  wakacje,
+  zoo,
+  obiadUdziadkow,
+  zakupy,
+  placZabaw,
+  kuchnia,
+  urodziny,
+];
