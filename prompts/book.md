@@ -150,3 +150,6 @@ Words known from previous books:
 ['tańczy', 'śmieje', 'głośno'],
 ['muzykę', 'gra', 'cicho'],
 ['zmęczony', 'zmęczona', 'zasypia'],
+['piknik', 'kocu', 'kosz'],
+['jabłko', 'sok', 'truskawki'],
+['słońce', 'świeci', 'smakuje'],
