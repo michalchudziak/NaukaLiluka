@@ -3,6 +3,7 @@ import dom from './dom/content';
 import deszcz from './deszcz/content';
 import kuchnia from './kuchnia/content';
 import las from './las/content';
+import muzyka from './muzyka/content';
 import obiadUdziadkow from './obiad-u-dziadkow/content';
 import ogrod from './ogrod/content';
 import park from './park/content';
@@ -27,4 +28,5 @@ export const books: Book[] = [
   urodziny,
   park,
   deszcz,
+  muzyka,
 ];
