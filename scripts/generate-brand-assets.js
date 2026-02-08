@@ -19,6 +19,7 @@ const THEME = {
   card: '#fffdf5',
   accent: '#f8f6df',
   warning: '#e7b95a',
+  splashBackground: '#2f8653',
 };
 
 const assetsToGenerate = [
@@ -28,7 +29,7 @@ const assetsToGenerate = [
       'Design a premium, child-friendly mobile app icon for a reading-learning app.',
       'Square composition suitable for iOS and Android launcher icon.',
       `Use only this fixed palette and close tints/shades: ${THEME.background}, ${THEME.backgroundAlt}, ${THEME.primary}, ${THEME.primaryStrong}, ${THEME.card}, ${THEME.accent}, ${THEME.warning}.`,
-      `Background should be a light tone matching ${THEME.background}.`,
+      `Use a clear green app-icon background close to ${THEME.splashBackground}.`,
       'Main motif: open storybook shaped like a gentle forest camp scene, with simple leaves and small glow dots.',
       'Flat modern vector illustration, soft depth, clean edges, high contrast, minimal clutter.',
       'No text, no letters, no numbers, no watermark, no logo marks.',
@@ -38,12 +39,13 @@ const assetsToGenerate = [
   {
     fileName: 'splash-icon.png',
     prompt: [
-      'Create a centered splash emblem for a children reading app as a standalone symbol.',
+      'Create a centered splash emblem for a children reading app as a standalone symbol only.',
       'The output must be a PNG with transparent background and absolutely no background panel.',
       'Only the central emblem should be visible, with large transparent margins around it.',
       `Keep the exact same palette: ${THEME.background}, ${THEME.backgroundAlt}, ${THEME.primary}, ${THEME.primaryStrong}, ${THEME.card}, ${THEME.accent}, ${THEME.warning}.`,
       'Main motif: open storybook with subtle forest leaves and three tiny glow dots above it.',
-      'Flat modern vector illustration, friendly, clean, calm, no glow effects outside the emblem.',
+      'Flat modern vector illustration, friendly, clean, calm.',
+      'No glow halo, no gradients, no drop shadow, no vignette.',
       'No text, no letters, no numbers, no watermark.',
     ].join(' '),
     extraParams: {

@@ -14,8 +14,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/app-icon.png",
-        "backgroundColor": "#eef6e7"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#2f8653"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.michalchudziak.NaukaLiluka"
@@ -33,7 +33,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#eef6e7"
+          "backgroundColor": "#2f8653"
         }
       ]
     ],
