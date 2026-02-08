@@ -36,6 +36,9 @@ Rules for creating sentences:
 - Sentences should have at least 3 words.
 - Sentences in book.pages should be versatile: vary structure and details while keeping language simple for children.
 - Each sentence in book.pages should move the story forward.
+- Every sentence must sound natural to a native Polish speaker. Use natural Polish word order, especially with time and adverbs.
+- Prefer natural order like: "Wczoraj byłaś bardzo miła." instead of "Byłaś bardzo miła wczoraj."
+- Prefer natural order like: "Karolcia głośno się śmieje." instead of "Karolcia śmieje się głośno."
 - In the current book sentences, you can only use words from the same or previous triplet, for example:
     From the previous book we know following words:
         ["brudna", "jest", "Karol"],
@@ -110,7 +113,7 @@ Words known from previous books:
 ["To", "tata", "Karolcia"],
 ["w", "domu", "siedzi"],
 ["Mama", "kanapie", "pracuje"],
-["Tata", "czyta", "książkę"]
+["Tata", "czyta", "książkę"],
 ["podlewa", "kwiaty", "trawę"],
 ["drzewo", "krzaki", "warzywa"],
 ["ogrodzie", "rosną", "piękne"],
@@ -144,3 +147,12 @@ Words known from previous books:
 ['deszcz', 'pada', 'parasol'],
 ['kalosze', 'kałuże', 'mokre'],
 ['chmury', 'ciemne', 'suszy'],
+['tańczy', 'śmieje', 'głośno'],
+['muzykę', 'gra', 'cicho'],
+['zmęczony', 'zmęczona', 'zasypia'],
+['piknik', 'kocu', 'kosz'],
+['jabłko', 'sok', 'truskawki'],
+['słońce', 'świeci', 'smakuje'],
+['rower', 'kask', 'dzwonek'],
+['ścieżce', 'pedałuje', 'hamuje'],
+['moście', 'zakręcie', 'spokojnie'],

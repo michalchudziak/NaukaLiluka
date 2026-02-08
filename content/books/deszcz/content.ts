@@ -21,7 +21,7 @@ const deszcz: Book = {
         image: require('./deszcz-page-04.png'),
       },
       {
-        sentences: ['Lora biegnie szybko do domu.'],
+        sentences: ['Lora szybko biegnie do domu.'],
         image: require('./deszcz-page-05.png'),
       },
       {

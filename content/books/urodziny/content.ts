@@ -45,7 +45,7 @@ const urodziny: Book = {
   ],
   sentences: [
     ['Karolcia ma urodziny.', 'Lora ma prezent.', 'Tata ma prezent.'],
-    ['Lora ma pięć lat.', 'Karolcia ma pięć lat.', 'Kto ma pięc lat?'],
+    ['Lora ma pięć lat.', 'Karolcia ma pięć lat.', 'Kto ma pięć lat?'],
     ['Ile lat ma tata?', 'Ile lat ma mama?', 'To są wesołe urodziny.'],
   ],
 };

@@ -9,7 +9,7 @@ const park: Book = {
         image: require('./park-page-01.png'),
       },
       {
-        sentences: ['W parku pies biegnie szybko.'],
+        sentences: ['W parku pies szybko biegnie.'],
         image: require('./park-page-02.png'),
       },
       {
@@ -17,7 +17,7 @@ const park: Book = {
         image: require('./park-page-03.png'),
       },
       {
-        sentences: ['Karolcia też biega wesoło na placu.'],
+        sentences: ['Karolcia też wesoło biega na placu.'],
         image: require('./park-page-04.png'),
       },
       {
@@ -41,8 +41,8 @@ const park: Book = {
   ],
   sentences: [
     ['Kto idzie do parku?', 'Karol idzie do parku.', 'Pies biegnie w lesie.'],
-    ['Lora biegnie szybko na placu.', 'Karolcia biega wesoło w parku.', 'Tata siedzi na ławce.'],
-    ['Kto karmi ptaki w parku?', 'Potem mama wraca do domu.', 'Lora biegnie szybko, potem odpoczywa.'],
+    ['Lora szybko biegnie na placu.', 'Karolcia wesoło biega w parku.', 'Tata siedzi na ławce.'],
+    ['Kto karmi ptaki w parku?', 'Potem mama wraca do domu.', 'Lora szybko biegnie, potem odpoczywa.'],
   ],
 };
 
