@@ -4,6 +4,7 @@ import kuchnia from './kuchnia/content';
 import las from './las/content';
 import obiadUdziadkow from './obiad-u-dziadkow/content';
 import ogrod from './ogrod/content';
+import park from './park/content';
 import placZabaw from './plac-zabaw/content';
 import rodzina from './rodzina/content';
 import urodziny from './urodziny/content';
@@ -23,4 +24,5 @@ export const books: Book[] = [
   placZabaw,
   kuchnia,
   urodziny,
+  park,
 ];

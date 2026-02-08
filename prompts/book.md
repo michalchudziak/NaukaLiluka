@@ -13,14 +13,18 @@ While creating a book you should start from creating the book part.
 Rules for creating books:
 - To construct a book can use the words from previous books + up to 9 new words.
 - The story should follow some theme. I will provide the theme for the next book later in this prompt.
+- The book must tell one coherent short story with a clear beginning, middle and ending.
+- Each next page should continue the same story, not a disconnected random sentence.
+- Avoid near-duplicate pages. Do not create multiple pages that only swap names in the same sentence template.
 - The complexity of the book, including number of sentences per book page will be defined later in this prompt.
 - Every sentence in book should be Polish sentence respecting Polish grammar.
-- On the SIMPLE complexity level we should present patterns in books - changing only verb or adjective across the sentence. Only one pattern should be used per book. 
+- On the SIMPLE complexity level we should still present one dominant pattern, but sentences must stay varied and story-driven (not almost identical clones). 
 
 All the words used in the book should be included in the "words" section. 
+- After generating a new book, append all new words from this book (all 3 triplets / 9 words) to "Words known from previous books" in BOOK INFO, keeping exact casing and inflection.
 
 Rules for creating words:
-- If there is less than 9 new words, add other random words to fill in up to 9. Words should be split to 3 triplets.
+- If there is less than 9 new words, add other theme-related words to fill in up to 9. Do not use unrelated random filler. Words should be split to 3 triplets.
 - Words should not be over simplified, consider regular popular words. Use different types: verb, noun, adjectives or conjunctions.
 - Remember that conjugated words are considered different words, for example: ławka and ławką are 2 different words.
 - Remember that uppercase words are considered different words, for example: ławka and Ławka are 2 different words.
@@ -30,6 +34,8 @@ After choosing the words triplets lets create 3 sentences triplets.
 Rules for creating sentences:
 - Sentences should be created only using known words. This means words form other books and new words from the current book.
 - Sentences should have at least 3 words.
+- Sentences in book.pages should be versatile: vary structure and details while keeping language simple for children.
+- Each sentence in book.pages should move the story forward.
 - In the current book sentences, you can only use words from the same or previous triplet, for example:
     From the previous book we know following words:
         ["brudna", "jest", "Karol"],
@@ -132,3 +138,6 @@ Words known from previous books:
 ['urodziny', 'Karola', 'prezent'],
 ['ma', 'pięć', 'lat'],
 ['Dziś', 'Ile', 'dla'],
+['parku', 'pies', 'biegnie'],
+['szybko', 'wesoło', 'ławce'],
+['potem', 'karmi', 'ptaki'],
