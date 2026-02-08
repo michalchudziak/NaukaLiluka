@@ -118,7 +118,7 @@ export default function MyDayScreen() {
 
   // Helper to reset into Tabs with a specific tab active and optional nested stack
   // Keeps all tabs present to avoid affecting the TabBar.
-  type TabName = 'my-day' | 'reading' | 'math' | 'drawings' | 'settings';
+  type TabName = 'my-day' | 'reading' | 'math' | 'drawings' | 'settings' | 'style-lab';
 
   const resetToTab = (
     tab: TabName,
@@ -130,6 +130,7 @@ export default function MyDayScreen() {
       math: 3,
       drawings: 4,
       settings: 5,
+      'style-lab': 6,
     } as const;
 
     const routes = [
@@ -139,6 +140,7 @@ export default function MyDayScreen() {
       { name: 'math' as const },
       { name: 'drawings' as const },
       { name: 'settings' as const },
+      { name: 'style-lab' as const },
     ].map((r) => {
       if (r.name === tab && nestedState) {
         return { ...r, state: { ...nestedState } } as any;
