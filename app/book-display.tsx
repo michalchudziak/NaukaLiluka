@@ -163,9 +163,11 @@ export default function BookDisplayScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#ffffff',
   },
   content: {
     flex: 1,
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,

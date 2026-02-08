@@ -1,15 +1,21 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { StyleSheet, useWindowDimensions } from 'react-native';
-import { Button } from '@/components/Button';
+import { StateActionRow } from '@/components/StateActionRow';
+import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { TrackButton } from '@/components/TrackButton';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
 
 export default function BookTrackScreen() {
-  const { width, height } = useWindowDimensions();
-  const isHorizontal = width > height;
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
   const { t } = useTranslation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
@@ -24,18 +30,55 @@ export default function BookTrackScreen() {
     router.push('/reading/books-list');
   };
 
-  return (
-    <ThemedView style={[styles.container, { marginBottom: tabBarHeight }]}>
-      <ThemedView
-        style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}
-      >
-        <TrackButton
-          title={t('bookTrack.training')}
-          isCompleted={isTrainingCompleted}
-          onPress={handleTrainingPress}
-        />
+  const actions = [
+    {
+      id: 'training',
+      title: t('bookTrack.training'),
+      subtitle: isTrainingCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus'),
+      isCompleted: isTrainingCompleted,
+      onPress: handleTrainingPress,
+    },
+    {
+      id: 'books',
+      title: t('bookTrack.books'),
+      subtitle: t('booksList.title'),
+      isCompleted: false,
+      onPress: handleBooksPress,
+    },
+  ] as const;
 
-        <Button title={t('bookTrack.books')} onPress={handleBooksPress} />
+  return (
+    <ThemedView style={styles.container}>
+      <ThemedView
+        style={[
+          styles.content,
+          {
+            marginBottom: tabBarHeight + 8,
+            paddingHorizontal: metrics.screenPadding,
+          },
+        ]}
+      >
+        <ThemedText style={[styles.title, metrics.isTablet && styles.titleTablet]}>
+          {t('bookTrack.title')}
+        </ThemedText>
+        <ThemedView
+          style={[
+            styles.actionsCard,
+            {
+              maxWidth: metrics.maxContentWidth,
+            },
+          ]}
+        >
+          {actions.map((action) => (
+            <StateActionRow
+              key={action.id}
+              title={action.title}
+              subtitle={action.subtitle}
+              isCompleted={action.isCompleted}
+              onPress={action.onPress}
+            />
+          ))}
+        </ThemedView>
       </ThemedView>
     </ThemedView>
   );
@@ -44,19 +87,35 @@ export default function BookTrackScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: ForestCampTheme.colors.background,
   },
-  buttonsContainer: {
+  content: {
     flex: 1,
-    gap: 20,
+    paddingTop: 12,
+    width: '100%',
   },
-  horizontal: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  title: {
+    ...forestCampTypography.display,
+    fontSize: 30,
+    lineHeight: 34,
+    color: ForestCampTheme.colors.title,
+    alignSelf: 'flex-start',
+    marginBottom: 14,
   },
-  vertical: {
-    flexDirection: 'column',
-    justifyContent: 'center',
+  titleTablet: {
+    fontSize: 36,
+    lineHeight: 40,
+    marginBottom: 18,
+  },
+  actionsCard: {
+    width: '100%',
+    borderRadius: ForestCampTheme.radius.xl,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
+    backgroundColor: ForestCampTheme.colors.card,
+    padding: 16,
+    gap: 10,
+    alignSelf: 'center',
+    ...forestCampSoftShadow,
   },
 });

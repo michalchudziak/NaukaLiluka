@@ -1,6 +1,12 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import { WordColors } from '@/constants/WordColors';
 
 interface ColorPickerProps {
@@ -10,16 +16,20 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker({ selectedColor, onColorSelect, label }: ColorPickerProps) {
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
+
   return (
     <ThemedView style={styles.container}>
       {label && <ThemedText style={styles.label}>{label}</ThemedText>}
-      <View style={styles.colorSwatches}>
+      <View style={[styles.colorSwatches, metrics.isTablet && styles.colorSwatchesTablet]}>
         {WordColors.map((color) => (
           <TouchableOpacity
             key={color.name}
             onPress={() => onColorSelect(color.hex)}
             style={[
               styles.colorSwatch,
+              metrics.isTablet && styles.colorSwatchTablet,
               { backgroundColor: color.hex },
               selectedColor === color.hex && styles.selectedSwatch,
             ]}
@@ -34,14 +44,19 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     marginTop: 20,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderRadius: ForestCampTheme.radius.lg,
+    backgroundColor: ForestCampTheme.colors.cardMuted,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
+    padding: 16,
+    ...forestCampSoftShadow,
   },
   label: {
+    ...forestCampTypography.heading,
     fontSize: 18,
-    marginBottom: 15,
-    fontWeight: '600',
+    lineHeight: 22,
+    marginBottom: 12,
+    color: ForestCampTheme.colors.title,
   },
   colorSwatches: {
     flexDirection: 'row',
@@ -49,23 +64,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
   },
+  colorSwatchesTablet: {
+    gap: 14,
+  },
   colorSwatch: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     borderWidth: 2,
-    borderColor: 'transparent',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
+    borderColor: 'rgba(31,58,41,0.2)',
+    ...forestCampSoftShadow,
+  },
+  colorSwatchTablet: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
   },
   selectedSwatch: {
-    borderColor: '#007AFF',
+    borderColor: ForestCampTheme.colors.primaryStrong,
     borderWidth: 3,
   },
 });

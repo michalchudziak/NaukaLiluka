@@ -1,11 +1,25 @@
 import { Stack } from 'expo-router';
+import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ReadingLayout() {
   const { t } = useTranslation();
 
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: ForestCampTheme.colors.card,
+        },
+        headerShadowVisible: false,
+        headerTintColor: ForestCampTheme.colors.primaryStrong,
+        headerTitleStyle: {
+          ...forestCampTypography.heading,
+          color: ForestCampTheme.colors.title,
+          fontSize: 20,
+        },
+      }}
+    >
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
         name="no-rep-track"

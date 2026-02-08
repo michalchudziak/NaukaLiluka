@@ -1,6 +1,11 @@
 import { Pressable, StyleSheet } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+} from '@/constants/ForestCampTheme';
 import type { Book } from '@/types/book';
 
 interface BookListItemProps {
@@ -18,8 +23,9 @@ export function BookListItem({ book, isCompleted, isAccessible, onPress }: BookL
       style={({ pressed }) => [
         styles.bookItem,
         {
-          backgroundColor: pressed && canInteract ? '#f0f0f0' : '#ffffff',
-          borderColor: '#e0e0e0',
+          backgroundColor:
+            pressed && canInteract ? ForestCampTheme.colors.cardMuted : ForestCampTheme.colors.card,
+          borderColor: ForestCampTheme.colors.border,
           opacity: canInteract ? 1 : 0.4,
         },
       ]}
@@ -52,16 +58,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: ForestCampTheme.radius.lg,
+    borderWidth: 2,
+    ...forestCampSoftShadow,
   },
   bookContent: {
     flex: 1,
     backgroundColor: 'transparent',
   },
   bookTitle: {
+    ...forestCampTypography.heading,
     fontSize: 18,
-    fontWeight: '600',
+    color: ForestCampTheme.colors.title,
     marginBottom: 8,
   },
   bookStats: {
@@ -69,8 +77,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   bookInfo: {
+    ...forestCampTypography.body,
     fontSize: 14,
-    opacity: 0.7,
+    color: ForestCampTheme.colors.textMuted,
   },
   disabledText: {
     opacity: 0.6,

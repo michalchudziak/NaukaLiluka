@@ -1,19 +1,25 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, useWindowDimensions } from 'react-native';
+import { Alert, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
+import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { TrackButton } from '@/components/TrackButton';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import sentencesData from '@/content/no-rep/sentences.json';
 import wordsData from '@/content/no-rep/words.json';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useNoRepStore } from '@/store/no-rep-store';
 
 export default function NoRepScreen() {
-  const { width, height } = useWindowDimensions();
-  const isHorizontal = width > height;
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
   const { t } = useTranslation();
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState('#000000');
@@ -63,41 +69,73 @@ export default function NoRepScreen() {
     });
   };
 
+  const actions = [
+    {
+      id: 'words',
+      title: t('noRep.words'),
+      subtitle: wordsCompletedToday ? t('myDay.doneStatus') : t('myDay.pendingStatus'),
+      isCompleted: wordsCompletedToday,
+      onPress: handleWordsPress,
+    },
+    {
+      id: 'sentences',
+      title: t('noRep.sentences'),
+      subtitle: sentencesCompletedToday ? t('myDay.doneStatus') : t('myDay.pendingStatus'),
+      isCompleted: sentencesCompletedToday,
+      onPress: handleSentencesPress,
+    },
+  ] as const;
+
   return (
-    <ThemedView style={[styles.container, { marginBottom: tabBarHeight }]}>
-      <ThemedView style={styles.textContainer}>
-        <ThemedText style={styles.counter}>
-          {t('noRep.knownWordsCount', { count: displayedWords.length, total: wordsData.length })}
-        </ThemedText>
-        <ThemedText style={styles.counter}>
-          {t('noRep.knownSentencesCount', {
-            count: displayedSentences.length,
-            total: sentencesData.length,
-          })}
-        </ThemedText>
-      </ThemedView>
-
+    <ThemedView style={styles.container}>
       <ThemedView
-        style={[styles.buttonsContainer, isHorizontal ? styles.horizontal : styles.vertical]}
+        style={[
+          styles.content,
+          {
+            marginBottom: tabBarHeight + 16,
+            paddingHorizontal: metrics.screenPadding,
+          },
+        ]}
       >
-        <TrackButton
-          title={t('noRep.words')}
-          isCompleted={wordsCompletedToday}
-          onPress={handleWordsPress}
-        />
+        <View style={[styles.textContainer, { maxWidth: metrics.maxContentWidth }]}>
+          <ThemedText style={styles.counter}>
+            {t('noRep.knownWordsCount', { count: displayedWords.length, total: wordsData.length })}
+          </ThemedText>
+          <ThemedText style={styles.counter}>
+            {t('noRep.knownSentencesCount', {
+              count: displayedSentences.length,
+              total: sentencesData.length,
+            })}
+          </ThemedText>
+        </View>
 
-        <TrackButton
-          title={t('noRep.sentences')}
-          isCompleted={sentencesCompletedToday}
-          onPress={handleSentencesPress}
-        />
+        <ThemedView
+          style={[
+            styles.actionsCard,
+            {
+              maxWidth: metrics.maxContentWidth,
+            },
+          ]}
+        >
+          {actions.map((action) => (
+            <StateActionRow
+              key={action.id}
+              title={action.title}
+              subtitle={action.subtitle}
+              isCompleted={action.isCompleted}
+              onPress={action.onPress}
+            />
+          ))}
+        </ThemedView>
+
+        <View style={[styles.pickerWrap, { maxWidth: metrics.maxContentWidth }]}>
+          <ColorPicker
+            selectedColor={selectedColor}
+            onColorSelect={setSelectedColor}
+            label={t('reading.selectColor')}
+          />
+        </View>
       </ThemedView>
-
-      <ColorPicker
-        selectedColor={selectedColor}
-        onColorSelect={setSelectedColor}
-        label={t('reading.selectColor')}
-      />
     </ThemedView>
   );
 }
@@ -105,31 +143,44 @@ export default function NoRepScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: ForestCampTheme.colors.background,
   },
-  buttonsContainer: {
+  content: {
     flex: 1,
-    gap: 20,
+    paddingTop: 14,
+    width: '100%',
   },
-  horizontal: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  vertical: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  buttonWrapper: {
-    alignItems: 'center',
+  actionsCard: {
+    width: '100%',
+    borderRadius: ForestCampTheme.radius.xl,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
+    backgroundColor: ForestCampTheme.colors.card,
+    padding: 16,
     gap: 10,
+    alignSelf: 'center',
+    ...forestCampSoftShadow,
   },
   counter: {
-    fontSize: 14,
-    opacity: 0.7,
+    ...forestCampTypography.body,
+    fontSize: 15,
+    color: ForestCampTheme.colors.textMuted,
   },
   textContainer: {
+    width: '100%',
+    borderRadius: ForestCampTheme.radius.md,
+    backgroundColor: ForestCampTheme.colors.cardMuted,
+    borderWidth: 1,
+    borderColor: ForestCampTheme.colors.border,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginBottom: 14,
+  },
+  pickerWrap: {
+    width: '100%',
+    marginTop: 14,
+    marginBottom: 8,
   },
 });

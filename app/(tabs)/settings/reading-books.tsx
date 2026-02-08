@@ -1,7 +1,13 @@
 import { useEffect } from 'react';
-import { ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, useWindowDimensions, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
 
@@ -22,7 +28,7 @@ function SwitchSetting({ label, description, value, onValueChange }: SwitchSetti
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ false: '#E5E5EA', true: '#34C759' }}
+        trackColor={{ false: '#d3e2c5', true: ForestCampTheme.colors.success }}
         thumbColor="#FFFFFF"
       />
     </View>
@@ -31,6 +37,8 @@ function SwitchSetting({ label, description, value, onValueChange }: SwitchSetti
 
 export default function ReadingBooksSettingsScreen() {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
   const { reading, updateReadingBooksAllowAll, hydrate } = useSettingsStore();
 
   useEffect(() => {
@@ -39,7 +47,17 @@ export default function ReadingBooksSettingsScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingHorizontal: metrics.screenPadding,
+            maxWidth: metrics.maxContentWidth,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.section}>
           <ThemedText style={styles.sectionDescription}>
             {t('settings.reading.booksDescription')}
@@ -62,44 +80,57 @@ export default function ReadingBooksSettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ForestCampTheme.colors.background,
   },
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingTop: 14,
+    paddingBottom: 20,
+  },
   section: {
-    marginTop: 30,
+    marginTop: 10,
   },
   sectionDescription: {
+    ...forestCampTypography.body,
     fontSize: 14,
-    opacity: 0.6,
-    marginHorizontal: 20,
-    marginBottom: 20,
+    color: ForestCampTheme.colors.textMuted,
+    marginHorizontal: 10,
+    marginBottom: 14,
     lineHeight: 20,
   },
   settingsContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 0.5,
-    borderBottomWidth: 0.5,
-    borderColor: '#C8C7CC',
+    backgroundColor: ForestCampTheme.colors.card,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
+    borderRadius: ForestCampTheme.radius.lg,
+    overflow: 'hidden',
+    ...forestCampSoftShadow,
   },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: ForestCampTheme.colors.card,
   },
   switchTextContainer: {
     flex: 1,
     marginRight: 10,
   },
   switchLabel: {
+    ...forestCampTypography.heading,
     fontSize: 16,
+    color: ForestCampTheme.colors.title,
   },
   switchDescription: {
+    ...forestCampTypography.body,
     fontSize: 13,
-    opacity: 0.6,
+    color: ForestCampTheme.colors.textMuted,
     marginTop: 4,
     lineHeight: 18,
   },

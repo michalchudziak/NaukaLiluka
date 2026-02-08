@@ -3,9 +3,22 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { format, isToday, isYesterday } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import { books } from '@/content/books';
 import { useTranslation } from '@/hooks/useTranslation';
 import { HybridStorageService } from '@/services/hybrid-storage';
@@ -75,6 +88,8 @@ export default function ViewStorageScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const tabBarHeight = useBottomTabBarHeight();
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
 
   const loadStorageData = useCallback(async () => {
     try {
@@ -447,9 +462,17 @@ export default function ViewStorageScreen() {
   };
 
   return (
-    <ThemedView style={[styles.container, { marginBottom: tabBarHeight }]}>
+    <ThemedView style={styles.container}>
       <ScrollView
         style={styles.scrollView}
+        contentContainerStyle={[
+          styles.content,
+          {
+            marginBottom: tabBarHeight,
+            paddingHorizontal: metrics.screenPadding,
+            maxWidth: metrics.maxContentWidth,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
@@ -499,6 +522,7 @@ export default function ViewStorageScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ForestCampTheme.colors.background,
   },
   centerContainer: {
     flex: 1,
@@ -508,23 +532,28 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  content: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingTop: 14,
+    paddingBottom: 20,
+  },
   card: {
-    backgroundColor: '#FFFFFF',
-    margin: 16,
+    backgroundColor: ForestCampTheme.colors.card,
+    marginVertical: 8,
     marginBottom: 0,
-    borderRadius: 12,
+    borderRadius: ForestCampTheme.radius.lg,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...forestCampSoftShadow,
   },
   cardTitle: {
+    ...forestCampTypography.heading,
     fontSize: 18,
-    fontWeight: '600',
+    lineHeight: 22,
     marginBottom: 12,
-    color: '#000',
+    color: ForestCampTheme.colors.title,
   },
   cardContent: {
     gap: 8,
@@ -536,49 +565,52 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   dataLabel: {
+    ...forestCampTypography.body,
     fontSize: 14,
-    color: '#666',
+    color: ForestCampTheme.colors.textMuted,
     flex: 1,
   },
   dataValue: {
+    ...forestCampTypography.heading,
     fontSize: 14,
-    color: '#000',
-    fontWeight: '500',
+    color: ForestCampTheme.colors.title,
     textAlign: 'right',
     flex: 1,
   },
   emptyText: {
+    ...forestCampTypography.body,
     fontSize: 14,
-    color: '#999',
+    color: ForestCampTheme.colors.textMuted,
     fontStyle: 'italic',
   },
   bookItem: {
     paddingVertical: 8,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#E0E0E0',
+    borderBottomWidth: 1,
+    borderBottomColor: '#dbe8cf',
   },
   bookName: {
+    ...forestCampTypography.heading,
     fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
+    color: ForestCampTheme.colors.title,
     marginBottom: 4,
   },
   progressInfo: {
     gap: 4,
   },
   progressText: {
+    ...forestCampTypography.body,
     fontSize: 13,
-    color: '#666',
+    color: ForestCampTheme.colors.textMuted,
   },
   completedBadge: {
+    ...forestCampTypography.heading,
     fontSize: 12,
-    color: '#4CAF50',
-    fontWeight: '600',
+    color: ForestCampTheme.colors.success,
     marginTop: 4,
   },
   activeText: {
-    color: '#007AFF',
-    fontWeight: '600',
+    color: ForestCampTheme.colors.primaryStrong,
+    ...forestCampTypography.heading,
   },
   sessionsContainer: {
     marginTop: 12,
@@ -591,9 +623,9 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   sessionName: {
+    ...forestCampTypography.heading,
     fontSize: 14,
-    fontWeight: '500',
-    color: '#000',
+    color: ForestCampTheme.colors.title,
   },
   sessionStatus: {
     flexDirection: 'row',
@@ -603,18 +635,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: ForestCampTheme.colors.cardMuted,
   },
   completedStatusBadge: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: '#dceecf',
   },
   statusText: {
+    ...forestCampTypography.body,
     fontSize: 12,
-    color: '#666',
+    color: ForestCampTheme.colors.textMuted,
   },
   completedStatusText: {
-    color: '#4CAF50',
-    fontWeight: '500',
+    ...forestCampTypography.heading,
+    color: ForestCampTheme.colors.primaryStrong,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -623,19 +656,23 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flex: 1,
-    backgroundColor: '#F5F5F7',
-    borderRadius: 8,
+    backgroundColor: ForestCampTheme.colors.cardMuted,
+    borderRadius: ForestCampTheme.radius.sm,
+    borderWidth: 1,
+    borderColor: ForestCampTheme.colors.border,
     padding: 12,
     alignItems: 'center',
   },
   statNumber: {
+    ...forestCampTypography.display,
     fontSize: 24,
-    fontWeight: '700',
-    color: '#007AFF',
+    lineHeight: 26,
+    color: ForestCampTheme.colors.primaryStrong,
   },
   statLabel: {
+    ...forestCampTypography.body,
     fontSize: 12,
-    color: '#666',
+    color: ForestCampTheme.colors.textMuted,
     marginTop: 4,
     textAlign: 'center',
   },
@@ -643,37 +680,40 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   recentTitle: {
+    ...forestCampTypography.heading,
     fontSize: 14,
-    fontWeight: '600',
-    color: '#000',
+    color: ForestCampTheme.colors.title,
     marginBottom: 6,
   },
   itemsList: {
     gap: 4,
   },
   listItem: {
+    ...forestCampTypography.body,
     fontSize: 13,
-    color: '#444',
+    color: ForestCampTheme.colors.text,
     paddingLeft: 8,
   },
   completedSection: {
     marginVertical: 4,
   },
   completedTitle: {
+    ...forestCampTypography.heading,
     fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
+    color: ForestCampTheme.colors.title,
     marginBottom: 4,
   },
   completedItem: {
+    ...forestCampTypography.body,
     fontSize: 12,
-    color: '#555',
+    color: ForestCampTheme.colors.text,
     paddingLeft: 8,
     marginVertical: 2,
   },
   moreItems: {
+    ...forestCampTypography.body,
     fontSize: 12,
-    color: '#888',
+    color: ForestCampTheme.colors.textMuted,
     fontStyle: 'italic',
     paddingLeft: 8,
     marginTop: 2,
@@ -686,19 +726,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    borderWidth: 1,
+    borderWidth: 2,
   },
   cloudEnabledBadge: {
-    backgroundColor: '#E3F2FD',
-    borderColor: '#2196F3',
+    backgroundColor: '#dcf0d1',
+    borderColor: ForestCampTheme.colors.success,
   },
   localStorageBadge: {
-    backgroundColor: '#F5F5F5',
-    borderColor: '#9E9E9E',
+    backgroundColor: ForestCampTheme.colors.cardMuted,
+    borderColor: ForestCampTheme.colors.borderStrong,
   },
   cloudStatusText: {
+    ...forestCampTypography.heading,
     fontSize: 14,
-    fontWeight: '600',
-    color: '#000',
+    color: ForestCampTheme.colors.title,
   },
 });

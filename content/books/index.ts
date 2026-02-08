@@ -1,6 +1,6 @@
 import type { Book } from '@/types/book';
-import dom from './dom/content';
 import deszcz from './deszcz/content';
+import dom from './dom/content';
 import kuchnia from './kuchnia/content';
 import las from './las/content';
 import muzyka from './muzyka/content';
@@ -9,8 +9,8 @@ import ogrod from './ogrod/content';
 import park from './park/content';
 import piknik from './piknik/content';
 import placZabaw from './plac-zabaw/content';
-import rower from './rower/content';
 import rodzina from './rodzina/content';
+import rower from './rower/content';
 import urodziny from './urodziny/content';
 import wakacje from './wakacje/content';
 import zakupy from './zakupy/content';

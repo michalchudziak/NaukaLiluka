@@ -1,6 +1,12 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import {
   Circle,
   Diamond,
@@ -46,8 +52,14 @@ const shapes: ShapeType[] = [
 ];
 
 export function ShapePicker({ selectedShape, onShapeSelect, label }: ShapePickerProps) {
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
+
   const renderShape = (shape: ShapeType) => {
-    const shapeProps = { size: 30, color: '#333' };
+    const shapeProps = {
+      size: metrics.isTablet ? 34 : 28,
+      color: ForestCampTheme.colors.primaryStrong,
+    };
 
     switch (shape) {
       case 'circle':
@@ -76,12 +88,16 @@ export function ShapePicker({ selectedShape, onShapeSelect, label }: ShapePicker
   return (
     <ThemedView style={styles.container}>
       {label && <ThemedText style={styles.label}>{label}</ThemedText>}
-      <View style={styles.shapeSwatches}>
+      <View style={[styles.shapeSwatches, metrics.isTablet && styles.shapeSwatchesTablet]}>
         {shapes.map((shape) => (
           <TouchableOpacity
             key={shape}
             onPress={() => onShapeSelect(shape)}
-            style={[styles.shapeSwatch, selectedShape === shape && styles.selectedSwatch]}
+            style={[
+              styles.shapeSwatch,
+              metrics.isTablet && styles.shapeSwatchTablet,
+              selectedShape === shape && styles.selectedSwatch,
+            ]}
           >
             {renderShape(shape)}
           </TouchableOpacity>
@@ -95,14 +111,19 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     marginTop: 20,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderRadius: ForestCampTheme.radius.lg,
+    backgroundColor: ForestCampTheme.colors.cardMuted,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
+    padding: 16,
+    ...forestCampSoftShadow,
   },
   label: {
+    ...forestCampTypography.heading,
     fontSize: 18,
-    marginBottom: 15,
-    fontWeight: '600',
+    lineHeight: 22,
+    marginBottom: 12,
+    color: ForestCampTheme.colors.title,
   },
   shapeSwatches: {
     flexDirection: 'row',
@@ -110,27 +131,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
   },
+  shapeSwatchesTablet: {
+    gap: 14,
+  },
   shapeSwatch: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
+    width: 54,
+    height: 54,
+    borderRadius: ForestCampTheme.radius.sm,
     borderWidth: 2,
-    borderColor: 'transparent',
-    backgroundColor: '#f0f0f0',
+    borderColor: 'rgba(47,134,83,0.2)',
+    backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
+    ...forestCampSoftShadow,
+  },
+  shapeSwatchTablet: {
+    width: 62,
+    height: 62,
   },
   selectedSwatch: {
-    borderColor: '#007AFF',
+    borderColor: ForestCampTheme.colors.primaryStrong,
     borderWidth: 3,
-    backgroundColor: '#e8f4ff',
+    backgroundColor: ForestCampTheme.colors.card,
   },
 });

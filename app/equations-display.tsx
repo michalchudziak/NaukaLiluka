@@ -73,8 +73,6 @@ export default function EquationsDisplayScreen() {
 
   const currentEquation = equations[currentIndex];
 
-  console.log(currentEquation);
-
   return (
     <AnimatedThemedView style={[styles.container, animatedStyle]}>
       {currentIndex >= 0 && currentIndex < equations.length && (
@@ -92,6 +90,7 @@ export default function EquationsDisplayScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#ffffff',
     paddingHorizontal: '10%',
     justifyContent: 'center',
     alignItems: 'center',
