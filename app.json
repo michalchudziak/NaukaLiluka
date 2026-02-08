@@ -14,8 +14,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/app-icon.png",
+        "backgroundColor": "#eef6e7"
       },
       "edgeToEdgeEnabled": true,
       "package": "com.michalchudziak.NaukaLiluka"
@@ -30,10 +30,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/app-icon.png",
+          "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#d303fc"
+          "backgroundColor": "#eef6e7"
         }
       ]
     ],

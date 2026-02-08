@@ -24,7 +24,15 @@ const PROMPTS_IMAGES_DIR = path.join(ROOT, 'prompts', 'images');
 
 const SUPPORTED_IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp']);
 
-const FAMILY_CHARACTER_KEYS = new Set(['karol', 'karolcia', 'mama', 'tata', 'lora', 'babcia', 'dziadek']);
+const FAMILY_CHARACTER_KEYS = new Set([
+  'karol',
+  'karolcia',
+  'mama',
+  'tata',
+  'lora',
+  'babcia',
+  'dziadek',
+]);
 
 const STOPWORDS = new Set([
   'dzis',
@@ -69,7 +77,8 @@ const CHARACTER_HINTS = new Map([
   ['dziadek', 'elderly grandfather'],
 ]);
 
-const PAGE_REGEX = /(\{\s*\n\s*sentences:\s*\[[\s\S]*?\],\s*\n)(\s*image:\s*require\('(\.\/[^']+)'\),\s*\n)?(\s*\},)/g;
+const PAGE_REGEX =
+  /(\{\s*\n\s*sentences:\s*\[[\s\S]*?\],\s*\n)(\s*image:\s*require\('(\.\/[^']+)'\),\s*\n)?(\s*\},)/g;
 const SENTENCE_STRING_REGEX = /'([^']+)'/g;
 const WORD_REGEX = /\p{L}+/gu;
 
@@ -99,12 +108,23 @@ function parseArgs(argv) {
       process.exit(0);
     }
     if (arg === '--book' && argv[i + 1]) {
-      options.books.push(...argv[i + 1].split(',').map((value) => value.trim()).filter(Boolean));
+      options.books.push(
+        ...argv[i + 1]
+          .split(',')
+          .map((value) => value.trim())
+          .filter(Boolean)
+      );
       i += 1;
       continue;
     }
     if (arg.startsWith('--book=')) {
-      options.books.push(...arg.slice('--book='.length).split(',').map((value) => value.trim()).filter(Boolean));
+      options.books.push(
+        ...arg
+          .slice('--book='.length)
+          .split(',')
+          .map((value) => value.trim())
+          .filter(Boolean)
+      );
       continue;
     }
     if (arg === '--model' && argv[i + 1]) {
@@ -475,55 +495,49 @@ async function buildFormDataWithReferences(prompt, model, size, referencePaths) 
 }
 
 async function requestEditedImage(apiKey, prompt, model, size, referencePaths) {
-  return withRetry(
-    async () => {
-      const form = await buildFormDataWithReferences(prompt, model, size, referencePaths);
-      const response = await fetch('https://api.openai.com/v1/images/edits', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: form,
-      });
+  return withRetry(async () => {
+    const form = await buildFormDataWithReferences(prompt, model, size, referencePaths);
+    const response = await fetch('https://api.openai.com/v1/images/edits', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: form,
+    });
 
-      if (!response.ok) {
-        const message = await parseErrorBody(response);
-        throw new Error(message);
-      }
+    if (!response.ok) {
+      const message = await parseErrorBody(response);
+      throw new Error(message);
+    }
 
-      const payload = await response.json();
-      return extractImageBufferFromResponsePayload(payload);
-    },
-    'Image edit request',
-  );
+    const payload = await response.json();
+    return extractImageBufferFromResponsePayload(payload);
+  }, 'Image edit request');
 }
 
 async function requestGeneratedImage(apiKey, prompt, model, size) {
-  return withRetry(
-    async () => {
-      const response = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model,
-          prompt,
-          size,
-        }),
-      });
+  return withRetry(async () => {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        prompt,
+        size,
+      }),
+    });
 
-      if (!response.ok) {
-        const message = await parseErrorBody(response);
-        throw new Error(message);
-      }
+    if (!response.ok) {
+      const message = await parseErrorBody(response);
+      throw new Error(message);
+    }
 
-      const payload = await response.json();
-      return extractImageBufferFromResponsePayload(payload);
-    },
-    'Image generation request',
-  );
+    const payload = await response.json();
+    return extractImageBufferFromResponsePayload(payload);
+  }, 'Image generation request');
 }
 
 async function generateImageBuffer({ apiKey, prompt, model, size, referencePaths }) {
@@ -536,7 +550,10 @@ async function generateImageBuffer({ apiKey, prompt, model, size, referencePaths
 
 async function readBooks(targetBooks) {
   const entries = await fs.readdir(BOOKS_DIR, { withFileTypes: true });
-  const directories = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
+  const directories = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
 
   const targetSet = targetBooks.length ? new Set(targetBooks) : null;
   const missingTargets = targetSet ? targetBooks.filter((slug) => !directories.includes(slug)) : [];
@@ -561,8 +578,8 @@ async function readBooks(targetBooks) {
     PAGE_REGEX.lastIndex = 0;
     const pages = [];
 
-    let match;
-    while ((match = PAGE_REGEX.exec(rawContent)) !== null) {
+    let match = PAGE_REGEX.exec(rawContent);
+    while (match !== null) {
       const pagePrefix = match[1];
       const existingImagePath = match[3] || null;
       const sentences = extractSentencesFromPageBlock(pagePrefix);
@@ -573,6 +590,7 @@ async function readBooks(targetBooks) {
         finalImagePath: existingImagePath,
         characters: [],
       });
+      match = PAGE_REGEX.exec(rawContent);
     }
 
     books.push({
@@ -591,7 +609,10 @@ async function readBooks(targetBooks) {
 async function readCharacterReferences() {
   await fs.mkdir(PROMPTS_IMAGES_DIR, { recursive: true });
   const entries = await fs.readdir(PROMPTS_IMAGES_DIR, { withFileTypes: true });
-  const files = entries.filter((entry) => entry.isFile()).map((entry) => entry.name).sort();
+  const files = entries
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name)
+    .sort();
 
   const references = new Map();
 
@@ -627,21 +648,24 @@ function upsertImagesInContent(rawContent, pages) {
   let cursor = 0;
   PAGE_REGEX.lastIndex = 0;
 
-  const updated = rawContent.replace(PAGE_REGEX, (fullMatch, pagePrefix, imageLine, existingPath, pageSuffix) => {
-    const page = pages[cursor];
-    cursor += 1;
+  const updated = rawContent.replace(
+    PAGE_REGEX,
+    (fullMatch, pagePrefix, imageLine, existingPath, pageSuffix) => {
+      const page = pages[cursor];
+      cursor += 1;
 
-    if (!page?.finalImagePath) {
-      return fullMatch;
+      if (!page?.finalImagePath) {
+        return fullMatch;
+      }
+
+      if (imageLine && existingPath === page.finalImagePath) {
+        return fullMatch;
+      }
+
+      const nextImageLine = `        image: require('${page.finalImagePath}'),\n`;
+      return `${pagePrefix}${nextImageLine}${pageSuffix}`;
     }
-
-    if (imageLine && existingPath === page.finalImagePath) {
-      return fullMatch;
-    }
-
-    const nextImageLine = `        image: require('${page.finalImagePath}'),\n`;
-    return `${pagePrefix}${nextImageLine}${pageSuffix}`;
-  });
+  );
 
   if (cursor !== pages.length) {
     throw new Error('Could not update content.ts because page parsing count changed unexpectedly.');
@@ -654,7 +678,7 @@ function summarizePlan(books, characterReferences, missingCharacters, pageTasks)
   const totalPages = books.reduce((count, book) => count + book.pages.length, 0);
   const pagesWithImages = books.reduce(
     (count, book) => count + book.pages.filter((page) => page.existingImagePath).length,
-    0,
+    0
   );
 
   console.log('');
@@ -690,7 +714,9 @@ async function run() {
     }
   }
 
-  const missingCharacters = [...discoveredCharacters].filter((character) => !characterReferences.has(character));
+  const missingCharacters = [...discoveredCharacters].filter(
+    (character) => !characterReferences.has(character)
+  );
   const styleReferencePaths = preferredStyleReferencePaths(characterReferences);
 
   const pageTasks = [];
@@ -701,7 +727,8 @@ async function run() {
         continue;
       }
 
-      const targetRelativePath = page.existingImagePath || `./${resolveTargetImageName(book.slug, page.index)}`;
+      const targetRelativePath =
+        page.existingImagePath || `./${resolveTargetImageName(book.slug, page.index)}`;
       const targetAbsolutePath = path.join(book.directory, targetRelativePath.replace('./', ''));
       page.finalImagePath = targetRelativePath;
 
@@ -724,13 +751,15 @@ async function run() {
 
   if (options.dryRun) {
     for (const character of missingCharacters) {
-      console.log(`[dry-run] missing character ref: ${character} -> prompts/images/${character}.png`);
+      console.log(
+        `[dry-run] missing character ref: ${character} -> prompts/images/${character}.png`
+      );
     }
 
     for (const task of pageTasks.slice(0, 20)) {
       const shortText = task.sentences.join(' ').slice(0, 120);
       console.log(
-        `[dry-run] page image: ${task.bookSlug}#${task.pageIndex + 1} -> ${path.relative(ROOT, task.outputPath)} | "${shortText}"`,
+        `[dry-run] page image: ${task.bookSlug}#${task.pageIndex + 1} -> ${path.relative(ROOT, task.outputPath)} | "${shortText}"`
       );
     }
 
@@ -746,7 +775,7 @@ async function run() {
 
   if (needsApi && !apiKey) {
     throw new Error(
-      'OPENAI_API_KEY is missing. Set OPENAI_API_KEY and re-run this script (or use --dry-run to inspect the plan).',
+      'OPENAI_API_KEY is missing. Set OPENAI_API_KEY and re-run this script (or use --dry-run to inspect the plan).'
     );
   }
 
@@ -775,10 +804,16 @@ async function run() {
   const limitedTasks = pageTasks.slice(0, options.maxPages);
   for (let i = 0; i < limitedTasks.length; i += 1) {
     const task = limitedTasks[i];
-    console.log(`Generating page image (${i + 1}/${limitedTasks.length}): ${task.bookSlug}#${task.pageIndex + 1}`);
+    console.log(
+      `Generating page image (${i + 1}/${limitedTasks.length}): ${task.bookSlug}#${task.pageIndex + 1}`
+    );
 
     const prompt = pagePrompt(task.bookTitle, task.sentences, task.characters);
-    const referencePaths = collectPageReferences(task.characters, characterReferences, styleReferencePaths);
+    const referencePaths = collectPageReferences(
+      task.characters,
+      characterReferences,
+      styleReferencePaths
+    );
     const imageBuffer = await generateImageBuffer({
       apiKey,
       prompt,
@@ -792,7 +827,9 @@ async function run() {
 
   if (limitedTasks.length < pageTasks.length) {
     console.warn(`Stopped after ${limitedTasks.length} pages because --max-pages was set.`);
-    console.warn('Skipping content.ts updates to avoid adding image requires for pages that were not generated yet.');
+    console.warn(
+      'Skipping content.ts updates to avoid adding image requires for pages that were not generated yet.'
+    );
     return;
   }
 

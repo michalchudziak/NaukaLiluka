@@ -7,7 +7,7 @@ export default function SettingsLayout() {
       screenOptions={{
         headerTransparent: true,
         headerTitle: '',
-        headerBackTitleVisible: false,
+        headerBackButtonDisplayMode: 'minimal',
         headerShadowVisible: false,
         headerTintColor: ForestCampTheme.colors.primaryStrong,
       }}

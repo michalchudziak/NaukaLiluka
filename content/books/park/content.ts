@@ -42,7 +42,11 @@ const park: Book = {
   sentences: [
     ['Kto idzie do parku?', 'Karol idzie do parku.', 'Pies biegnie w lesie.'],
     ['Lora szybko biegnie na placu.', 'Karolcia wesoło biega w parku.', 'Tata siedzi na ławce.'],
-    ['Kto karmi ptaki w parku?', 'Potem mama wraca do domu.', 'Lora szybko biegnie, potem odpoczywa.'],
+    [
+      'Kto karmi ptaki w parku?',
+      'Potem mama wraca do domu.',
+      'Lora szybko biegnie, potem odpoczywa.',
+    ],
   ],
 };
 

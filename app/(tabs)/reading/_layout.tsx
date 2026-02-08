@@ -7,7 +7,7 @@ export default function ReadingLayout() {
       screenOptions={{
         headerTransparent: true,
         headerTitle: '',
-        headerBackTitleVisible: false,
+        headerBackButtonDisplayMode: 'minimal',
         headerShadowVisible: false,
         headerTintColor: ForestCampTheme.colors.primaryStrong,
       }}

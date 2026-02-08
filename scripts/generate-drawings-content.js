@@ -28,26 +28,66 @@ const sets = [
     items: [
       { slug: 'car', description: 'Samochód', prompt: 'compact family car, side view' },
       { slug: 'bus', description: 'Autobus', prompt: 'city bus with large windows, side view' },
-      { slug: 'train', description: 'Pociąg', prompt: 'modern passenger train with several wagons' },
+      {
+        slug: 'train',
+        description: 'Pociąg',
+        prompt: 'modern passenger train with several wagons',
+      },
       { slug: 'tram', description: 'Tramwaj', prompt: 'city tram, side view' },
-      { slug: 'bicycle', description: 'Rower', prompt: 'children bicycle with visible frame and wheels' },
+      {
+        slug: 'bicycle',
+        description: 'Rower',
+        prompt: 'children bicycle with visible frame and wheels',
+      },
       { slug: 'motorcycle', description: 'Motocykl', prompt: 'street motorcycle, side view' },
       { slug: 'tractor', description: 'Traktor', prompt: 'farm tractor with large rear wheels' },
-      { slug: 'fire-truck', description: 'Wóz strażacki', prompt: 'fire truck with ladder, side view' },
+      {
+        slug: 'fire-truck',
+        description: 'Wóz strażacki',
+        prompt: 'fire truck with ladder, side view',
+      },
     ],
   },
   {
     folder: 'vehicles-air-water',
     title: 'Pojazdy powietrzne i wodne',
     items: [
-      { slug: 'airplane', description: 'Samolot', prompt: 'passenger airplane in flight, side view' },
-      { slug: 'helicopter', description: 'Helikopter', prompt: 'rescue helicopter with visible rotor' },
-      { slug: 'sailboat', description: 'Żaglówka', prompt: 'small sailboat with white sail on calm water' },
+      {
+        slug: 'airplane',
+        description: 'Samolot',
+        prompt: 'passenger airplane in flight, side view',
+      },
+      {
+        slug: 'helicopter',
+        description: 'Helikopter',
+        prompt: 'rescue helicopter with visible rotor',
+      },
+      {
+        slug: 'sailboat',
+        description: 'Żaglówka',
+        prompt: 'small sailboat with white sail on calm water',
+      },
       { slug: 'ship', description: 'Statek', prompt: 'large cargo ship on sea, side view' },
-      { slug: 'submarine', description: 'Okręt podwodny', prompt: 'yellow submarine with periscope, side view' },
-      { slug: 'hot-air-balloon', description: 'Balon', prompt: 'colorful hot-air balloon with basket' },
-      { slug: 'rocket', description: 'Rakieta', prompt: 'space rocket launching with small smoke clouds' },
-      { slug: 'kayak', description: 'Kajak', prompt: 'kayak with paddle on river water, side view' },
+      {
+        slug: 'submarine',
+        description: 'Okręt podwodny',
+        prompt: 'yellow submarine with periscope, side view',
+      },
+      {
+        slug: 'hot-air-balloon',
+        description: 'Balon',
+        prompt: 'colorful hot-air balloon with basket',
+      },
+      {
+        slug: 'rocket',
+        description: 'Rakieta',
+        prompt: 'space rocket launching with small smoke clouds',
+      },
+      {
+        slug: 'kayak',
+        description: 'Kajak',
+        prompt: 'kayak with paddle on river water, side view',
+      },
     ],
   },
   {
@@ -58,7 +98,11 @@ const sets = [
       { slug: 'cucumber', description: 'Ogórek', prompt: 'green cucumber' },
       { slug: 'tomato', description: 'Pomidor', prompt: 'ripe red tomato with green stem' },
       { slug: 'potato', description: 'Ziemniak', prompt: 'potato tuber with simple natural shape' },
-      { slug: 'broccoli', description: 'Brokuł', prompt: 'broccoli head with green florets and stem' },
+      {
+        slug: 'broccoli',
+        description: 'Brokuł',
+        prompt: 'broccoli head with green florets and stem',
+      },
       { slug: 'pepper', description: 'Papryka', prompt: 'red bell pepper with stem' },
       { slug: 'onion', description: 'Cebula', prompt: 'golden onion with simple dry peel' },
       { slug: 'pumpkin', description: 'Dynia', prompt: 'orange pumpkin with short stem' },
@@ -75,7 +119,11 @@ const sets = [
       { slug: 'duck', description: 'Kaczka', prompt: 'duck on calm water, side view' },
       { slug: 'swan', description: 'Łabędź', prompt: 'white swan on calm lake water' },
       { slug: 'penguin', description: 'Pingwin', prompt: 'penguin standing on ice' },
-      { slug: 'woodpecker', description: 'Dzięcioł', prompt: 'woodpecker on tree trunk, side view' },
+      {
+        slug: 'woodpecker',
+        description: 'Dzięcioł',
+        prompt: 'woodpecker on tree trunk, side view',
+      },
     ],
   },
   {
@@ -96,28 +144,80 @@ const sets = [
     folder: 'jobs',
     title: 'Zawody',
     items: [
-      { slug: 'doctor', description: 'Lekarz', prompt: 'friendly doctor in white coat with stethoscope' },
-      { slug: 'firefighter', description: 'Strażak', prompt: 'firefighter in helmet and protective uniform' },
+      {
+        slug: 'doctor',
+        description: 'Lekarz',
+        prompt: 'friendly doctor in white coat with stethoscope',
+      },
+      {
+        slug: 'firefighter',
+        description: 'Strażak',
+        prompt: 'firefighter in helmet and protective uniform',
+      },
       { slug: 'teacher', description: 'Nauczyciel', prompt: 'teacher pointing at school board' },
-      { slug: 'police-officer', description: 'Policjant', prompt: 'police officer in uniform with cap' },
+      {
+        slug: 'police-officer',
+        description: 'Policjant',
+        prompt: 'police officer in uniform with cap',
+      },
       { slug: 'chef', description: 'Kucharz', prompt: 'chef with white hat holding spoon' },
       { slug: 'pilot', description: 'Pilot', prompt: 'airplane pilot in uniform' },
-      { slug: 'farmer', description: 'Rolnik', prompt: 'farmer with straw hat and basket of vegetables' },
-      { slug: 'astronaut', description: 'Astronauta', prompt: 'astronaut in white spacesuit with helmet' },
+      {
+        slug: 'farmer',
+        description: 'Rolnik',
+        prompt: 'farmer with straw hat and basket of vegetables',
+      },
+      {
+        slug: 'astronaut',
+        description: 'Astronauta',
+        prompt: 'astronaut in white spacesuit with helmet',
+      },
     ],
   },
   {
     folder: 'dinosaurs',
     title: 'Dinozaury',
     items: [
-      { slug: 'tyrannosaurus', description: 'Tyranozaur', prompt: 'tyrannosaurus dinosaur standing, side view' },
-      { slug: 'triceratops', description: 'Triceratops', prompt: 'triceratops dinosaur with three horns' },
-      { slug: 'stegosaurus', description: 'Stegozaur', prompt: 'stegosaurus dinosaur with plates on back' },
-      { slug: 'brachiosaurus', description: 'Brachiozaur', prompt: 'brachiosaurus dinosaur with long neck' },
-      { slug: 'velociraptor', description: 'Welociraptor', prompt: 'velociraptor dinosaur running, side view' },
-      { slug: 'ankylosaurus', description: 'Ankylozaur', prompt: 'ankylosaurus dinosaur with armored back and tail club' },
-      { slug: 'diplodocus', description: 'Diplodok', prompt: 'diplodocus dinosaur with very long tail' },
-      { slug: 'spinosaurus', description: 'Spinozaur', prompt: 'spinosaurus dinosaur with sail on back' },
+      {
+        slug: 'tyrannosaurus',
+        description: 'Tyranozaur',
+        prompt: 'tyrannosaurus dinosaur standing, side view',
+      },
+      {
+        slug: 'triceratops',
+        description: 'Triceratops',
+        prompt: 'triceratops dinosaur with three horns',
+      },
+      {
+        slug: 'stegosaurus',
+        description: 'Stegozaur',
+        prompt: 'stegosaurus dinosaur with plates on back',
+      },
+      {
+        slug: 'brachiosaurus',
+        description: 'Brachiozaur',
+        prompt: 'brachiosaurus dinosaur with long neck',
+      },
+      {
+        slug: 'velociraptor',
+        description: 'Welociraptor',
+        prompt: 'velociraptor dinosaur running, side view',
+      },
+      {
+        slug: 'ankylosaurus',
+        description: 'Ankylozaur',
+        prompt: 'ankylosaurus dinosaur with armored back and tail club',
+      },
+      {
+        slug: 'diplodocus',
+        description: 'Diplodok',
+        prompt: 'diplodocus dinosaur with very long tail',
+      },
+      {
+        slug: 'spinosaurus',
+        description: 'Spinozaur',
+        prompt: 'spinosaurus dinosaur with sail on back',
+      },
     ],
   },
   {
@@ -125,13 +225,29 @@ const sets = [
     title: 'Sporty',
     items: [
       { slug: 'football', description: 'Piłka nożna', prompt: 'child kicking soccer ball' },
-      { slug: 'basketball', description: 'Koszykówka', prompt: 'basketball ball and hoop on court' },
+      {
+        slug: 'basketball',
+        description: 'Koszykówka',
+        prompt: 'basketball ball and hoop on court',
+      },
       { slug: 'tennis', description: 'Tenis', prompt: 'tennis racket and tennis ball on court' },
       { slug: 'volleyball', description: 'Siatkówka', prompt: 'volleyball ball above net' },
-      { slug: 'swimming', description: 'Pływanie', prompt: 'swimming goggles and swim cap near pool lane' },
+      {
+        slug: 'swimming',
+        description: 'Pływanie',
+        prompt: 'swimming goggles and swim cap near pool lane',
+      },
       { slug: 'skiing', description: 'Narciarstwo', prompt: 'skis and poles on snowy slope' },
-      { slug: 'gymnastics', description: 'Gimnastyka', prompt: 'gymnastics ribbon and balance beam equipment' },
-      { slug: 'athletics', description: 'Lekkoatletyka', prompt: 'running shoes on track lane with finish line' },
+      {
+        slug: 'gymnastics',
+        description: 'Gimnastyka',
+        prompt: 'gymnastics ribbon and balance beam equipment',
+      },
+      {
+        slug: 'athletics',
+        description: 'Lekkoatletyka',
+        prompt: 'running shoes on track lane with finish line',
+      },
     ],
   },
   {
@@ -141,8 +257,16 @@ const sets = [
       { slug: 'dolphin', description: 'Delfin', prompt: 'dolphin jumping above sea water' },
       { slug: 'whale', description: 'Wieloryb', prompt: 'blue whale swimming in ocean' },
       { slug: 'shark', description: 'Rekin', prompt: 'shark swimming underwater, side view' },
-      { slug: 'octopus', description: 'Ośmiornica', prompt: 'octopus with spread tentacles underwater' },
-      { slug: 'sea-turtle', description: 'Żółw morski', prompt: 'sea turtle swimming above coral reef' },
+      {
+        slug: 'octopus',
+        description: 'Ośmiornica',
+        prompt: 'octopus with spread tentacles underwater',
+      },
+      {
+        slug: 'sea-turtle',
+        description: 'Żółw morski',
+        prompt: 'sea turtle swimming above coral reef',
+      },
       { slug: 'seahorse', description: 'Konik morski', prompt: 'seahorse near sea plants' },
       { slug: 'jellyfish', description: 'Meduza', prompt: 'translucent jellyfish underwater' },
       { slug: 'crab', description: 'Krab', prompt: 'red crab on sandy seabed' },
@@ -154,12 +278,24 @@ const sets = [
     items: [
       { slug: 'sun', description: 'Słońce', prompt: 'Sun as bright yellow star with rays' },
       { slug: 'moon', description: 'Księżyc', prompt: 'Moon with visible craters on dark sky' },
-      { slug: 'earth', description: 'Ziemia', prompt: 'planet Earth seen from space with continents and clouds' },
-      { slug: 'mars', description: 'Mars', prompt: 'planet Mars in red colors with visible details' },
+      {
+        slug: 'earth',
+        description: 'Ziemia',
+        prompt: 'planet Earth seen from space with continents and clouds',
+      },
+      {
+        slug: 'mars',
+        description: 'Mars',
+        prompt: 'planet Mars in red colors with visible details',
+      },
       { slug: 'jupiter', description: 'Jowisz', prompt: 'planet Jupiter with cloud bands' },
       { slug: 'saturn', description: 'Saturn', prompt: 'planet Saturn with large rings' },
       { slug: 'comet', description: 'Kometa', prompt: 'comet with long glowing tail in space' },
-      { slug: 'space-station', description: 'Stacja kosmiczna', prompt: 'orbital space station with solar panels above Earth' },
+      {
+        slug: 'space-station',
+        description: 'Stacja kosmiczna',
+        prompt: 'orbital space station with solar panels above Earth',
+      },
     ],
   },
 ];
@@ -287,7 +423,9 @@ async function openAiPost(pathname, body, maxRetries = 6) {
     }
 
     const backoffMs = 1500 * 2 ** attempt + Math.floor(Math.random() * 700);
-    console.log(`[retry ${attempt + 1}/${maxRetries}] ${pathname} -> ${errorMessage}. Czekam ${backoffMs} ms.`);
+    console.log(
+      `[retry ${attempt + 1}/${maxRetries}] ${pathname} -> ${errorMessage}. Czekam ${backoffMs} ms.`
+    );
     await sleep(backoffMs);
   }
 
@@ -489,7 +627,8 @@ async function generateImage(outputPath, itemPrompt) {
 }
 
 async function runWithConcurrency(tasks, concurrency) {
-  const safeConcurrency = Number.isFinite(concurrency) && concurrency > 0 ? Math.floor(concurrency) : 1;
+  const safeConcurrency =
+    Number.isFinite(concurrency) && concurrency > 0 ? Math.floor(concurrency) : 1;
   let index = 0;
 
   const workers = Array.from({ length: safeConcurrency }, async () => {

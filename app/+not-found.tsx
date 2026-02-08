@@ -11,7 +11,7 @@ export default function NotFoundScreen() {
         options={{
           headerTransparent: true,
           headerTitle: '',
-          headerBackTitleVisible: false,
+          headerBackButtonDisplayMode: 'minimal',
           headerShadowVisible: false,
         }}
       />
