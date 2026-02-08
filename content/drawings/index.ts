@@ -1,3 +1,5 @@
+import generatedSets from './generated-sets';
+
 export default [
   {
     title: 'Zwierzęta',
@@ -1085,4 +1087,5 @@ export default [
       },
     ],
   },
+  ...generatedSets,
 ];
