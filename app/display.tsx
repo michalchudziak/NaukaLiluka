@@ -109,6 +109,7 @@ export default function DisplayScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#ffffff',
     paddingHorizontal: '10%',
     justifyContent: 'center',
     alignItems: 'center',

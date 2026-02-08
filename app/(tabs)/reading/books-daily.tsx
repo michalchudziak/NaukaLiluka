@@ -1,11 +1,17 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
+import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { TrackButton } from '@/components/TrackButton';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import { WordColors } from '@/constants/WordColors';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
@@ -13,6 +19,8 @@ import { useBookStore } from '@/store/book-store';
 export default function BooksDailyScreen() {
   const { t } = useTranslation();
   const tabBarHeight = useBottomTabBarHeight();
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const { getDailyData, markSessionItemCompleted, isSessionItemCompletedToday } = useBookStore();
@@ -23,20 +31,22 @@ export default function BooksDailyScreen() {
     sessionId: 'session1' | 'session2' | 'session3',
     type: 'words' | 'sentences'
   ) => {
+    if (!dailyPlan) {
+      return;
+    }
+
     const sessionContent = dailyPlan.sessions[sessionId];
     const items = type === 'words' ? sessionContent.words : sessionContent.sentences;
 
-    // Navigate to display screen with the content
     router.push({
       pathname: '/display',
       params: {
         items: JSON.stringify(items),
-        type: type,
+        type,
         color: selectedColor,
       },
     });
 
-    // Mark as completed
     markSessionItemCompleted(sessionId, type);
   };
 
@@ -46,33 +56,45 @@ export default function BooksDailyScreen() {
 
     const hasWords = sessionData?.words && sessionData.words.length > 0;
     const hasSentences = sessionData?.sentences && sessionData.sentences.length > 0;
+    const actions = [
+      hasWords
+        ? {
+            id: 'words',
+            title: t('booksDaily.words'),
+            isCompleted: isSessionItemCompletedToday(sessionKey, 'words'),
+            onPress: () => handleTrackPress(sessionKey, 'words'),
+          }
+        : null,
+      hasSentences
+        ? {
+            id: 'sentences',
+            title: t('booksDaily.sentences'),
+            isCompleted: isSessionItemCompletedToday(sessionKey, 'sentences'),
+            onPress: () => handleTrackPress(sessionKey, 'sentences'),
+          }
+        : null,
+    ].filter(Boolean) as Array<{
+      id: string;
+      title: string;
+      isCompleted: boolean;
+      onPress: () => void;
+    }>;
 
     return (
       <View key={sessionKey} style={styles.sessionRow}>
         <ThemedText type="subtitle" style={styles.sessionLabel}>
           {t(`booksDaily.${sessionKey}`)}
         </ThemedText>
-        <View
-          style={[
-            styles.buttonsContainer,
-            (!hasWords || !hasSentences) && styles.singleButtonContainer,
-          ]}
-        >
-          {hasWords && (
-            <TrackButton
-              title={t('booksDaily.words')}
-              isCompleted={isSessionItemCompletedToday(sessionKey, 'words')}
-              onPress={() => handleTrackPress(sessionKey, 'words')}
+        <View style={styles.actionsContainer}>
+          {actions.map((action) => (
+            <StateActionRow
+              key={action.id}
+              title={action.title}
+              subtitle={action.isCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus')}
+              isCompleted={action.isCompleted}
+              onPress={action.onPress}
             />
-          )}
-          {hasWords && hasSentences && <View style={styles.buttonSpacer} />}
-          {hasSentences && (
-            <TrackButton
-              title={t('booksDaily.sentences')}
-              isCompleted={isSessionItemCompletedToday(sessionKey, 'sentences')}
-              onPress={() => handleTrackPress(sessionKey, 'sentences')}
-            />
-          )}
+          ))}
         </View>
       </View>
     );
@@ -96,8 +118,18 @@ export default function BooksDailyScreen() {
   }
 
   return (
-    <ThemedView style={[styles.container, { marginBottom: tabBarHeight }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+    <ThemedView style={styles.container}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            marginBottom: tabBarHeight + 8,
+            paddingHorizontal: metrics.screenPadding,
+            maxWidth: metrics.maxContentWidth,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <ThemedText type="subtitle" style={styles.bookTitle}>
           {dailyPlan.bookId}
         </ThemedText>
@@ -121,11 +153,16 @@ export default function BooksDailyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: ForestCampTheme.colors.background,
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
+    width: '100%',
+    alignSelf: 'center',
+    paddingTop: 14,
+    paddingBottom: 30,
+    gap: 14,
   },
   centerContent: {
     justifyContent: 'center',
@@ -134,38 +171,43 @@ const styles = StyleSheet.create({
   sessionsContainer: {
     flex: 1,
     justifyContent: 'center',
-    gap: 30,
+    gap: 18,
   },
   sessionRow: {
-    gap: 15,
+    gap: 10,
+    borderRadius: ForestCampTheme.radius.lg,
+    backgroundColor: ForestCampTheme.colors.card,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
+    padding: 14,
+    ...forestCampSoftShadow,
   },
   sessionLabel: {
+    ...forestCampTypography.heading,
     fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 10,
+    lineHeight: 24,
+    color: ForestCampTheme.colors.title,
   },
-  buttonsContainer: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  singleButtonContainer: {
-    justifyContent: 'center',
-  },
-  buttonSpacer: {
-    width: 12,
+  actionsContainer: {
+    gap: 10,
   },
   bookTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    ...forestCampTypography.display,
+    fontSize: 34,
+    lineHeight: 38,
+    color: ForestCampTheme.colors.title,
     textAlign: 'center',
-    marginBottom: 30,
+    marginBottom: 10,
   },
   loadingText: {
     marginTop: 10,
     fontSize: 16,
+    color: ForestCampTheme.colors.textMuted,
   },
   noContentText: {
+    ...forestCampTypography.heading,
     fontSize: 18,
+    color: ForestCampTheme.colors.textMuted,
     textAlign: 'center',
   },
 });

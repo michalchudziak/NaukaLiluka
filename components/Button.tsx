@@ -1,6 +1,18 @@
-import { type StyleProp, StyleSheet, TouchableOpacity, View, type ViewStyle } from 'react-native';
+import {
+  type StyleProp,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  type ViewStyle,
+} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { Colors } from '@/constants/Colors';
+import {
+  ForestCampTheme,
+  forestCampShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 
 interface ButtonProps {
   title: string;
@@ -10,15 +22,30 @@ interface ButtonProps {
 }
 
 export function Button({ title, onPress, style, disabled = false }: ButtonProps) {
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
+
   return (
     <TouchableOpacity
-      style={[styles.button, style, disabled && styles.buttonDisabled]}
+      style={[
+        styles.button,
+        metrics.isTablet && styles.buttonTablet,
+        style,
+        disabled && styles.buttonDisabled,
+      ]}
       activeOpacity={0.8}
       onPress={onPress}
       disabled={disabled}
     >
       <View style={styles.buttonContent}>
-        <ThemedText type="title" style={[styles.buttonText, disabled && styles.buttonTextDisabled]}>
+        <ThemedText
+          type="title"
+          style={[
+            styles.buttonText,
+            metrics.isTablet && styles.buttonTextTablet,
+            disabled && styles.buttonTextDisabled,
+          ]}
+        >
           {title}
         </ThemedText>
       </View>
@@ -29,39 +56,45 @@ export function Button({ title, onPress, style, disabled = false }: ButtonProps)
 const styles = StyleSheet.create({
   button: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: ForestCampTheme.radius.lg,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.primaryStrong,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    minHeight: 100,
-    maxHeight: 150,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    backgroundColor: Colors.light.tint,
+    padding: 18,
+    minHeight: 94,
+    maxHeight: 152,
+    backgroundColor: ForestCampTheme.colors.primary,
+    ...forestCampShadow,
+  },
+  buttonTablet: {
+    minHeight: 112,
+    paddingVertical: 20,
+    paddingHorizontal: 22,
   },
   buttonDisabled: {
-    backgroundColor: '#ccc',
-    opacity: 0.6,
+    backgroundColor: ForestCampTheme.colors.borderStrong,
+    borderColor: ForestCampTheme.colors.borderStrong,
+    opacity: 0.7,
   },
   buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    justifyContent: 'center',
   },
   buttonText: {
-    color: '#fff',
+    ...forestCampTypography.heading,
+    color: '#ffffff',
     textAlign: 'center',
     fontSize: 24,
-    fontWeight: 'bold',
+    lineHeight: 30,
+  },
+  buttonTextTablet: {
+    fontSize: 28,
+    lineHeight: 34,
   },
   buttonTextDisabled: {
-    color: '#999',
+    color: '#eef3e8',
   },
   icon: {
     marginTop: 2,

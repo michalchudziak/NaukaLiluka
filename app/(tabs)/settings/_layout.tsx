@@ -1,16 +1,30 @@
 import { Stack } from 'expo-router';
+import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function SettingsLayout() {
   const { t } = useTranslation();
 
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: ForestCampTheme.colors.card,
+        },
+        headerShadowVisible: false,
+        headerTintColor: ForestCampTheme.colors.primaryStrong,
+        headerTitleStyle: {
+          ...forestCampTypography.heading,
+          color: ForestCampTheme.colors.title,
+          fontSize: 20,
+        },
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{
           title: t('settings.title'),
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -72,7 +86,7 @@ export default function SettingsLayout() {
       <Stack.Screen
         name="cloud-data"
         options={{
-          title: t('settings.drawings.settings'),
+          title: t('settings.cloudData.menuTitle'),
           headerShown: true,
           presentation: 'modal',
         }}

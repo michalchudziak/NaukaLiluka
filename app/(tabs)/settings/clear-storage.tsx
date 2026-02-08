@@ -1,10 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { AsyncStorageService } from '@/services/async-storage';
 import { useBookStore } from '@/store/book-store';
@@ -17,6 +23,8 @@ export default function ClearStorageScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [isClearing, setIsClearing] = useState(false);
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
 
   const bookStore = useBookStore();
   const noRepStore = useNoRepStore();
@@ -39,10 +47,8 @@ export default function ClearStorageScreen() {
           onPress: async () => {
             setIsClearing(true);
             try {
-              // Clear all AsyncStorage - this wipes everything
               await AsyncStorage.clear();
 
-              // Reinitialize all stores with default values
               await Promise.all([
                 bookStore.hydrate(),
                 noRepStore.hydrate(),
@@ -86,12 +92,10 @@ export default function ClearStorageScreen() {
           onPress: async () => {
             setIsClearing(true);
             try {
-              // Clear all book-related storage keys
               await AsyncStorageService.clear('progress.books');
               await AsyncStorageService.clear('progress.books.daily-plan');
               await AsyncStorageService.clear('routines.reading.book-track.sessions');
 
-              // Reinitialize book store
               await bookStore.hydrate();
 
               Alert.alert(
@@ -128,10 +132,8 @@ export default function ClearStorageScreen() {
           onPress: async () => {
             setIsClearing(true);
             try {
-              // Clear drawings storage
               await AsyncStorageService.clear('progress.drawings.presentations');
 
-              // Reinitialize drawings store
               await drawingsStore.hydrate();
 
               Alert.alert(
@@ -168,10 +170,8 @@ export default function ClearStorageScreen() {
           onPress: async () => {
             setIsClearing(true);
             try {
-              // Clear settings storage
               await AsyncStorageService.clear('settings');
 
-              // Reinitialize settings store with defaults
               await settingsStore.hydrate();
 
               Alert.alert(
@@ -208,11 +208,9 @@ export default function ClearStorageScreen() {
           onPress: async () => {
             setIsClearing(true);
             try {
-              // Clear all math related storage keys
               await AsyncStorageService.clear('progress.math');
               await AsyncStorageService.clear('routines.math.sessions');
 
-              // Reinitialize math store
               await mathStore.hydrate();
 
               Alert.alert(
@@ -249,13 +247,11 @@ export default function ClearStorageScreen() {
           onPress: async () => {
             setIsClearing(true);
             try {
-              // Clear all no-rep related storage keys
               await AsyncStorageService.clear('progress.reading.no-rep.words');
               await AsyncStorageService.clear('progress.reading.no-rep.sentences');
               await AsyncStorageService.clear('routines.reading.no-rep.words');
               await AsyncStorageService.clear('routines.reading.no-rep.sentences');
 
-              // Reinitialize no-rep store
               await noRepStore.hydrate();
 
               Alert.alert(
@@ -279,7 +275,17 @@ export default function ClearStorageScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingHorizontal: metrics.screenPadding,
+            maxWidth: metrics.maxContentWidth,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.warningCard}>
           <ThemedText style={styles.warningTitle}>{t('settings.clearStorage.warning')}</ThemedText>
           <ThemedText style={styles.warningText}>
@@ -352,37 +358,46 @@ export default function ClearStorageScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ForestCampTheme.colors.background,
   },
   scrollView: {
     flex: 1,
-    padding: 20,
+  },
+  content: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingTop: 14,
+    paddingBottom: 20,
   },
   warningCard: {
-    backgroundColor: '#FFF3CD',
-    borderRadius: 12,
+    backgroundColor: '#fff3df',
+    borderRadius: ForestCampTheme.radius.lg,
     padding: 16,
-    marginBottom: 30,
-    borderWidth: 1,
-    borderColor: '#FFE69C',
+    marginBottom: 22,
+    borderWidth: 2,
+    borderColor: '#efcf9a',
+    ...forestCampSoftShadow,
   },
   warningTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#856404',
+    ...forestCampTypography.heading,
+    fontSize: 17,
+    color: '#95622e',
     marginBottom: 8,
   },
   warningText: {
+    ...forestCampTypography.body,
     fontSize: 14,
-    color: '#856404',
+    color: '#95622e',
     lineHeight: 20,
   },
   section: {
-    marginBottom: 30,
+    marginBottom: 22,
   },
   sectionTitle: {
+    ...forestCampTypography.heading,
     fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 16,
+    color: ForestCampTheme.colors.title,
+    marginBottom: 12,
   },
   buttonContainer: {
     gap: 12,
@@ -391,6 +406,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   destructiveButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: ForestCampTheme.colors.danger,
+    borderColor: '#ab3e2f',
   },
 });

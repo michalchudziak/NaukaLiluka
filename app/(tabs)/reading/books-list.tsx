@@ -1,15 +1,25 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { BookListItem } from '@/components/BookListItem';
+import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {
+  ForestCampTheme,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import { books } from '@/content/books';
+import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
 import { useSettingsStore } from '@/store/settings-store';
 import type { Book } from '@/types/book';
 
 export default function BooksListScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
   const activeBook = useBookStore((s) => s.activeBookProgress);
   const settings = useSettingsStore();
   const bottomTabBarHeight = useBottomTabBarHeight();
@@ -36,12 +46,22 @@ export default function BooksListScreen() {
   };
 
   return (
-    <ThemedView style={[styles.container, { paddingBottom: bottomTabBarHeight }]}>
+    <ThemedView style={styles.container}>
+      <View style={[styles.header, { paddingHorizontal: metrics.screenPadding }]}>
+        <ThemedText style={styles.title}>{t('booksList.title')}</ThemedText>
+      </View>
       <FlatList
         data={books}
         renderItem={renderBook}
         keyExtractor={(item) => item.book.title}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[
+          styles.listContent,
+          {
+            paddingHorizontal: metrics.screenPadding,
+            paddingBottom: bottomTabBarHeight + 12,
+            maxWidth: metrics.maxContentWidth,
+          },
+        ]}
         ItemSeparatorComponent={() => <ThemedView style={styles.separator} />}
       />
     </ThemedView>
@@ -51,9 +71,21 @@ export default function BooksListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ForestCampTheme.colors.background,
+  },
+  header: {
+    paddingTop: 12,
+  },
+  title: {
+    ...forestCampTypography.display,
+    fontSize: 30,
+    lineHeight: 34,
+    color: ForestCampTheme.colors.title,
   },
   listContent: {
-    padding: 16,
+    alignSelf: 'center',
+    width: '100%',
+    paddingTop: 12,
   },
   separator: {
     height: 12,

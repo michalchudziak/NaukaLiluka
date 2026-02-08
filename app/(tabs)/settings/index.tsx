@@ -1,9 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface SettingItemProps {
@@ -16,10 +22,16 @@ interface SettingItemProps {
 
 function SettingItem({ title, subtitle, icon, onPress, destructive }: SettingItemProps) {
   return (
-    <TouchableOpacity style={styles.settingItem} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity style={styles.settingItem} onPress={onPress} activeOpacity={0.75}>
       <View style={styles.settingItemContent}>
         <View style={[styles.iconContainer, destructive && styles.destructiveIcon]}>
-          <Ionicons name={icon} size={24} color={destructive ? '#FF3B30' : '#007AFF'} />
+          <Ionicons
+            name={icon}
+            size={22}
+            color={
+              destructive ? ForestCampTheme.colors.danger : ForestCampTheme.colors.primaryStrong
+            }
+          />
         </View>
         <View style={styles.textContainer}>
           <ThemedText style={[styles.settingTitle, destructive && styles.destructiveText]}>
@@ -27,7 +39,7 @@ function SettingItem({ title, subtitle, icon, onPress, destructive }: SettingIte
           </ThemedText>
           {subtitle && <ThemedText style={styles.settingSubtitle}>{subtitle}</ThemedText>}
         </View>
-        <Ionicons name="chevron-forward" size={20} color="#C7C7CC" />
+        <Ionicons name="chevron-forward" size={18} color={ForestCampTheme.colors.textMuted} />
       </View>
     </TouchableOpacity>
   );
@@ -37,14 +49,27 @@ export default function SettingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
 
   return (
-    <ThemedView style={styles.container}>
+    <SafeAreaView edges={['top']} style={styles.container}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={{ paddingBottom: tabBarHeight }}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingBottom: tabBarHeight + 16,
+            paddingHorizontal: metrics.screenPadding,
+            maxWidth: metrics.maxContentWidth,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
       >
+        <ThemedText style={[styles.pageTitle, metrics.isTablet && styles.pageTitleTablet]}>
+          {t('tabs.settings')}
+        </ThemedText>
+
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>{t('settings.reading.sectionTitle')}</ThemedText>
 
@@ -143,37 +168,55 @@ export default function SettingsScreen() {
           </View>
         </View>
       </ScrollView>
-    </ThemedView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ForestCampTheme.colors.background,
   },
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingTop: 12,
+  },
+  pageTitle: {
+    ...forestCampTypography.display,
+    fontSize: 30,
+    lineHeight: 34,
+    color: ForestCampTheme.colors.title,
+  },
+  pageTitleTablet: {
+    fontSize: 38,
+    lineHeight: 42,
+  },
   section: {
-    marginTop: 20,
+    marginTop: 18,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    opacity: 0.6,
-    marginLeft: 20,
+    ...forestCampTypography.heading,
+    fontSize: 15,
+    lineHeight: 18,
+    color: ForestCampTheme.colors.textMuted,
+    marginLeft: 10,
     marginBottom: 8,
   },
   sectionContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 0.5,
-    borderBottomWidth: 0.5,
-    borderColor: '#C8C7CC',
+    backgroundColor: ForestCampTheme.colors.card,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
+    borderRadius: ForestCampTheme.radius.lg,
+    overflow: 'hidden',
+    ...forestCampSoftShadow,
   },
   settingItem: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
+    backgroundColor: ForestCampTheme.colors.card,
+    paddingHorizontal: 14,
     paddingVertical: 12,
   },
   settingItemContent: {
@@ -181,35 +224,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#F2F2F7',
+    width: 36,
+    height: 36,
+    borderRadius: 11,
+    backgroundColor: '#e4f0da',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   destructiveIcon: {
-    backgroundColor: '#FFE5E5',
+    backgroundColor: '#fbe0d8',
   },
   textContainer: {
     flex: 1,
   },
   settingTitle: {
-    fontSize: 16,
-    fontWeight: '400',
+    ...forestCampTypography.heading,
+    fontSize: 17,
+    lineHeight: 21,
+    color: ForestCampTheme.colors.title,
   },
   settingSubtitle: {
+    ...forestCampTypography.body,
     fontSize: 13,
-    opacity: 0.6,
+    color: ForestCampTheme.colors.textMuted,
     marginTop: 2,
   },
   destructiveText: {
-    color: '#FF3B30',
+    color: ForestCampTheme.colors.danger,
   },
   separator: {
-    height: 0.5,
-    backgroundColor: '#C8C7CC',
-    marginLeft: 60,
+    height: 1,
+    backgroundColor: '#dbe8cf',
+    marginLeft: 62,
   },
 });

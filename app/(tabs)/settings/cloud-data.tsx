@@ -1,11 +1,19 @@
-import { Alert, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Switch, useWindowDimensions, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import {
+  ForestCampTheme,
+  forestCampSoftShadow,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
 
 export default function CloudDataScreen() {
   const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const metrics = getForestCampMetrics(width);
   const { useCloudData, updateUseCloudData } = useSettingsStore();
 
   const handleToggle = async (value: boolean) => {
@@ -29,7 +37,17 @@ export default function CloudDataScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingHorizontal: metrics.screenPadding,
+            maxWidth: metrics.maxContentWidth,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.section}>
           <View style={styles.sectionContent}>
             <View style={styles.settingItem}>
@@ -42,9 +60,9 @@ export default function CloudDataScreen() {
               <Switch
                 value={useCloudData}
                 onValueChange={handleToggle}
-                trackColor={{ false: '#767577', true: '#34C759' }}
+                trackColor={{ false: '#d3e2c5', true: ForestCampTheme.colors.success }}
                 thumbColor={'#FFFFFF'}
-                ios_backgroundColor="#3e3e3e"
+                ios_backgroundColor="#9eb08a"
               />
             </View>
           </View>
@@ -73,18 +91,27 @@ export default function CloudDataScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: ForestCampTheme.colors.background,
   },
   scrollView: {
     flex: 1,
   },
+  scrollContent: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingTop: 14,
+    paddingBottom: 20,
+  },
   section: {
-    marginTop: 20,
+    marginTop: 10,
   },
   sectionContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 0.5,
-    borderBottomWidth: 0.5,
-    borderColor: '#C8C7CC',
+    backgroundColor: ForestCampTheme.colors.card,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
+    borderRadius: ForestCampTheme.radius.lg,
+    overflow: 'hidden',
+    ...forestCampSoftShadow,
   },
   settingItem: {
     flexDirection: 'row',
@@ -99,47 +126,50 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   settingTitle: {
-    fontSize: 16,
-    fontWeight: '400',
+    ...forestCampTypography.heading,
+    fontSize: 17,
+    color: ForestCampTheme.colors.title,
     marginBottom: 4,
   },
   settingDescription: {
+    ...forestCampTypography.body,
     fontSize: 13,
-    opacity: 0.6,
+    color: ForestCampTheme.colors.textMuted,
   },
   infoSection: {
-    marginTop: 20,
-    paddingHorizontal: 16,
+    marginTop: 18,
+    paddingHorizontal: 10,
   },
   infoTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    opacity: 0.6,
+    ...forestCampTypography.heading,
+    fontSize: 14,
+    color: ForestCampTheme.colors.textMuted,
     marginBottom: 8,
   },
   infoText: {
+    ...forestCampTypography.body,
     fontSize: 14,
-    opacity: 0.8,
+    color: ForestCampTheme.colors.textMuted,
     lineHeight: 20,
   },
   statusSection: {
-    marginTop: 20,
-    paddingHorizontal: 16,
+    marginTop: 18,
+    paddingHorizontal: 10,
   },
   statusItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#34C759',
+    width: 9,
+    height: 9,
+    borderRadius: 5,
+    backgroundColor: ForestCampTheme.colors.success,
     marginRight: 8,
   },
   statusText: {
+    ...forestCampTypography.heading,
     fontSize: 14,
-    opacity: 0.8,
+    color: ForestCampTheme.colors.title,
   },
 });
