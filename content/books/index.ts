@@ -1,5 +1,6 @@
 import type { Book } from '@/types/book';
 import dom from './dom/content';
+import deszcz from './deszcz/content';
 import kuchnia from './kuchnia/content';
 import las from './las/content';
 import obiadUdziadkow from './obiad-u-dziadkow/content';
@@ -25,4 +26,5 @@ export const books: Book[] = [
   kuchnia,
   urodziny,
   park,
+  deszcz,
 ];

@@ -141,3 +141,6 @@ Words known from previous books:
 ['parku', 'pies', 'biegnie'],
 ['szybko', 'wesoło', 'ławce'],
 ['potem', 'karmi', 'ptaki'],
+['deszcz', 'pada', 'parasol'],
+['kalosze', 'kałuże', 'mokre'],
+['chmury', 'ciemne', 'suszy'],
