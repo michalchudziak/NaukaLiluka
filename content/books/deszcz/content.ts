@@ -17,7 +17,7 @@ const deszcz: Book = {
         sentences: ['Karolcia widzi kałuże na placu.'],
       },
       {
-        sentences: ['Lora biegnie szybko do domu.'],
+        sentences: ['Lora szybko biegnie do domu.'],
       },
       {
         sentences: ['Dziś kalosze są mokre.'],

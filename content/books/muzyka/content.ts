@@ -17,7 +17,7 @@ const muzyka: Book = {
         sentences: ['Lora też tańczy w domu.'],
       },
       {
-        sentences: ['Mama śpiewa cicho.'],
+        sentences: ['Mama cicho śpiewa.'],
       },
       {
         sentences: ['Karol jest zmęczony.'],
@@ -40,7 +40,7 @@ const muzyka: Book = {
   ],
   sentences: [
     ['Kto tańczy w domu?', 'Karol tańczy na placu.', 'Lora głośno się śmieje.'],
-    ['Mama gra muzykę w domu.', 'Czy Tata gra muzykę?', 'Karolcia śpiewa cicho.'],
+    ['Mama gra muzykę w domu.', 'Czy Tata gra muzykę?', 'Karolcia cicho śpiewa.'],
     ['Tata jest zmęczony.', 'Czy Karolcia jest zmęczona?', 'Lora zasypia w domu.'],
   ],
 };

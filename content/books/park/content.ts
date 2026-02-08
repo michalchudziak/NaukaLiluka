@@ -8,13 +8,13 @@ const park: Book = {
         sentences: ['Dziś Karol idzie do parku.'],
       },
       {
-        sentences: ['W parku pies biegnie szybko.'],
+        sentences: ['W parku pies szybko biegnie.'],
       },
       {
         sentences: ['Karol karmi ptaki w parku.'],
       },
       {
-        sentences: ['Karolcia też biega wesoło na placu.'],
+        sentences: ['Karolcia też wesoło biega na placu.'],
       },
       {
         sentences: ['Mama odpoczywa na ławce.'],
@@ -34,8 +34,8 @@ const park: Book = {
   ],
   sentences: [
     ['Kto idzie do parku?', 'Karol idzie do parku.', 'Pies biegnie w lesie.'],
-    ['Lora biegnie szybko na placu.', 'Karolcia biega wesoło w parku.', 'Tata siedzi na ławce.'],
-    ['Kto karmi ptaki w parku?', 'Potem mama wraca do domu.', 'Lora biegnie szybko, potem odpoczywa.'],
+    ['Lora szybko biegnie na placu.', 'Karolcia wesoło biega w parku.', 'Tata siedzi na ławce.'],
+    ['Kto karmi ptaki w parku?', 'Potem mama wraca do domu.', 'Lora szybko biegnie, potem odpoczywa.'],
   ],
 };
 
