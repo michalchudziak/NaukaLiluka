@@ -29,9 +29,6 @@ const piknik: Book = {
         sentences: ['Dziś słońce świeci.'],
       },
       {
-        sentences: ['Jabłko też smakuje.'],
-      },
-      {
         sentences: ['Wszyscy są w domu.'],
       },
     ],
