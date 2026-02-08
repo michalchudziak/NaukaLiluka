@@ -6,18 +6,23 @@ const ogrod: Book = {
     pages: [
       {
         sentences: ['Mama podlewa kwiaty.'],
+        image: require('./ogrod-page-01.png'),
       },
       {
         sentences: ['Mama podlewa trawę.'],
+        image: require('./ogrod-page-02.png'),
       },
       {
         sentences: ['Mama podlewa drzewo.'],
+        image: require('./ogrod-page-03.png'),
       },
       {
         sentences: ['Mama podlewa krzaki.'],
+        image: require('./ogrod-page-04.png'),
       },
       {
         sentences: ['Mama podlewa warzywa.'],
+        image: require('./ogrod-page-05.png'),
       },
     ],
   },

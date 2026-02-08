@@ -6,24 +6,31 @@ const placZabaw: Book = {
     pages: [
       {
         sentences: ['Karol bawi się na huśtawce.'],
+        image: require('./plac-zabaw-page-01.png'),
       },
       {
         sentences: ['Karolcia bawi się na zjeżdżalni.'],
+        image: require('./plac-zabaw-page-02.png'),
       },
       {
         sentences: ['Tata jest na placu.'],
+        image: require('./plac-zabaw-page-03.png'),
       },
       {
         sentences: ['Mama też jest na placu.'],
+        image: require('./plac-zabaw-page-04.png'),
       },
       {
         sentences: ['Czy Lora bawi się na placu?'],
+        image: require('./plac-zabaw-page-05.png'),
       },
       {
         sentences: ['Gdzie jest Lora?'],
+        image: require('./plac-zabaw-page-06.png'),
       },
       {
         sentences: ['Lora bawi się w piaskownicy.'],
+        image: require('./plac-zabaw-page-07.png'),
       },
     ],
   },

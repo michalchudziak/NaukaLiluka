@@ -6,24 +6,31 @@ const kuchnia: Book = {
     pages: [
       {
         sentences: ['Wszyscy są w domu.'],
+        image: require('./kuchnia-page-01.png'),
       },
       {
         sentences: ['Tata siedzi na kanapie.'],
+        image: require('./kuchnia-page-02.png'),
       },
       {
         sentences: ['Tata też siedzi na kanapie.'],
+        image: require('./kuchnia-page-03.png'),
       },
       {
         sentences: ['Kto jest w kuchni?'],
+        image: require('./kuchnia-page-04.png'),
       },
       {
         sentences: ['Mama jest w kuchni.'],
+        image: require('./kuchnia-page-05.png'),
       },
       {
         sentences: ['Mama gotuje smaczny obiad.'],
+        image: require('./kuchnia-page-06.png'),
       },
       {
         sentences: ['Karolcia pomaga w kuchni.'],
+        image: require('./kuchnia-page-07.png'),
       },
     ],
   },

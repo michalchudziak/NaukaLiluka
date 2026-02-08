@@ -6,18 +6,23 @@ const zoo: Book = {
     pages: [
       {
         sentences: ['Karol widzi małpę.'],
+        image: require('./zoo-page-01.png'),
       },
       {
         sentences: ['Karolcia widzi słonia.'],
+        image: require('./zoo-page-02.png'),
       },
       {
         sentences: ['Karol widzi słonia.'],
+        image: require('./zoo-page-03.png'),
       },
       {
         sentences: ['Tata widzi lwa.'],
+        image: require('./zoo-page-04.png'),
       },
       {
         sentences: ['Mama widzi zwierzęta.'],
+        image: require('./zoo-page-05.png'),
       },
     ],
   },

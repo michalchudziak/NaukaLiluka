@@ -6,30 +6,39 @@ const deszcz: Book = {
     pages: [
       {
         sentences: ['Dziś pada deszcz.'],
+        image: require('./deszcz-page-01.png'),
       },
       {
         sentences: ['Mama ma parasol.'],
+        image: require('./deszcz-page-02.png'),
       },
       {
         sentences: ['Karol ma kalosze.'],
+        image: require('./deszcz-page-03.png'),
       },
       {
         sentences: ['Karolcia widzi kałuże na placu.'],
+        image: require('./deszcz-page-04.png'),
       },
       {
         sentences: ['Lora biegnie szybko do domu.'],
+        image: require('./deszcz-page-05.png'),
       },
       {
         sentences: ['Dziś kalosze są mokre.'],
+        image: require('./deszcz-page-06.png'),
       },
       {
         sentences: ['Dziś chmury są ciemne.'],
+        image: require('./deszcz-page-07.png'),
       },
       {
         sentences: ['Tata suszy parasol w domu.'],
+        image: require('./deszcz-page-08.png'),
       },
       {
         sentences: ['Wszyscy są w domu.'],
+        image: require('./deszcz-page-09.png'),
       },
     ],
   },

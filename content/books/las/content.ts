@@ -6,21 +6,27 @@ const las: Book = {
     pages: [
       {
         sentences: ['Karol idzie do lasu.'],
+        image: require('./las-page-01.png'),
       },
       {
         sentences: ['Karol biega w lesie.'],
+        image: require('./las-page-02.png'),
       },
       {
         sentences: ['Karol śpiewa w lesie.'],
+        image: require('./las-page-03.png'),
       },
       {
         sentences: ['Karol skacze w lesie.'],
+        image: require('./las-page-04.png'),
       },
       {
         sentences: ['Karol odpoczywa w lesie.'],
+        image: require('./las-page-05.png'),
       },
       {
         sentences: ['Karol wraca do domu.'],
+        image: require('./las-page-06.png'),
       },
     ],
   },

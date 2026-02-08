@@ -6,27 +6,35 @@ const urodziny: Book = {
     pages: [
       {
         sentences: ['Dziś są urodziny Karola.'],
+        image: require('./urodziny-page-01.png'),
       },
       {
         sentences: ['Wszyscy są w domu.'],
+        image: require('./urodziny-page-02.png'),
       },
       {
         sentences: ['Mama ma prezent dla Karola.'],
+        image: require('./urodziny-page-03.png'),
       },
       {
         sentences: ['Tata też ma prezent dla Karola.'],
+        image: require('./urodziny-page-04.png'),
       },
       {
         sentences: ['Karolcia też ma prezent dla Karola.'],
+        image: require('./urodziny-page-05.png'),
       },
       {
         sentences: ['Ile lat ma Karol?'],
+        image: require('./urodziny-page-06.png'),
       },
       {
         sentences: ['Karol ma pięć lat.'],
+        image: require('./urodziny-page-07.png'),
       },
       {
         sentences: ['To są udane urodziny.'],
+        image: require('./urodziny-page-08.png'),
       },
     ],
   },

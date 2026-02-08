@@ -6,18 +6,23 @@ const wakacje: Book = {
     pages: [
       {
         sentences: ['Wakacje są długie.'],
+        image: require('./wakacje-page-01.png'),
       },
       {
         sentences: ['Wakacje są słoneczne.'],
+        image: require('./wakacje-page-02.png'),
       },
       {
         sentences: ['Wakacje są wesołe.'],
+        image: require('./wakacje-page-03.png'),
       },
       {
         sentences: ['Wakacje są ciepłe.'],
+        image: require('./wakacje-page-04.png'),
       },
       {
         sentences: ['Wakacje są udane.'],
+        image: require('./wakacje-page-05.png'),
       },
     ],
   },

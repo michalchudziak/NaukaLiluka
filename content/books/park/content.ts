@@ -6,24 +6,31 @@ const park: Book = {
     pages: [
       {
         sentences: ['Dziś Karol idzie do parku.'],
+        image: require('./park-page-01.png'),
       },
       {
         sentences: ['W parku pies biegnie szybko.'],
+        image: require('./park-page-02.png'),
       },
       {
         sentences: ['Karol karmi ptaki w parku.'],
+        image: require('./park-page-03.png'),
       },
       {
         sentences: ['Karolcia też biega wesoło na placu.'],
+        image: require('./park-page-04.png'),
       },
       {
         sentences: ['Mama odpoczywa na ławce.'],
+        image: require('./park-page-05.png'),
       },
       {
         sentences: ['Tata siedzi na ławce i czyta książkę.'],
+        image: require('./park-page-06.png'),
       },
       {
         sentences: ['Potem Lora wraca do domu.'],
+        image: require('./park-page-07.png'),
       },
     ],
   },
