@@ -1,96 +1,26 @@
 import { Stack } from 'expo-router';
-import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
-import { useTranslation } from '@/hooks/useTranslation';
+import { ForestCampTheme } from '@/constants/ForestCampTheme';
 
 export default function SettingsLayout() {
-  const { t } = useTranslation();
-
   return (
     <Stack
       screenOptions={{
-        headerStyle: {
-          backgroundColor: ForestCampTheme.colors.card,
-        },
+        headerTransparent: true,
+        headerTitle: '',
+        headerBackTitleVisible: false,
         headerShadowVisible: false,
         headerTintColor: ForestCampTheme.colors.primaryStrong,
-        headerTitleStyle: {
-          ...forestCampTypography.heading,
-          color: ForestCampTheme.colors.title,
-          fontSize: 20,
-        },
       }}
     >
-      <Stack.Screen
-        name="index"
-        options={{
-          title: t('settings.title'),
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="clear-storage"
-        options={{
-          title: t('settings.clearStorage.title'),
-          headerShown: true,
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
-        name="view-storage"
-        options={{
-          title: t('settings.viewStorage.title'),
-          headerShown: true,
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
-        name="reading-norep"
-        options={{
-          title: t('settings.reading.noRepSettings'),
-          headerShown: true,
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
-        name="reading-interval"
-        options={{
-          title: t('settings.reading.intervalSettings'),
-          headerShown: true,
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
-        name="reading-books"
-        options={{
-          title: t('settings.reading.booksSettings'),
-          headerShown: true,
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
-        name="drawings"
-        options={{
-          title: t('settings.drawings.settings'),
-          headerShown: true,
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
-        name="math"
-        options={{
-          title: t('settings.math.settings'),
-          headerShown: true,
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
-        name="cloud-data"
-        options={{
-          title: t('settings.cloudData.menuTitle'),
-          headerShown: true,
-          presentation: 'modal',
-        }}
-      />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="clear-storage" />
+      <Stack.Screen name="view-storage" />
+      <Stack.Screen name="reading-norep" />
+      <Stack.Screen name="reading-interval" />
+      <Stack.Screen name="reading-books" />
+      <Stack.Screen name="drawings" />
+      <Stack.Screen name="math" />
+      <Stack.Screen name="cloud-data" />
     </Stack>
   );
 }

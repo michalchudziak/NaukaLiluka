@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useEffect } from 'react';
 import {
   ScrollView,
@@ -93,6 +94,7 @@ function NumberInput({ label, value, onChangeValue, min = 1, max = 99 }: NumberI
 
 export default function ReadingNoRepSettingsScreen() {
   const { t } = useTranslation();
+  const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
   const { reading, updateReadingNoRepWords, updateReadingNoRepSentences, hydrate } =
@@ -111,6 +113,7 @@ export default function ReadingNoRepSettingsScreen() {
           {
             paddingHorizontal: metrics.screenPadding,
             maxWidth: metrics.maxContentWidth,
+            paddingBottom: tabBarHeight + 8,
           },
         ]}
         showsVerticalScrollIndicator={false}

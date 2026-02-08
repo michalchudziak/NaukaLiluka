@@ -80,8 +80,8 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBarBase: {
-    borderTopWidth: 1,
-    borderTopColor: ForestCampTheme.colors.border,
+    borderWidth: 1,
+    borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.tabSurface,
     ...forestCampShadow,
   },
@@ -104,7 +104,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   tabBarDefault: {
-    position: 'relative',
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    bottom: 10,
+    borderRadius: 30,
+    overflow: 'hidden',
   },
   tabLabelPhone: {
     ...forestCampTypography.heading,

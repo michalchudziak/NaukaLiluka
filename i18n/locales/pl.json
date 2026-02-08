@@ -13,8 +13,8 @@
     "enable": "Włącz"
   },
   "reading": {
-    "bookTrack": "Ścieka książkowa",
-    "noRepeatTrack": "Ścieka bez powtórzeń",
+    "bookTrack": "Ścieżka książkowa",
+    "noRepeatTrack": "Ścieżka bez powtórzeń",
     "booksList": "Lista książek",
     "selectColor": "Wybierz kolor",
     "wordsTrack": "Słowa",
@@ -23,7 +23,7 @@
   "noRep": {
     "words": "Słowa",
     "sentences": "Zdania",
-    "title": "Ścieka bez powtórzeń",
+    "title": "Ścieżka bez powtórzeń",
     "back": "Wróć",
     "knownWordsCount": "{{count}} z {{total}} znanych słów",
     "knownSentencesCount": "{{count}} z {{total}} znanych zdań",
@@ -31,7 +31,7 @@
     "noMoreSentences": "Przerobione wszystkie zdania"
   },
   "bookTrack": {
-    "title": "Ścieka książkowa",
+    "title": "Ścieżka książkowa",
     "training": "Trening",
     "books": "Książki",
     "back": "Wróć"
@@ -57,9 +57,9 @@
     "back": "Wróć",
     "reading": {
       "sectionTitle": "Ustawienia czytania",
-      "noRepSettings": "Ścieka bez powtórzeń",
+      "noRepSettings": "Ścieżka bez powtórzeń",
       "noRepSettingsSubtitle": "Ilość elementów na sesję",
-      "noRepDescription": "Ustaw ilość słów i zdań wyświetlanych w każdej sesji ścieki bez powtórzeń.",
+      "noRepDescription": "Ustaw ilość słów i zdań wyświetlanych w każdej sesji ścieżki bez powtórzeń.",
       "intervalSettings": "Interwały czasowe",
       "intervalSettingsSubtitle": "Czas wyświetlania elementów",
       "intervalDescription": "Ustaw czas wyświetlania słów i zdań w milisekundach.",
@@ -128,7 +128,7 @@
       "selectiveTitle": "Wybiórcze czyszczenie",
       "completeTitle": "Całkowite czyszczenie",
       "clearBooks": "Wyczyść postępy książek",
-      "clearNoRep": "Wyczyść ściekę bez powtórzeń",
+      "clearNoRep": "Wyczyść ścieżkę bez powtórzeń",
       "clearDrawings": "Wyczyść historię obrazków",
       "clearSettings": "Przywróć domyślne ustawienia",
       "clearMath": "Wyczyść postępy matematyczne",
@@ -138,7 +138,7 @@
       "confirmBookTitle": "Usunąć postępy książek?",
       "confirmBookMessage": "Wszystkie postępy w książkach zostaną utracone.",
       "confirmNoRepTitle": "Usunąć dane bez powtórzeń?",
-      "confirmNoRepMessage": "Wszystkie postępy w ściece bez powtórzeń zostaną utracone.",
+      "confirmNoRepMessage": "Wszystkie postępy w ścieżce bez powtórzeń zostaną utracone.",
       "confirmDrawingsTitle": "Usunąć historię obrazków?",
       "confirmDrawingsMessage": "Cała historia wyświetlonych obrazków zostanie usunięta.",
       "confirmSettingsTitle": "Przywrócić domyślne ustawienia?",
@@ -148,7 +148,7 @@
       "successTitle": "Sukces",
       "successMessage": "Wszystkie dane zostały usunięte.",
       "bookClearedMessage": "Postępy książek zostały usunięte.",
-      "noRepClearedMessage": "Dane ścieki bez powtórzeń zostały usunięte.",
+      "noRepClearedMessage": "Dane ścieżki bez powtórzeń zostały usunięte.",
       "drawingsClearedMessage": "Historia obrazków została usunięta.",
       "settingsClearedMessage": "Ustawienia zostały przywrócone do wartości domyślnych.",
       "mathClearedMessage": "Postępy matematyczne zostały usunięte.",
@@ -160,7 +160,7 @@
       "subtitle": "Zobacz zapisane dane aplikacji",
       "bookProgressTitle": "Postępy książek",
       "dailyPlanTitle": "Plan dzienny",
-      "noRepProgressTitle": "Ścieka bez powtórzeń",
+      "noRepProgressTitle": "Ścieżka bez powtórzeń",
       "routinesTitle": "Aktywność dzienna",
       "storageInfo": "Informacje o pamięci",
       "noBookProgress": "Brak postępów w książkach",

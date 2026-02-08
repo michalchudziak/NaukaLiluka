@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -23,6 +24,7 @@ export default function ClearStorageScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [isClearing, setIsClearing] = useState(false);
+  const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
 
@@ -282,6 +284,7 @@ export default function ClearStorageScreen() {
           {
             paddingHorizontal: metrics.screenPadding,
             maxWidth: metrics.maxContentWidth,
+            paddingBottom: tabBarHeight + 8,
           },
         ]}
         showsVerticalScrollIndicator={false}

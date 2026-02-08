@@ -1,3 +1,4 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Alert, ScrollView, StyleSheet, Switch, useWindowDimensions, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -12,6 +13,7 @@ import { useSettingsStore } from '@/store/settings-store';
 
 export default function CloudDataScreen() {
   const { t } = useTranslation();
+  const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
   const { useCloudData, updateUseCloudData } = useSettingsStore();
@@ -44,6 +46,7 @@ export default function CloudDataScreen() {
           {
             paddingHorizontal: metrics.screenPadding,
             maxWidth: metrics.maxContentWidth,
+            paddingBottom: tabBarHeight + 8,
           },
         ]}
         showsVerticalScrollIndicator={false}
