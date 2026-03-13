@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: '100%',
     minHeight: 60,
+    backgroundColor: 'transparent',
   },
   captionText: {
     fontSize: 24,
@@ -229,6 +230,7 @@ const styles = StyleSheet.create({
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'transparent',
   },
   factText: {
     color: '#C3C3C3',
