@@ -1,9 +1,7 @@
 import { create } from 'zustand';
-import { HybridStorageService } from '@/services/hybrid-storage';
+import { ignoreCloudFailure, SupabaseService } from '@/services/supabase';
 
-const STORAGE_KEY = 'settings';
-
-interface SettingsState {
+type SettingsSnapshot = {
   reading: {
     noRep: {
       words: number;
@@ -34,8 +32,9 @@ interface SettingsState {
       numberCount: number;
     };
   };
-  useCloudData: boolean;
+};
 
+interface SettingsState extends SettingsSnapshot {
   updateReadingNoRepWords: (value: number) => void;
   updateReadingNoRepSentences: (value: number) => void;
   updateReadingIntervalWords: (value: number) => void;
@@ -46,15 +45,14 @@ interface SettingsState {
   updateDrawingsShowFacts: (value: boolean) => void;
   updateDrawingsInterval: (value: number) => void;
   updateDrawingsRandomOrder: (value: boolean) => void;
-  updateUseCloudData: (value: boolean) => void;
   updateMathEquationsInterval: (value: number) => void;
   updateMathEquationsCount: (value: number) => void;
   updateMathNumbersInterval: (value: number) => void;
   updateMathNumbersCount: (value: number) => void;
-  hydrate: () => Promise<void>;
+  bootstrap: () => Promise<void>;
 }
 
-const defaultSettings = {
+const defaultSettings: SettingsSnapshot = {
   reading: {
     noRep: {
       words: 3,
@@ -85,10 +83,54 @@ const defaultSettings = {
       numberCount: 10,
     },
   },
-  useCloudData: false,
 };
 
-export const useSettingsStore = create<SettingsState>((set, get) => ({
+function mergeSettings(stored: Partial<SettingsSnapshot> | null | undefined): SettingsSnapshot {
+  if (!stored) {
+    return defaultSettings;
+  }
+
+  return {
+    reading: {
+      ...defaultSettings.reading,
+      ...stored.reading,
+      noRep: {
+        ...defaultSettings.reading.noRep,
+        ...(stored.reading?.noRep ?? {}),
+      },
+      interval: {
+        ...defaultSettings.reading.interval,
+        ...(stored.reading?.interval ?? {}),
+      },
+      books: {
+        ...defaultSettings.reading.books,
+        ...(stored.reading?.books ?? {}),
+      },
+    },
+    drawings: {
+      ...defaultSettings.drawings,
+      ...(stored.drawings ?? {}),
+    },
+    math: {
+      ...defaultSettings.math,
+      ...stored.math,
+      equations: {
+        ...defaultSettings.math.equations,
+        ...(stored.math?.equations ?? {}),
+      },
+      numbers: {
+        ...defaultSettings.math.numbers,
+        ...(stored.math?.numbers ?? {}),
+      },
+    },
+  };
+}
+
+function persistSettings(snapshot: SettingsSnapshot) {
+  void SupabaseService.updateSettings(snapshot).catch(ignoreCloudFailure);
+}
+
+export const useSettingsStore = create<SettingsState>((set) => ({
   ...defaultSettings,
 
   updateReadingNoRepWords: (value: number) => {
@@ -103,11 +145,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           },
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -124,11 +162,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           },
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -145,11 +179,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           },
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -166,11 +196,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           },
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -187,11 +213,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           },
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -205,11 +227,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           wordSpacing: value,
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -223,11 +241,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           showCaptions: value,
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -241,11 +255,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           showFacts: value,
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -259,11 +269,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           interval: value,
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -277,25 +283,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           randomOrder: value,
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
 
-  updateUseCloudData: async (value: boolean) => {
-    await HybridStorageService.setUseCloudData(value);
-    set({ useCloudData: value });
-    // Re-hydrate from cloud if enabled
-    if (value) {
-      get().hydrate();
-    }
-  },
-
-  // Math settings updaters
   updateMathEquationsInterval: (value: number) => {
     set((state) => {
       const newState = {
@@ -308,11 +300,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           },
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -329,11 +317,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           },
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -350,11 +334,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           },
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
@@ -371,63 +351,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           },
         },
       };
-      HybridStorageService.writeSettings(STORAGE_KEY, {
-        reading: newState.reading,
-        drawings: newState.drawings,
-        math: newState.math,
-      });
+      persistSettings(newState);
       return newState;
     });
   },
 
-  hydrate: async () => {
-    await HybridStorageService.initialize();
-    const useCloudData = await HybridStorageService.getUseCloudData();
-    const stored = await HybridStorageService.readSettings(STORAGE_KEY);
-    if (stored) {
-      const mergedReading = {
-        ...defaultSettings.reading,
-        ...stored.reading,
-        noRep: {
-          ...defaultSettings.reading.noRep,
-          ...(stored.reading?.noRep ?? {}),
-        },
-        interval: {
-          ...defaultSettings.reading.interval,
-          ...(stored.reading?.interval ?? {}),
-        },
-        books: {
-          ...defaultSettings.reading.books,
-          ...(stored.reading?.books ?? {}),
-        },
-      };
-
-      const mergedDrawings = {
-        ...defaultSettings.drawings,
-        ...(stored.drawings ?? {}),
-      };
-
-      const mergedMath = {
-        ...defaultSettings.math,
-        ...stored.math,
-        equations: {
-          ...defaultSettings.math.equations,
-          ...(stored.math?.equations ?? {}),
-        },
-        numbers: {
-          ...defaultSettings.math.numbers,
-          ...(stored.math?.numbers ?? {}),
-        },
-      };
-
-      set({
-        reading: mergedReading,
-        drawings: mergedDrawings,
-        math: mergedMath,
-        useCloudData,
-      });
-    } else {
-      set({ useCloudData });
-    }
+  bootstrap: async () => {
+    const stored = await SupabaseService.getSettings();
+    set(mergeSettings(stored));
   },
 }));

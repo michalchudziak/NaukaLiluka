@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -111,12 +110,8 @@ export default function ReadingIntervalSettingsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
-  const { reading, updateReadingIntervalWords, updateReadingIntervalSentences, hydrate } =
+  const { reading, updateReadingIntervalWords, updateReadingIntervalSentences } =
     useSettingsStore();
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
 
   return (
     <ThemedView style={styles.container}>

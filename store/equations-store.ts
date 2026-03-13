@@ -1,7 +1,7 @@
 import { isSameDay, isToday, parseISO } from 'date-fns';
 import { create } from 'zustand';
 import { buildEquationScheme, type DailyData } from '@/content/math/equation-scheme';
-import { HybridStorageService } from '@/services/hybrid-storage';
+import { SupabaseService } from '@/services/supabase';
 import { useSettingsStore } from './settings-store';
 
 type Session = 'subitizing1' | 'subitizing2' | 'equations1' | 'equations2';
@@ -19,13 +19,8 @@ interface EquationsStore {
   isDayCompleted: () => boolean;
   isSessionCompletedToday: (session: 'session1' | 'session2') => boolean;
   maybeAdvanceTheDay: () => Promise<void>;
-  hydrate: () => Promise<void>;
+  bootstrap: () => Promise<void>;
 }
-
-const STORAGE_KEYS = {
-  EQUATIONS_PROGRESS: 'progress.equations',
-  EQUATIONS_SESSION_COMPLETIONS: 'routines.equations.sessions',
-} as const;
 
 const CATEGORY_ORDER: Category[] = ['integer', 'fraction', 'decimal', 'negative', 'percentage'];
 const CATEGORY_DURATIONS: Record<Category, number> = {
@@ -93,22 +88,19 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
     if (newState) set(newState as any);
 
     const updated = { ...get() };
-    await HybridStorageService.writeEquationsProgress(STORAGE_KEYS.EQUATIONS_PROGRESS, {
+    await SupabaseService.updateEquationsProgress({
       currentDay: updated.currentDay,
       currentCategory: updated.currentCategory,
       lastSessionDate: updated.lastSessionDate,
       completedSessions: updated.completedSessions,
     });
 
-    await HybridStorageService.writeEquationsSessionCompletions(
-      STORAGE_KEYS.EQUATIONS_SESSION_COMPLETIONS,
-      {
-        session,
-        day: currentDay,
-        category: currentCategory,
-        timestamp: Date.now(),
-      }
-    );
+    await SupabaseService.saveEquationsSessionCompletion({
+      session,
+      day: currentDay,
+      category: currentCategory,
+      timestamp: Date.now(),
+    });
   },
 
   isDayCompleted: () => {
@@ -152,7 +144,7 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
     set({ currentDay: next.day, currentCategory: next.category, completedSessions: [] });
 
     const updated = { ...get() };
-    await HybridStorageService.writeEquationsProgress(STORAGE_KEYS.EQUATIONS_PROGRESS, {
+    await SupabaseService.updateEquationsProgress({
       currentDay: updated.currentDay,
       currentCategory: updated.currentCategory,
       lastSessionDate: updated.lastSessionDate,
@@ -160,11 +152,8 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
     });
   },
 
-  hydrate: async () => {
-    await HybridStorageService.initialize();
-    const eqProgress = await HybridStorageService.readEquationsProgress(
-      STORAGE_KEYS.EQUATIONS_PROGRESS
-    );
+  bootstrap: async () => {
+    const eqProgress = await SupabaseService.getEquationsProgress();
     if (eqProgress) {
       set({
         currentDay: eqProgress.currentDay || 1,

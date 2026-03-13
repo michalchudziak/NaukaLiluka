@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Image, Pressable, StyleSheet } from 'react-native';
 import Animated, {
   runOnJS,
@@ -20,16 +20,12 @@ type DisplayState = 'title' | 'sentences' | 'image' | 'summary';
 export default function BookDisplayScreen() {
   const { bookIndex } = useLocalSearchParams<{ bookIndex: string }>();
   const router = useRouter();
-  const { reading, hydrate } = useSettingsStore();
+  const { reading } = useSettingsStore();
 
   const [currentPageIndex, setCurrentPageIndex] = useState(-1); // -1 for title
   const [displayState, setDisplayState] = useState<DisplayState>('title');
 
   const opacity = useSharedValue(1);
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {

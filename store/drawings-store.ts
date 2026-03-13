@@ -1,10 +1,6 @@
 import { isToday } from 'date-fns';
 import { create } from 'zustand';
-import { HybridStorageService } from '@/services/hybrid-storage';
-
-const STORAGE_KEYS = {
-  DRAWINGS_PRESENTATIONS: 'progress.drawings.presentations',
-} as const;
+import { ignoreCloudFailure, SupabaseService } from '@/services/supabase';
 
 interface DrawingPresentation {
   setTitle: string;
@@ -18,9 +14,8 @@ interface DrawingsStore {
   getTodayPresentations: () => DrawingPresentation[];
   getTodayPresentationCount: () => number;
   getTodaySetPresentationCount: (setTitle: string) => number;
-  clearAll: () => void;
 
-  hydrate: () => Promise<void>;
+  bootstrap: () => Promise<void>;
 }
 
 export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
@@ -33,10 +28,7 @@ export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
     };
     const newPresentations = [...get().presentations, newPresentation];
     set({ presentations: newPresentations });
-    HybridStorageService.writeDrawingPresentations(
-      STORAGE_KEYS.DRAWINGS_PRESENTATIONS,
-      newPresentations
-    );
+    void SupabaseService.saveDrawingPresentation(newPresentations).catch(ignoreCloudFailure);
   },
 
   getTodayPresentations: () => {
@@ -53,17 +45,8 @@ export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
       .filter((p) => p.setTitle === setTitle).length;
   },
 
-  clearAll: () => {
-    set({ presentations: [] });
-    HybridStorageService.clear(STORAGE_KEYS.DRAWINGS_PRESENTATIONS);
-  },
-
-  hydrate: async () => {
-    await HybridStorageService.initialize();
-    const storedPresentations = await HybridStorageService.readDrawingPresentations(
-      STORAGE_KEYS.DRAWINGS_PRESENTATIONS
-    );
-
+  bootstrap: async () => {
+    const storedPresentations = await SupabaseService.getDrawingPresentations();
     set({
       presentations: storedPresentations || [],
     });

@@ -13,14 +13,12 @@ export default function SettingsLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="clear-storage" />
-      <Stack.Screen name="view-storage" />
       <Stack.Screen name="reading-norep" />
       <Stack.Screen name="reading-interval" />
       <Stack.Screen name="reading-books" />
       <Stack.Screen name="drawings" />
       <Stack.Screen name="math" />
-      <Stack.Screen name="cloud-data" />
+      <Stack.Screen name="word-spacing" />
     </Stack>
   );
 }

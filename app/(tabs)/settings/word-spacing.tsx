@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -128,11 +127,7 @@ export default function WordSpacingSettingsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
-  const { reading, updateReadingWordSpacing, hydrate } = useSettingsStore();
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+  const { reading, updateReadingWordSpacing } = useSettingsStore();
 
   const wordSpacing = reading.wordSpacing ?? 1;
 

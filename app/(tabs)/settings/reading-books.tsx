@@ -1,5 +1,4 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useEffect } from 'react';
 import { ScrollView, StyleSheet, Switch, useWindowDimensions, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -41,11 +40,7 @@ export default function ReadingBooksSettingsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
-  const { reading, updateReadingBooksAllowAll, hydrate } = useSettingsStore();
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+  const { reading, updateReadingBooksAllowAll } = useSettingsStore();
 
   return (
     <ThemedView style={styles.container}>

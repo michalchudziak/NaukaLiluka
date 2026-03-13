@@ -1,12 +1,7 @@
 import { isToday } from 'date-fns';
 import { create } from 'zustand';
 import { books } from '@/content/books';
-import { HybridStorageService } from '@/services/hybrid-storage';
-
-const STORAGE_KEYS = {
-  BOOK_PROGRESS: 'progress.books',
-  ROUTINES_BOOK_TRACK_SESSIONS: 'routines.reading.book-track.sessions',
-} as const;
+import { ignoreCloudFailure, SupabaseService } from '@/services/supabase';
 
 interface BookProgress {
   bookId: number;
@@ -55,7 +50,56 @@ interface BookStore {
     session: 'session1' | 'session2' | 'session3',
     type: 'words' | 'sentences'
   ) => boolean;
-  hydrate: () => Promise<void>;
+  bootstrap: () => Promise<void>;
+}
+
+function getRequiredBookDays(bookId: number): number {
+  const book = books[bookId];
+  if (!book) {
+    return 0;
+  }
+
+  const maxLen = Math.max(book.words.length, book.sentences.length);
+  let count = 0;
+
+  for (let i = 0; i < maxLen; i++) {
+    const hasWords = (book.words[i]?.length || 0) > 0;
+    const hasSentences = (book.sentences[i]?.length || 0) > 0;
+    if (hasWords || hasSentences) {
+      count++;
+    }
+  }
+
+  return count;
+}
+
+function normalizeBookProgressList(stored: BookProgress[]): BookProgress[] {
+  return books.map((book, idx) => {
+    const found = stored.find(
+      (progress) => progress.bookId === idx || progress.bookTitle === book.book.title
+    );
+    const normalized = found
+      ? {
+          bookId: typeof found.bookId === 'number' ? found.bookId : idx,
+          bookTitle: found.bookTitle || book.book.title,
+          completedTriples: found.completedTriples || [],
+          progressTimestamp: found.progressTimestamp || 0,
+          isCompleted: !!found.isCompleted,
+        }
+      : {
+          bookId: idx,
+          bookTitle: book.book.title,
+          completedTriples: [],
+          progressTimestamp: 0,
+          isCompleted: false,
+        };
+
+    return {
+      ...normalized,
+      isCompleted:
+        (normalized.completedTriples?.length || 0) >= getRequiredBookDays(normalized.bookId),
+    };
+  });
 }
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -197,10 +241,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
     if (!already) {
       const updated = [...prev, { session, type, timestamp: Date.now() }];
       set({ completedSessions: updated });
-      HybridStorageService.writeBookTrackSessions(
-        STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS,
-        updated
-      );
+      void SupabaseService.saveBookTrackSession(updated).catch(ignoreCloudFailure);
     }
 
     // Update book progress after marking
@@ -219,60 +260,25 @@ export const useBookStore = create<BookStore>((set, get) => ({
       nextState.progressTimestamp = Date.now();
     }
 
-    // Determine if book is completed (count only non-empty triples)
-    const requiredDays = (() => {
-      const maxLen = Math.max(book.words.length, book.sentences.length);
-      let count = 0;
-      for (let i = 0; i < maxLen; i++) {
-        const hasWords = (book.words[i]?.length || 0) > 0;
-        const hasSentences = (book.sentences[i]?.length || 0) > 0;
-        if (hasWords || hasSentences) count++;
-      }
-      return count;
-    })();
-    nextState.isCompleted = (nextState.completedTriples.length || 0) >= requiredDays;
+    nextState.isCompleted =
+      (nextState.completedTriples.length || 0) >= getRequiredBookDays(active.bookId);
 
     set({ activeBookProgress: nextState });
 
-    // Persist full progress list: we store one record per book in storage
-    // Read existing progress, merge/replace current, save back
-    (async () => {
-      const stored: BookProgress[] =
-        (await HybridStorageService.readBookProgress(STORAGE_KEYS.BOOK_PROGRESS)) || [];
-      // Ensure progress for all books exists
-      const merged: BookProgress[] = books.map((b, idx) => {
-        const found = stored.find((p: any) => p.bookId === idx || p.bookTitle === b.book.title);
-        if (found && (found.bookId === idx || found.bookTitle === b.book.title)) {
-          // Normalize shape
-          return {
-            bookId: typeof found.bookId === 'number' ? found.bookId : idx,
-            bookTitle: found.bookTitle || b.book.title,
-            completedTriples: (found.completedTriples || []) as number[],
-            progressTimestamp: found.progressTimestamp || 0,
-            isCompleted: !!found.isCompleted,
-          };
-        }
-        return {
-          bookId: idx,
-          bookTitle: b.book.title,
-          completedTriples: [],
-          progressTimestamp: 0,
-          isCompleted: false,
-        };
-      });
-
+    void (async () => {
+      const stored = await SupabaseService.getBookProgress();
+      const merged = normalizeBookProgressList(stored);
       merged[nextState.bookId] = nextState;
 
-      await HybridStorageService.writeBookProgress(STORAGE_KEYS.BOOK_PROGRESS, merged);
+      await SupabaseService.updateBookProgress(merged);
 
-      // If current became completed, we could move to next book for future sessions
       if (nextState.isCompleted) {
-        const nextIndex = merged.findIndex((p) => !p.isCompleted);
+        const nextIndex = merged.findIndex((progress) => !progress.isCompleted);
         if (nextIndex !== -1) {
           set({ activeBookProgress: merged[nextIndex] });
         }
       }
-    })();
+    })().catch(ignoreCloudFailure);
   },
 
   isDayCompleted: () => {
@@ -297,55 +303,12 @@ export const useBookStore = create<BookStore>((set, get) => ({
     return todays.some((c) => c.session === session && c.type === type);
   },
 
-  hydrate: async () => {
-    await HybridStorageService.initialize();
-
-    // Load completions
-    const completions =
-      (await HybridStorageService.readBookTrackSessions(
-        STORAGE_KEYS.ROUTINES_BOOK_TRACK_SESSIONS
-      )) || [];
-
-    // Load progress list and resolve active book
-    const stored: BookProgress[] =
-      (await HybridStorageService.readBookProgress(STORAGE_KEYS.BOOK_PROGRESS)) || [];
-    const progressList: BookProgress[] = books.map((b, idx) => {
-      const found = stored.find((p) => p.bookId === idx || p.bookTitle === b.book.title);
-      if (found) {
-        return {
-          bookId: typeof found.bookId === 'number' ? found.bookId : idx,
-          bookTitle: found.bookTitle || b.book.title,
-          completedTriples: (found.completedTriples || []) as number[],
-          progressTimestamp: found.progressTimestamp || 0,
-          isCompleted: !!found.isCompleted,
-        };
-      }
-      return {
-        bookId: idx,
-        bookTitle: b.book.title,
-        completedTriples: [],
-        progressTimestamp: 0,
-        isCompleted: false,
-      };
-    });
-
-    // Determine which books are completed based on current content lengths (normalize)
-    for (const p of progressList) {
-      const book = books[p.bookId];
-      if (!book) continue;
-      const requiredDays = (() => {
-        const maxLen = Math.max(book.words.length, book.sentences.length);
-        let count = 0;
-        for (let i = 0; i < maxLen; i++) {
-          const hasWords = (book.words[i]?.length || 0) > 0;
-          const hasSentences = (book.sentences[i]?.length || 0) > 0;
-          if (hasWords || hasSentences) count++;
-        }
-        return count;
-      })();
-      p.isCompleted = (p.completedTriples?.length || 0) >= requiredDays;
-    }
-
+  bootstrap: async () => {
+    const [completions, stored] = await Promise.all([
+      SupabaseService.getBookTrackSessions(),
+      SupabaseService.getBookProgress(),
+    ]);
+    const progressList = normalizeBookProgressList(stored);
     const active = progressList.find((p) => !p.isCompleted) || progressList[0];
 
     set({ activeBookProgress: active, completedSessions: completions });

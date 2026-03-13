@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -142,12 +141,7 @@ export default function DrawingsSettingsScreen() {
     updateDrawingsShowFacts,
     updateDrawingsInterval,
     updateDrawingsRandomOrder,
-    hydrate,
   } = useSettingsStore();
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
 
   return (
     <ThemedView style={styles.container}>

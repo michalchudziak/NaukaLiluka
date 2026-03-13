@@ -5,13 +5,8 @@ import {
   getNumbersLearningScheme,
   type SessionContent,
 } from '@/content/math/learning-scheme';
-import { HybridStorageService } from '@/services/hybrid-storage';
+import { SupabaseService } from '@/services/supabase';
 import { useSettingsStore } from './settings-store';
-
-const STORAGE_KEYS = {
-  MATH_PROGRESS: 'progress.math',
-  MATH_SESSION_COMPLETIONS: 'routines.math.sessions',
-} as const;
 
 type Session = 'subitizingOrdered' | 'subitizingUnordered' | 'numbersOrdered' | 'numbersUnordered';
 
@@ -25,7 +20,7 @@ interface MathStore {
   isDayCompleted: () => boolean;
   isSessionCompletedToday: (session: 'session1' | 'session2') => boolean;
   maybeAdvanceTheDay: () => Promise<void>;
-  hydrate: () => Promise<void>;
+  bootstrap: () => Promise<void>;
 }
 
 const sessionContentToSession = (content: SessionContent): Session => {
@@ -67,16 +62,14 @@ export const useMathStore = create<MathStore>((set, get) => ({
 
     set(newState);
 
-    // Persist to storage
     const updatedState = { ...get() };
-    await HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, {
+    await SupabaseService.updateMathProgress({
       currentDay: updatedState.currentDay,
       lastSessionDate: updatedState.lastSessionDate,
       completedSessions: updatedState.completedSessions,
     });
 
-    // Save session completion record
-    await HybridStorageService.writeMathSessionCompletions(STORAGE_KEYS.MATH_SESSION_COMPLETIONS, {
+    await SupabaseService.saveMathSessionCompletion({
       session,
       day: currentDay,
       timestamp: Date.now(),
@@ -149,9 +142,8 @@ export const useMathStore = create<MathStore>((set, get) => ({
       };
       set(newState);
 
-      // Persist the advancement
       const updatedState = { ...get() };
-      await HybridStorageService.writeMathProgress(STORAGE_KEYS.MATH_PROGRESS, {
+      await SupabaseService.updateMathProgress({
         currentDay: updatedState.currentDay,
         lastSessionDate: updatedState.lastSessionDate,
         completedSessions: updatedState.completedSessions,
@@ -159,10 +151,8 @@ export const useMathStore = create<MathStore>((set, get) => ({
     }
   },
 
-  hydrate: async () => {
-    await HybridStorageService.initialize();
-
-    const mathProgress = await HybridStorageService.readMathProgress(STORAGE_KEYS.MATH_PROGRESS);
+  bootstrap: async () => {
+    const mathProgress = await SupabaseService.getMathProgress();
 
     if (mathProgress) {
       set({

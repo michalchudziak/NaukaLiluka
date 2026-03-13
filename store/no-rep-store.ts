@@ -2,15 +2,8 @@ import { isToday } from 'date-fns';
 import { create } from 'zustand';
 import sentencesData from '@/content/no-rep/sentences.json';
 import wordsData from '@/content/no-rep/words.json';
-import { HybridStorageService } from '@/services/hybrid-storage';
+import { ignoreCloudFailure, SupabaseService } from '@/services/supabase';
 import { useSettingsStore } from '@/store/settings-store';
-
-const STORAGE_KEYS = {
-  PROGRESS_NO_REP_WORDS: 'progress.reading.no-rep.words',
-  PROGRESS_NO_REP_SENTENCES: 'progress.reading.no-rep.sentences',
-  ROUTINES_NO_REP_WORDS: 'routines.reading.no-rep.words',
-  ROUTINES_NO_REP_SENTENCES: 'routines.reading.no-rep.sentences',
-} as const;
 
 function getRandomItems<T>(array: T[], count: number, exclude: T[] = []): T[] {
   const available = array.filter((item) => !exclude.includes(item));
@@ -26,9 +19,6 @@ interface NoRepStore {
 
   addDisplayedWords: (words: string[]) => void;
   addDisplayedSentences: (sentences: string[]) => void;
-  clearDisplayedWords: () => void;
-  clearDisplayedSentences: () => void;
-  clearAll: () => void;
 
   chooseAndMarkWords: () => Promise<string[]>;
   chooseAndMarkSentences: () => Promise<string[]>;
@@ -39,7 +29,7 @@ interface NoRepStore {
   isSentencesCompletedToday: () => boolean;
   isNoRepPathCompletedToday: () => boolean;
 
-  hydrate: () => Promise<void>;
+  bootstrap: () => Promise<void>;
 }
 
 export const useNoRepStore = create<NoRepStore>((set, get) => ({
@@ -53,9 +43,8 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
       displayedWords: Array.from(new Set([...get().displayedWords, ...words])),
     };
     set(newState);
-    HybridStorageService.writeNoRepWords(
-      STORAGE_KEYS.PROGRESS_NO_REP_WORDS,
-      newState.displayedWords
+    void SupabaseService.updateNoRepProgress('words', newState.displayedWords).catch(
+      ignoreCloudFailure
     );
   },
 
@@ -64,26 +53,9 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
       displayedSentences: Array.from(new Set([...get().displayedSentences, ...sentences])),
     };
     set(newState);
-    HybridStorageService.writeNoRepSentences(
-      STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES,
-      newState.displayedSentences
+    void SupabaseService.updateNoRepProgress('sentences', newState.displayedSentences).catch(
+      ignoreCloudFailure
     );
-  },
-
-  clearDisplayedWords: () => {
-    set({ displayedWords: [] });
-    HybridStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_WORDS);
-  },
-
-  clearDisplayedSentences: () => {
-    set({ displayedSentences: [] });
-    HybridStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES);
-  },
-
-  clearAll: () => {
-    set({ displayedWords: [], displayedSentences: [] });
-    HybridStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_WORDS);
-    HybridStorageService.clear(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES);
   },
 
   chooseAndMarkWords: async () => {
@@ -127,19 +99,13 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   markWordsCompleted: () => {
     const newTimestamps = [...get().wordCompletionTimestamps, Date.now()];
     set({ wordCompletionTimestamps: newTimestamps });
-    HybridStorageService.writeNoRepWordCompletions(
-      STORAGE_KEYS.ROUTINES_NO_REP_WORDS,
-      newTimestamps
-    );
+    void SupabaseService.saveNoRepCompletion('words').catch(ignoreCloudFailure);
   },
 
   markSentencesCompleted: () => {
     const newTimestamps = [...get().sentenceCompletionTimestamps, Date.now()];
     set({ sentenceCompletionTimestamps: newTimestamps });
-    HybridStorageService.writeNoRepSentenceCompletions(
-      STORAGE_KEYS.ROUTINES_NO_REP_SENTENCES,
-      newTimestamps
-    );
+    void SupabaseService.saveNoRepCompletion('sentences').catch(ignoreCloudFailure);
   },
 
   isWordsCompletedToday: () => {
@@ -156,14 +122,13 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
     return wordsCompleted && sentencesCompleted;
   },
 
-  hydrate: async () => {
-    await HybridStorageService.initialize();
+  bootstrap: async () => {
     const [storedWords, storedSentences, storedWordTimestamps, storedSentenceTimestamps] =
       await Promise.all([
-        HybridStorageService.readNoRepWords(STORAGE_KEYS.PROGRESS_NO_REP_WORDS),
-        HybridStorageService.readNoRepSentences(STORAGE_KEYS.PROGRESS_NO_REP_SENTENCES),
-        HybridStorageService.readNoRepWordCompletions(STORAGE_KEYS.ROUTINES_NO_REP_WORDS),
-        HybridStorageService.readNoRepSentenceCompletions(STORAGE_KEYS.ROUTINES_NO_REP_SENTENCES),
+        SupabaseService.getNoRepProgress('words'),
+        SupabaseService.getNoRepProgress('sentences'),
+        SupabaseService.getNoRepCompletions('words'),
+        SupabaseService.getNoRepCompletions('sentences'),
       ]);
 
     set({

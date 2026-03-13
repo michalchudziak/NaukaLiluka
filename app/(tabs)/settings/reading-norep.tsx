@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -97,12 +96,7 @@ export default function ReadingNoRepSettingsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
-  const { reading, updateReadingNoRepWords, updateReadingNoRepSentences, hydrate } =
-    useSettingsStore();
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+  const { reading, updateReadingNoRepWords, updateReadingNoRepSentences } = useSettingsStore();
 
   return (
     <ThemedView style={styles.container}>

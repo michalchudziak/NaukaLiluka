@@ -135,38 +135,6 @@ export default function SettingsScreen() {
             />
           </View>
         </View>
-
-        <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>{t('settings.storage.sectionTitle')}</ThemedText>
-
-          <View style={styles.sectionContent}>
-            <SettingItem
-              title={t('settings.cloudData.menuTitle')}
-              subtitle={t('settings.cloudData.menuSubtitle')}
-              icon="cloud-outline"
-              onPress={() => router.push('/(tabs)/settings/cloud-data')}
-            />
-
-            <View style={styles.separator} />
-
-            <SettingItem
-              title={t('settings.clearStorage.title')}
-              subtitle={t('settings.clearStorage.subtitle')}
-              icon="trash-outline"
-              onPress={() => router.push('/(tabs)/settings/clear-storage')}
-              destructive
-            />
-
-            <View style={styles.separator} />
-
-            <SettingItem
-              title={t('settings.viewStorage.title')}
-              subtitle={t('settings.viewStorage.subtitle')}
-              icon="eye-outline"
-              onPress={() => router.push('/(tabs)/settings/view-storage')}
-            />
-          </View>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
