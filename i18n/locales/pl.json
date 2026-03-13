@@ -109,7 +109,7 @@
     "loadingTitle": "Ładowanie danych z chmury",
     "loadingDescription": "Pobieram ustawienia i postępy, zanim aplikacja się otworzy.",
     "errorTitle": "Nie udało się załadować danych",
-    "configError": "Brakuje konfiguracji Supabase. Ustaw EXPO_PUBLIC_SUPABASE_URL i EXPO_PUBLIC_SUPABASE_KEY.",
+    "configError": "Brakuje konfiguracji Convex. Ustaw EXPO_PUBLIC_CONVEX_URL i uruchom backend Convex.",
     "requestError": "Aplikacja nie może teraz połączyć się z chmurą. Sprawdź połączenie i spróbuj ponownie."
   },
   "drawings": {

@@ -1,7 +1,7 @@
 import { isToday } from 'date-fns';
 import { create } from 'zustand';
 import { books } from '@/content/books';
-import { ignoreCloudFailure, SupabaseService } from '@/services/supabase';
+import { ConvexService, ignoreCloudFailure } from '@/services/convex';
 
 interface BookProgress {
   bookId: number;
@@ -241,7 +241,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
     if (!already) {
       const updated = [...prev, { session, type, timestamp: Date.now() }];
       set({ completedSessions: updated });
-      void SupabaseService.saveBookTrackSession(updated).catch(ignoreCloudFailure);
+      void ConvexService.saveBookTrackSession(updated).catch(ignoreCloudFailure);
     }
 
     // Update book progress after marking
@@ -266,11 +266,11 @@ export const useBookStore = create<BookStore>((set, get) => ({
     set({ activeBookProgress: nextState });
 
     void (async () => {
-      const stored = await SupabaseService.getBookProgress();
+      const stored = await ConvexService.getBookProgress();
       const merged = normalizeBookProgressList(stored);
       merged[nextState.bookId] = nextState;
 
-      await SupabaseService.updateBookProgress(merged);
+      await ConvexService.updateBookProgress(merged);
 
       if (nextState.isCompleted) {
         const nextIndex = merged.findIndex((progress) => !progress.isCompleted);
@@ -305,8 +305,8 @@ export const useBookStore = create<BookStore>((set, get) => ({
 
   bootstrap: async () => {
     const [completions, stored] = await Promise.all([
-      SupabaseService.getBookTrackSessions(),
-      SupabaseService.getBookProgress(),
+      ConvexService.getBookTrackSessions(),
+      ConvexService.getBookProgress(),
     ]);
     const progressList = normalizeBookProgressList(stored);
     const active = progressList.find((p) => !p.isCompleted) || progressList[0];

@@ -1,6 +1,6 @@
 import { isToday } from 'date-fns';
 import { create } from 'zustand';
-import { ignoreCloudFailure, SupabaseService } from '@/services/supabase';
+import { ConvexService, ignoreCloudFailure } from '@/services/convex';
 
 interface DrawingPresentation {
   setTitle: string;
@@ -28,7 +28,7 @@ export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
     };
     const newPresentations = [...get().presentations, newPresentation];
     set({ presentations: newPresentations });
-    void SupabaseService.saveDrawingPresentation(newPresentations).catch(ignoreCloudFailure);
+    void ConvexService.saveDrawingPresentation(newPresentations).catch(ignoreCloudFailure);
   },
 
   getTodayPresentations: () => {
@@ -46,7 +46,7 @@ export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
   },
 
   bootstrap: async () => {
-    const storedPresentations = await SupabaseService.getDrawingPresentations();
+    const storedPresentations = await ConvexService.getDrawingPresentations();
     set({
       presentations: storedPresentations || [],
     });

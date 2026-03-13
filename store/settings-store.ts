@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ignoreCloudFailure, SupabaseService } from '@/services/supabase';
+import { ConvexService, ignoreCloudFailure } from '@/services/convex';
 
 type SettingsSnapshot = {
   reading: {
@@ -127,7 +127,7 @@ function mergeSettings(stored: Partial<SettingsSnapshot> | null | undefined): Se
 }
 
 function persistSettings(snapshot: SettingsSnapshot) {
-  void SupabaseService.updateSettings(snapshot).catch(ignoreCloudFailure);
+  void ConvexService.updateSettings(snapshot).catch(ignoreCloudFailure);
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
@@ -357,7 +357,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   bootstrap: async () => {
-    const stored = await SupabaseService.getSettings();
+    const stored = await ConvexService.getSettings();
     set(mergeSettings(stored));
   },
 }));

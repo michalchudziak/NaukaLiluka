@@ -1,7 +1,7 @@
 import { isSameDay, isToday, parseISO } from 'date-fns';
 import { create } from 'zustand';
 import { buildEquationScheme, type DailyData } from '@/content/math/equation-scheme';
-import { SupabaseService } from '@/services/supabase';
+import { ConvexService } from '@/services/convex';
 import { useSettingsStore } from './settings-store';
 
 type Session = 'subitizing1' | 'subitizing2' | 'equations1' | 'equations2';
@@ -88,14 +88,14 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
     if (newState) set(newState as any);
 
     const updated = { ...get() };
-    await SupabaseService.updateEquationsProgress({
+    await ConvexService.updateEquationsProgress({
       currentDay: updated.currentDay,
       currentCategory: updated.currentCategory,
       lastSessionDate: updated.lastSessionDate,
       completedSessions: updated.completedSessions,
     });
 
-    await SupabaseService.saveEquationsSessionCompletion({
+    await ConvexService.saveEquationsSessionCompletion({
       session,
       day: currentDay,
       category: currentCategory,
@@ -144,7 +144,7 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
     set({ currentDay: next.day, currentCategory: next.category, completedSessions: [] });
 
     const updated = { ...get() };
-    await SupabaseService.updateEquationsProgress({
+    await ConvexService.updateEquationsProgress({
       currentDay: updated.currentDay,
       currentCategory: updated.currentCategory,
       lastSessionDate: updated.lastSessionDate,
@@ -153,7 +153,7 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
   },
 
   bootstrap: async () => {
-    const eqProgress = await SupabaseService.getEquationsProgress();
+    const eqProgress = await ConvexService.getEquationsProgress();
     if (eqProgress) {
       set({
         currentDay: eqProgress.currentDay || 1,

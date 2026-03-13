@@ -5,7 +5,7 @@ import {
   getNumbersLearningScheme,
   type SessionContent,
 } from '@/content/math/learning-scheme';
-import { SupabaseService } from '@/services/supabase';
+import { ConvexService } from '@/services/convex';
 import { useSettingsStore } from './settings-store';
 
 type Session = 'subitizingOrdered' | 'subitizingUnordered' | 'numbersOrdered' | 'numbersUnordered';
@@ -63,13 +63,13 @@ export const useMathStore = create<MathStore>((set, get) => ({
     set(newState);
 
     const updatedState = { ...get() };
-    await SupabaseService.updateMathProgress({
+    await ConvexService.updateMathProgress({
       currentDay: updatedState.currentDay,
       lastSessionDate: updatedState.lastSessionDate,
       completedSessions: updatedState.completedSessions,
     });
 
-    await SupabaseService.saveMathSessionCompletion({
+    await ConvexService.saveMathSessionCompletion({
       session,
       day: currentDay,
       timestamp: Date.now(),
@@ -143,7 +143,7 @@ export const useMathStore = create<MathStore>((set, get) => ({
       set(newState);
 
       const updatedState = { ...get() };
-      await SupabaseService.updateMathProgress({
+      await ConvexService.updateMathProgress({
         currentDay: updatedState.currentDay,
         lastSessionDate: updatedState.lastSessionDate,
         completedSessions: updatedState.completedSessions,
@@ -152,7 +152,7 @@ export const useMathStore = create<MathStore>((set, get) => ({
   },
 
   bootstrap: async () => {
-    const mathProgress = await SupabaseService.getMathProgress();
+    const mathProgress = await ConvexService.getMathProgress();
 
     if (mathProgress) {
       set({

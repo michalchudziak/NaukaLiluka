@@ -2,7 +2,7 @@ import { isToday } from 'date-fns';
 import { create } from 'zustand';
 import sentencesData from '@/content/no-rep/sentences.json';
 import wordsData from '@/content/no-rep/words.json';
-import { ignoreCloudFailure, SupabaseService } from '@/services/supabase';
+import { ConvexService, ignoreCloudFailure } from '@/services/convex';
 import { useSettingsStore } from '@/store/settings-store';
 
 function getRandomItems<T>(array: T[], count: number, exclude: T[] = []): T[] {
@@ -43,7 +43,7 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
       displayedWords: Array.from(new Set([...get().displayedWords, ...words])),
     };
     set(newState);
-    void SupabaseService.updateNoRepProgress('words', newState.displayedWords).catch(
+    void ConvexService.updateNoRepProgress('words', newState.displayedWords).catch(
       ignoreCloudFailure
     );
   },
@@ -53,7 +53,7 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
       displayedSentences: Array.from(new Set([...get().displayedSentences, ...sentences])),
     };
     set(newState);
-    void SupabaseService.updateNoRepProgress('sentences', newState.displayedSentences).catch(
+    void ConvexService.updateNoRepProgress('sentences', newState.displayedSentences).catch(
       ignoreCloudFailure
     );
   },
@@ -99,13 +99,13 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   markWordsCompleted: () => {
     const newTimestamps = [...get().wordCompletionTimestamps, Date.now()];
     set({ wordCompletionTimestamps: newTimestamps });
-    void SupabaseService.saveNoRepCompletion('words').catch(ignoreCloudFailure);
+    void ConvexService.saveNoRepCompletion('words').catch(ignoreCloudFailure);
   },
 
   markSentencesCompleted: () => {
     const newTimestamps = [...get().sentenceCompletionTimestamps, Date.now()];
     set({ sentenceCompletionTimestamps: newTimestamps });
-    void SupabaseService.saveNoRepCompletion('sentences').catch(ignoreCloudFailure);
+    void ConvexService.saveNoRepCompletion('sentences').catch(ignoreCloudFailure);
   },
 
   isWordsCompletedToday: () => {
@@ -125,10 +125,10 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   bootstrap: async () => {
     const [storedWords, storedSentences, storedWordTimestamps, storedSentenceTimestamps] =
       await Promise.all([
-        SupabaseService.getNoRepProgress('words'),
-        SupabaseService.getNoRepProgress('sentences'),
-        SupabaseService.getNoRepCompletions('words'),
-        SupabaseService.getNoRepCompletions('sentences'),
+        ConvexService.getNoRepProgress('words'),
+        ConvexService.getNoRepProgress('sentences'),
+        ConvexService.getNoRepCompletions('words'),
+        ConvexService.getNoRepCompletions('sentences'),
       ]);
 
     set({

@@ -1,3 +1,4 @@
+import { ConvexProvider } from 'convex/react';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
@@ -7,9 +8,10 @@ import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampThe
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   CloudConfigurationError,
-  SupabaseService,
+  ConvexService,
+  getConvexClient,
   setCloudFailureListener,
-} from '@/services/supabase';
+} from '@/services/convex';
 import { useBookStore } from './book-store';
 import { useDrawingsStore } from './drawings-store';
 import { useEquationsStore } from './equations-store';
@@ -66,7 +68,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setError(null);
 
     try {
-      SupabaseService.validateConfiguration();
+      ConvexService.validateConfiguration();
       await useSettingsStore.getState().bootstrap();
 
       await Promise.all([
@@ -105,7 +107,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return <ErrorState error={error} onRetry={() => void bootstrapStores()} />;
   }
 
-  return <>{children}</>;
+  return <ConvexProvider client={getConvexClient()}>{children}</ConvexProvider>;
 }
 
 const styles = StyleSheet.create({
