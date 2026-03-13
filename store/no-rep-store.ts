@@ -29,6 +29,7 @@ interface NoRepStore {
   isSentencesCompletedToday: () => boolean;
   isNoRepPathCompletedToday: () => boolean;
 
+  reset: () => void;
   bootstrap: () => Promise<void>;
 }
 
@@ -120,6 +121,15 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
     const wordsCompleted = get().isWordsCompletedToday();
     const sentencesCompleted = get().isSentencesCompletedToday();
     return wordsCompleted && sentencesCompleted;
+  },
+
+  reset: () => {
+    set({
+      displayedWords: [],
+      displayedSentences: [],
+      wordCompletionTimestamps: [],
+      sentenceCompletionTimestamps: [],
+    });
   },
 
   bootstrap: async () => {

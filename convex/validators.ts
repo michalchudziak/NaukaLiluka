@@ -63,6 +63,14 @@ export const settingsSnapshotValidator = v.object({
   }),
 });
 
+export const appUserValidator = v.object({
+  _id: v.id('users'),
+  _creationTime: v.number(),
+  tokenIdentifier: v.string(),
+  email: v.string(),
+  createdAt: v.number(),
+});
+
 export const defaultSettings = {
   reading: {
     noRep: {

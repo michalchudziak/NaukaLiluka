@@ -1,4 +1,4 @@
-import { ConvexProvider } from 'convex/react';
+import { useConvexAuth } from 'convex/react';
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
@@ -6,17 +6,13 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
-import {
-  CloudConfigurationError,
-  ConvexService,
-  getConvexClient,
-  setCloudFailureListener,
-} from '@/services/convex';
+import { CloudConfigurationError, ConvexService, setCloudFailureListener } from '@/services/convex';
 import { useBookStore } from './book-store';
 import { useDrawingsStore } from './drawings-store';
 import { useEquationsStore } from './equations-store';
 import { useMathStore } from './math-store';
 import { useNoRepStore } from './no-rep-store';
+import { resetAllStores } from './reset-stores';
 import { useSettingsStore } from './settings-store';
 
 type BootstrapStatus = 'loading' | 'ready' | 'error';
@@ -60,6 +56,7 @@ function ErrorState({ error, onRetry }: { error: Error; onRetry: () => void }) {
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useConvexAuth();
   const [status, setStatus] = useState<BootstrapStatus>('loading');
   const [error, setError] = useState<Error | null>(null);
 
@@ -69,6 +66,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     try {
       ConvexService.validateConfiguration();
+      await ConvexService.ensureCurrentUser();
       await useSettingsStore.getState().bootstrap();
 
       await Promise.all([
@@ -92,14 +90,27 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setStatus('error');
     });
 
-    void bootstrapStores();
-
     return () => {
       setCloudFailureListener(null);
     };
-  }, [bootstrapStores]);
+  }, []);
 
-  if (status === 'loading') {
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      resetAllStores();
+      setError(null);
+      setStatus('loading');
+      return;
+    }
+
+    void bootstrapStores();
+  }, [bootstrapStores, isAuthenticated, isLoading]);
+
+  if (isLoading || status === 'loading') {
     return <LoadingState />;
   }
 
@@ -107,7 +118,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return <ErrorState error={error} onRetry={() => void bootstrapStores()} />;
   }
 
-  return <ConvexProvider client={getConvexClient()}>{children}</ConvexProvider>;
+  return <>{children}</>;
 }
 
 const styles = StyleSheet.create({

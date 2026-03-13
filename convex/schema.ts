@@ -10,12 +10,19 @@ import {
 } from './validators';
 
 export default defineSchema({
+  users: defineTable({
+    tokenIdentifier: v.string(),
+    email: v.string(),
+    createdAt: v.number(),
+  }).index('by_token_identifier', ['tokenIdentifier']),
+
   settings: defineTable({
-    key: v.literal('default'),
+    userId: v.id('users'),
     snapshot: settingsSnapshotValidator,
-  }).index('by_key', ['key']),
+  }).index('by_user', ['userId']),
 
   bookProgress: defineTable({
+    userId: v.id('users'),
     bookKey: v.string(),
     bookIndex: v.number(),
     bookTitle: v.string(),
@@ -23,16 +30,18 @@ export default defineSchema({
     progressTimestamp: v.number(),
     isCompleted: v.boolean(),
   })
-    .index('by_book_key', ['bookKey'])
-    .index('by_book_index', ['bookIndex']),
+    .index('by_user_and_book_key', ['userId', 'bookKey'])
+    .index('by_user_and_book_index', ['userId', 'bookIndex']),
 
   bookTrackSessions: defineTable({
+    userId: v.id('users'),
     sessionName: v.union(v.literal('session1'), v.literal('session2'), v.literal('session3')),
     contentType: contentTypeValidator,
     completedAt: v.number(),
-  }).index('by_completed_at', ['completedAt']),
+  }).index('by_user_and_completed_at', ['userId', 'completedAt']),
 
   dailyPlans: defineTable({
+    userId: v.id('users'),
     bookId: v.string(),
     selectedWordTripleIndex: v.number(),
     selectedSentenceTripleIndex: v.number(),
@@ -40,48 +49,53 @@ export default defineSchema({
     session2Content: bookDailySessionContentValidator,
     session3Content: bookDailySessionContentValidator,
     createdAt: v.number(),
-  }).index('by_created_at', ['createdAt']),
+  }).index('by_user_and_created_at', ['userId', 'createdAt']),
 
   noRepProgress: defineTable({
+    userId: v.id('users'),
     contentType: contentTypeValidator,
     displayedItems: v.array(v.string()),
-  }).index('by_content_type', ['contentType']),
+  }).index('by_user_and_content_type', ['userId', 'contentType']),
 
   noRepCompletions: defineTable({
+    userId: v.id('users'),
     contentType: contentTypeValidator,
     completedAt: v.number(),
-  }).index('by_content_type_and_completed_at', ['contentType', 'completedAt']),
+  }).index('by_user_and_content_type_and_completed_at', ['userId', 'contentType', 'completedAt']),
 
   drawingPresentations: defineTable({
+    userId: v.id('users'),
     setTitle: v.string(),
     presentedAt: v.number(),
-  }).index('by_presented_at', ['presentedAt']),
+  }).index('by_user_and_presented_at', ['userId', 'presentedAt']),
 
   mathProgress: defineTable({
-    key: v.literal('default'),
+    userId: v.id('users'),
     currentDay: v.number(),
     lastSessionDate: v.union(v.string(), v.null()),
     completedSessions: v.array(mathSessionValidator),
-  }).index('by_key', ['key']),
+  }).index('by_user', ['userId']),
 
   mathSessionCompletions: defineTable({
+    userId: v.id('users'),
     sessionType: mathSessionValidator,
     dayNumber: v.number(),
     completedAt: v.number(),
-  }).index('by_completed_at', ['completedAt']),
+  }).index('by_user_and_completed_at', ['userId', 'completedAt']),
 
   equationsProgress: defineTable({
-    key: v.literal('default'),
+    userId: v.id('users'),
     currentDay: v.number(),
     currentCategory: equationCategoryValidator,
     lastSessionDate: v.union(v.string(), v.null()),
     completedSessions: v.array(equationSessionValidator),
-  }).index('by_key', ['key']),
+  }).index('by_user', ['userId']),
 
   equationsSessionCompletions: defineTable({
+    userId: v.id('users'),
     sessionType: equationSessionValidator,
     category: equationCategoryValidator,
     dayNumber: v.number(),
     completedAt: v.number(),
-  }).index('by_completed_at', ['completedAt']),
+  }).index('by_user_and_completed_at', ['userId', 'completedAt']),
 });

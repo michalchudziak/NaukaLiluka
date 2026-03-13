@@ -3,6 +3,7 @@ import { isToday } from 'date-fns';
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
 const functions = {
+  usersEnsureCurrentUser: 'users:ensureCurrentUser',
   settingsGet: 'settings:get',
   settingsUpsert: 'settings:upsert',
   booksListProgress: 'books:listProgress',
@@ -164,6 +165,14 @@ export function ignoreCloudFailure() {
 export class ConvexService {
   static validateConfiguration() {
     getConvexClient();
+  }
+
+  static async ensureCurrentUser() {
+    try {
+      return await getConvexClient().mutation(functions.usersEnsureCurrentUser as any, {});
+    } catch (error) {
+      handleCloudFailure('initialize the current user', error);
+    }
   }
 
   static async getSettings(): Promise<SettingsSnapshot> {

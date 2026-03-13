@@ -1,3 +1,4 @@
+import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -5,7 +6,8 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import '@/i18n/i18n';
-import { StoreProvider } from '@/store/store-provider';
+import { authClient } from '@/services/auth-client';
+import { getConvexClient } from '@/services/convex';
 
 export default function RootLayout() {
   const [loaded] = useFonts({
@@ -18,19 +20,15 @@ export default function RootLayout() {
   }
 
   return (
-    <StoreProvider>
+    <ConvexBetterAuthProvider client={getConvexClient()} authClient={authClient}>
       <ThemeProvider value={DefaultTheme}>
         <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(protected)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
-          <Stack.Screen name="display" options={{ headerShown: false }} />
-          <Stack.Screen name="book-display" options={{ headerShown: false }} />
-          <Stack.Screen name="drawing-display" options={{ headerShown: false }} />
-          <Stack.Screen name="set-display" options={{ headerShown: false }} />
-          <Stack.Screen name="equations-display" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="dark" />
       </ThemeProvider>
-    </StoreProvider>
+    </ConvexBetterAuthProvider>
   );
 }

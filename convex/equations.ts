@@ -1,5 +1,6 @@
 import { mutationGeneric as mutation, queryGeneric as query } from 'convex/server';
 import { v } from 'convex/values';
+import { requireCurrentUser } from './lib/current_user';
 import {
   defaultEquationsProgress,
   equationsProgressValidator,
@@ -10,9 +11,10 @@ export const getProgress = query({
   args: {},
   returns: equationsProgressValidator,
   handler: async (ctx) => {
+    const user = await requireCurrentUser(ctx);
     const progress = await ctx.db
       .query('equationsProgress')
-      .withIndex('by_key', (q) => q.eq('key', 'default'))
+      .withIndex('by_user', (q) => q.eq('userId', user._id))
       .first();
 
     if (!progress) {
@@ -34,16 +36,17 @@ export const upsertProgress = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
+    const user = await requireCurrentUser(ctx);
     const existing = await ctx.db
       .query('equationsProgress')
-      .withIndex('by_key', (q) => q.eq('key', 'default'))
+      .withIndex('by_user', (q) => q.eq('userId', user._id))
       .first();
 
     if (existing) {
       await ctx.db.patch(existing._id, args.progress);
     } else {
       await ctx.db.insert('equationsProgress', {
-        key: 'default',
+        userId: user._id,
         ...args.progress,
       });
     }
@@ -56,7 +59,9 @@ export const insertSessionCompletion = mutation({
   args: equationsSessionCompletionValidator.fields,
   returns: v.null(),
   handler: async (ctx, args) => {
+    const user = await requireCurrentUser(ctx);
     await ctx.db.insert('equationsSessionCompletions', {
+      userId: user._id,
       sessionType: args.session,
       category: args.category,
       dayNumber: args.day,

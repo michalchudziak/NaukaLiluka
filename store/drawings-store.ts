@@ -15,6 +15,7 @@ interface DrawingsStore {
   getTodayPresentationCount: () => number;
   getTodaySetPresentationCount: (setTitle: string) => number;
 
+  reset: () => void;
   bootstrap: () => Promise<void>;
 }
 
@@ -43,6 +44,10 @@ export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
     return get()
       .getTodayPresentations()
       .filter((p) => p.setTitle === setTitle).length;
+  },
+
+  reset: () => {
+    set({ presentations: [] });
   },
 
   bootstrap: async () => {

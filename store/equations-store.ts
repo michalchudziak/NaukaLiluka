@@ -19,6 +19,7 @@ interface EquationsStore {
   isDayCompleted: () => boolean;
   isSessionCompletedToday: (session: 'session1' | 'session2') => boolean;
   maybeAdvanceTheDay: () => Promise<void>;
+  reset: () => void;
   bootstrap: () => Promise<void>;
 }
 
@@ -149,6 +150,15 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
       currentCategory: updated.currentCategory,
       lastSessionDate: updated.lastSessionDate,
       completedSessions: updated.completedSessions,
+    });
+  },
+
+  reset: () => {
+    set({
+      currentDay: 1,
+      currentCategory: 'integer',
+      lastSessionDate: null,
+      completedSessions: [],
     });
   },
 

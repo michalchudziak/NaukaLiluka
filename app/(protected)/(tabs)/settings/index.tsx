@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
@@ -11,6 +12,8 @@ import {
   getForestCampMetrics,
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
+import { authClient } from '@/services/auth-client';
+import { resetAllStores } from '@/store/reset-stores';
 
 interface SettingItemProps {
   title: string;
@@ -51,6 +54,33 @@ export default function SettingsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    if (isSigningOut) {
+      return;
+    }
+
+    setIsSigningOut(true);
+    setSignOutError(null);
+
+    const result = await authClient.signOut({
+      fetchOptions: {
+        throw: false,
+      },
+    });
+
+    setIsSigningOut(false);
+
+    if (result.error) {
+      setSignOutError(result.error.message ?? t('auth.signOutError'));
+      return;
+    }
+
+    resetAllStores();
+    router.replace('../sign-in');
+  };
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
@@ -78,7 +108,7 @@ export default function SettingsScreen() {
               title={t('settings.reading.noRepSettings')}
               subtitle={t('settings.reading.noRepSettingsSubtitle')}
               icon="repeat-outline"
-              onPress={() => router.push('/(tabs)/settings/reading-norep')}
+              onPress={() => router.push('/settings/reading-norep')}
             />
 
             <View style={styles.separator} />
@@ -87,7 +117,7 @@ export default function SettingsScreen() {
               title={t('settings.reading.intervalSettings')}
               subtitle={t('settings.reading.intervalSettingsSubtitle')}
               icon="timer-outline"
-              onPress={() => router.push('/(tabs)/settings/reading-interval')}
+              onPress={() => router.push('/settings/reading-interval')}
             />
 
             <View style={styles.separator} />
@@ -96,7 +126,7 @@ export default function SettingsScreen() {
               title={t('settings.reading.booksSettings')}
               subtitle={t('settings.reading.booksSettingsSubtitle')}
               icon="book-outline"
-              onPress={() => router.push('/(tabs)/settings/reading-books')}
+              onPress={() => router.push('/settings/reading-books')}
             />
 
             <View style={styles.separator} />
@@ -105,7 +135,7 @@ export default function SettingsScreen() {
               title={t('settings.reading.wordSpacingSettings')}
               subtitle={t('settings.reading.wordSpacingSettingsSubtitle')}
               icon="text-outline"
-              onPress={() => router.push('/(tabs)/settings/word-spacing')}
+              onPress={() => router.push('/settings/word-spacing')}
             />
           </View>
         </View>
@@ -118,7 +148,7 @@ export default function SettingsScreen() {
               title={t('settings.drawings.settings')}
               subtitle={t('settings.drawings.settingsSubtitle')}
               icon="image-outline"
-              onPress={() => router.push('/(tabs)/settings/drawings')}
+              onPress={() => router.push('/settings/drawings')}
             />
           </View>
         </View>
@@ -131,9 +161,29 @@ export default function SettingsScreen() {
               title={t('settings.math.settings')}
               subtitle={t('settings.math.settingsSubtitle')}
               icon="calculator-outline"
-              onPress={() => router.push('/(tabs)/settings/math')}
+              onPress={() => router.push('/settings/math')}
             />
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>{t('settings.account.sectionTitle')}</ThemedText>
+
+          <View style={styles.sectionContent}>
+            <SettingItem
+              title={t('settings.account.signOut')}
+              subtitle={isSigningOut ? t('auth.signingOut') : t('settings.account.signOutSubtitle')}
+              icon="log-out-outline"
+              onPress={() => void handleSignOut()}
+              destructive
+            />
+          </View>
+
+          {signOutError ? (
+            <ThemedText selectable style={styles.errorText}>
+              {signOutError}
+            </ThemedText>
+          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -217,6 +267,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: ForestCampTheme.colors.textMuted,
     marginTop: 2,
+  },
+  errorText: {
+    ...forestCampTypography.body,
+    fontSize: 13,
+    lineHeight: 18,
+    color: ForestCampTheme.colors.danger,
+    marginTop: 10,
+    marginLeft: 10,
   },
   destructiveText: {
     color: ForestCampTheme.colors.danger,

@@ -49,6 +49,7 @@ interface SettingsState extends SettingsSnapshot {
   updateMathEquationsCount: (value: number) => void;
   updateMathNumbersInterval: (value: number) => void;
   updateMathNumbersCount: (value: number) => void;
+  reset: () => void;
   bootstrap: () => Promise<void>;
 }
 
@@ -354,6 +355,10 @@ export const useSettingsStore = create<SettingsState>((set) => ({
       persistSettings(newState);
       return newState;
     });
+  },
+
+  reset: () => {
+    set({ ...defaultSettings });
   },
 
   bootstrap: async () => {

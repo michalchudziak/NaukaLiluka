@@ -20,6 +20,7 @@ interface MathStore {
   isDayCompleted: () => boolean;
   isSessionCompletedToday: (session: 'session1' | 'session2') => boolean;
   maybeAdvanceTheDay: () => Promise<void>;
+  reset: () => void;
   bootstrap: () => Promise<void>;
 }
 
@@ -149,6 +150,14 @@ export const useMathStore = create<MathStore>((set, get) => ({
         completedSessions: updatedState.completedSessions,
       });
     }
+  },
+
+  reset: () => {
+    set({
+      currentDay: 1,
+      lastSessionDate: null,
+      completedSessions: [],
+    });
   },
 
   bootstrap: async () => {

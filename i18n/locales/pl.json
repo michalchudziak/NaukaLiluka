@@ -13,6 +13,40 @@
     "enable": "Włącz",
     "retry": "Spróbuj ponownie"
   },
+  "auth": {
+    "loadingTitle": "Sprawdzanie sesji",
+    "loadingDescription": "Przygotowuję logowanie i sprawdzam, czy konto jest już aktywne.",
+    "configurationError": "Brakuje konfiguracji logowania. Ustaw EXPO_PUBLIC_CONVEX_SITE_URL oraz BETTER_AUTH_SECRET.",
+    "emailLabel": "Adres e-mail",
+    "emailPlaceholder": "twoj@email.com",
+    "nameLabel": "Imię opiekuna",
+    "namePlaceholder": "Wpisz imię",
+    "passwordLabel": "Hasło",
+    "passwordPlaceholder": "Wpisz hasło",
+    "confirmPasswordLabel": "Powtórz hasło",
+    "confirmPasswordPlaceholder": "Powtórz hasło",
+    "signInTitle": "Zaloguj się",
+    "signInDescription": "Wejdź na swoje konto, aby wczytać ustawienia i postępy przypisane do użytkownika.",
+    "signUpTitle": "Załóż konto",
+    "signUpDescription": "Utwórz nowe konto, żeby każdy użytkownik miał własne dane w Convex.",
+    "signInCta": "Zaloguj",
+    "signUpCta": "Utwórz konto",
+    "signingIn": "Logowanie...",
+    "signingUp": "Tworzenie konta...",
+    "signingOut": "Wylogowywanie...",
+    "signInError": "Nie udało się zalogować. Sprawdź dane i spróbuj ponownie.",
+    "signUpError": "Nie udało się utworzyć konta. Spróbuj ponownie.",
+    "signOutError": "Nie udało się wylogować. Spróbuj ponownie.",
+    "invalidEmail": "Wpisz poprawny adres e-mail.",
+    "passwordRequired": "Hasło jest wymagane.",
+    "passwordTooShort": "Hasło musi mieć co najmniej 8 znaków.",
+    "passwordMismatch": "Hasła muszą być identyczne.",
+    "nameRequired": "Wpisz imię składające się z co najmniej 2 znaków.",
+    "noAccount": "Nie masz jeszcze konta?",
+    "haveAccount": "Masz już konto?",
+    "goToSignUp": "Przejdź do rejestracji",
+    "goToSignIn": "Przejdź do logowania"
+  },
   "reading": {
     "bookTrack": "Ścieżka książkowa",
     "noRepeatTrack": "Ścieżka bez powtórzeń",
@@ -103,6 +137,11 @@
       "numbersCount": "Ilość liczb na sesję",
       "equationsInterval": "Czas wyświetlania równań",
       "equationsCount": "Ilość równań na sesję"
+    },
+    "account": {
+      "sectionTitle": "Konto",
+      "signOut": "Wyloguj się",
+      "signOutSubtitle": "Zakończ sesję i wróć do ekranu logowania."
     }
   },
   "cloud": {

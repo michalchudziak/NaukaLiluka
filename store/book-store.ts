@@ -50,8 +50,17 @@ interface BookStore {
     session: 'session1' | 'session2' | 'session3',
     type: 'words' | 'sentences'
   ) => boolean;
+  reset: () => void;
   bootstrap: () => Promise<void>;
 }
+
+const defaultActiveBookProgress: BookProgress = {
+  bookId: 0,
+  bookTitle: books[0]?.book.title || 'Unknown',
+  completedTriples: [],
+  progressTimestamp: 0,
+  isCompleted: false,
+};
 
 function getRequiredBookDays(bookId: number): number {
   const book = books[bookId];
@@ -130,13 +139,7 @@ function getUniquePermutations<T>(array: T[]): T[][] {
 }
 
 export const useBookStore = create<BookStore>((set, get) => ({
-  activeBookProgress: {
-    bookId: 0,
-    bookTitle: books[0]?.book.title || 'Unknown',
-    completedTriples: [],
-    progressTimestamp: 0,
-    isCompleted: false,
-  },
+  activeBookProgress: defaultActiveBookProgress,
   completedSessions: [],
 
   getDailyData: () => {
@@ -301,6 +304,13 @@ export const useBookStore = create<BookStore>((set, get) => ({
   isSessionItemCompletedToday: (session, type) => {
     const todays = get().completedSessions.filter((c) => isToday(c.timestamp));
     return todays.some((c) => c.session === session && c.type === type);
+  },
+
+  reset: () => {
+    set({
+      activeBookProgress: defaultActiveBookProgress,
+      completedSessions: [],
+    });
   },
 
   bootstrap: async () => {
