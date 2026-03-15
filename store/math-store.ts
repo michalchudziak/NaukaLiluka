@@ -21,7 +21,7 @@ interface MathStore {
   isSessionCompletedToday: (session: 'session1' | 'session2') => boolean;
   maybeAdvanceTheDay: () => Promise<void>;
   reset: () => void;
-  bootstrap: () => Promise<void>;
+  syncFromCloud: () => Promise<void>;
 }
 
 const sessionContentToSession = (content: SessionContent): Session => {
@@ -29,6 +29,8 @@ const sessionContentToSession = (content: SessionContent): Session => {
   const type = content.type === 'subitizing' ? 'subitizing' : 'numbers';
   return `${type}${ordered}` as Session;
 };
+
+let mathStoreVersion = 0;
 
 export const useMathStore = create<MathStore>((set, get) => ({
   currentDay: 1,
@@ -61,6 +63,7 @@ export const useMathStore = create<MathStore>((set, get) => ({
       }
     }
 
+    mathStoreVersion += 1;
     set(newState);
 
     const updatedState = { ...get() };
@@ -141,6 +144,7 @@ export const useMathStore = create<MathStore>((set, get) => ({
         currentDay: currentDay + 1,
         completedSessions: [],
       };
+      mathStoreVersion += 1;
       set(newState);
 
       const updatedState = { ...get() };
@@ -153,6 +157,7 @@ export const useMathStore = create<MathStore>((set, get) => ({
   },
 
   reset: () => {
+    mathStoreVersion += 1;
     set({
       currentDay: 1,
       lastSessionDate: null,
@@ -160,8 +165,13 @@ export const useMathStore = create<MathStore>((set, get) => ({
     });
   },
 
-  bootstrap: async () => {
+  syncFromCloud: async () => {
+    const requestVersion = ++mathStoreVersion;
     const mathProgress = await ConvexService.getMathProgress();
+
+    if (requestVersion !== mathStoreVersion) {
+      return;
+    }
 
     if (mathProgress) {
       set({

@@ -15,6 +15,7 @@
       "!**/web-build",
       "!**/ios",
       "!**/android",
+      "!**/convex/_generated",
       "!**/*.min.js",
       "!**/*.d.ts"
     ]

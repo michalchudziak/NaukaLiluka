@@ -1,12 +1,12 @@
 import { useConvexAuth } from 'convex/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
-import { CloudConfigurationError, ConvexService, setCloudFailureListener } from '@/services/convex';
+import { CloudConfigurationError, ConvexService, ignoreCloudFailure } from '@/services/convex';
 import { useBookStore } from './book-store';
 import { useDrawingsStore } from './drawings-store';
 import { useEquationsStore } from './equations-store';
@@ -59,41 +59,49 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const [status, setStatus] = useState<BootstrapStatus>('loading');
   const [error, setError] = useState<Error | null>(null);
+  const initializationRunId = useRef(0);
 
-  const bootstrapStores = useCallback(async () => {
+  const syncStoresInBackground = useCallback(() => {
+    void (async () => {
+      await useSettingsStore.getState().syncFromCloud().catch(ignoreCloudFailure);
+
+      await Promise.all([
+        useNoRepStore.getState().syncFromCloud().catch(ignoreCloudFailure),
+        useBookStore.getState().syncFromCloud().catch(ignoreCloudFailure),
+        useDrawingsStore.getState().syncFromCloud().catch(ignoreCloudFailure),
+        useMathStore.getState().syncFromCloud().catch(ignoreCloudFailure),
+        useEquationsStore.getState().syncFromCloud().catch(ignoreCloudFailure),
+      ]);
+    })();
+  }, []);
+
+  const initializeAuthenticatedApp = useCallback(async () => {
+    const runId = initializationRunId.current + 1;
+    initializationRunId.current = runId;
+
     setStatus('loading');
     setError(null);
 
     try {
       ConvexService.validateConfiguration();
       await ConvexService.ensureCurrentUser();
-      await useSettingsStore.getState().bootstrap();
 
-      await Promise.all([
-        useNoRepStore.getState().bootstrap(),
-        useBookStore.getState().bootstrap(),
-        useDrawingsStore.getState().bootstrap(),
-        useMathStore.getState().bootstrap(),
-        useEquationsStore.getState().bootstrap(),
-      ]);
+      if (initializationRunId.current !== runId) {
+        return;
+      }
 
       setStatus('ready');
+
+      syncStoresInBackground();
     } catch (error) {
+      if (initializationRunId.current !== runId) {
+        return;
+      }
+
       setError(normalizeError(error));
       setStatus('error');
     }
-  }, []);
-
-  useEffect(() => {
-    setCloudFailureListener((error) => {
-      setError(error);
-      setStatus('error');
-    });
-
-    return () => {
-      setCloudFailureListener(null);
-    };
-  }, []);
+  }, [syncStoresInBackground]);
 
   useEffect(() => {
     if (isLoading) {
@@ -101,21 +109,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (!isAuthenticated) {
+      initializationRunId.current += 1;
       resetAllStores();
       setError(null);
       setStatus('loading');
       return;
     }
 
-    void bootstrapStores();
-  }, [bootstrapStores, isAuthenticated, isLoading]);
+    void initializeAuthenticatedApp();
+  }, [initializeAuthenticatedApp, isAuthenticated, isLoading]);
 
   if (isLoading || status === 'loading') {
     return <LoadingState />;
   }
 
   if (status === 'error' && error) {
-    return <ErrorState error={error} onRetry={() => void bootstrapStores()} />;
+    return <ErrorState error={error} onRetry={() => void initializeAuthenticatedApp()} />;
   }
 
   return <>{children}</>;

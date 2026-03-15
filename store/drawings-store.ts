@@ -16,8 +16,10 @@ interface DrawingsStore {
   getTodaySetPresentationCount: (setTitle: string) => number;
 
   reset: () => void;
-  bootstrap: () => Promise<void>;
+  syncFromCloud: () => Promise<void>;
 }
+
+let drawingsStoreVersion = 0;
 
 export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
   presentations: [],
@@ -28,6 +30,7 @@ export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
       timestamp: Date.now(),
     };
     const newPresentations = [...get().presentations, newPresentation];
+    drawingsStoreVersion += 1;
     set({ presentations: newPresentations });
     void ConvexService.saveDrawingPresentation(newPresentations).catch(ignoreCloudFailure);
   },
@@ -47,11 +50,18 @@ export const useDrawingsStore = create<DrawingsStore>((set, get) => ({
   },
 
   reset: () => {
+    drawingsStoreVersion += 1;
     set({ presentations: [] });
   },
 
-  bootstrap: async () => {
+  syncFromCloud: async () => {
+    const requestVersion = ++drawingsStoreVersion;
     const storedPresentations = await ConvexService.getDrawingPresentations();
+
+    if (requestVersion !== drawingsStoreVersion) {
+      return;
+    }
+
     set({
       presentations: storedPresentations || [],
     });

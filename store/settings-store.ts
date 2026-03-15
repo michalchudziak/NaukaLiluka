@@ -50,7 +50,7 @@ interface SettingsState extends SettingsSnapshot {
   updateMathNumbersInterval: (value: number) => void;
   updateMathNumbersCount: (value: number) => void;
   reset: () => void;
-  bootstrap: () => Promise<void>;
+  syncFromCloud: () => Promise<void>;
 }
 
 const defaultSettings: SettingsSnapshot = {
@@ -131,10 +131,13 @@ function persistSettings(snapshot: SettingsSnapshot) {
   void ConvexService.updateSettings(snapshot).catch(ignoreCloudFailure);
 }
 
+let settingsStateVersion = 0;
+
 export const useSettingsStore = create<SettingsState>((set) => ({
   ...defaultSettings,
 
   updateReadingNoRepWords: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -152,6 +155,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateReadingNoRepSentences: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -169,6 +173,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateReadingIntervalWords: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -186,6 +191,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateReadingIntervalSentences: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -203,6 +209,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateReadingBooksAllowAll: (value: boolean) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -220,6 +227,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateReadingWordSpacing: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -234,6 +242,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateDrawingsShowCaptions: (value: boolean) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -248,6 +257,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateDrawingsShowFacts: (value: boolean) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -262,6 +272,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateDrawingsInterval: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -276,6 +287,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateDrawingsRandomOrder: (value: boolean) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -290,6 +302,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateMathEquationsInterval: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -307,6 +320,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateMathEquationsCount: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -324,6 +338,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateMathNumbersInterval: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -341,6 +356,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   updateMathNumbersCount: (value: number) => {
+    settingsStateVersion += 1;
     set((state) => {
       const newState = {
         ...state,
@@ -358,11 +374,18 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   reset: () => {
+    settingsStateVersion += 1;
     set({ ...defaultSettings });
   },
 
-  bootstrap: async () => {
+  syncFromCloud: async () => {
+    const requestVersion = ++settingsStateVersion;
     const stored = await ConvexService.getSettings();
+
+    if (requestVersion !== settingsStateVersion) {
+      return;
+    }
+
     set(mergeSettings(stored));
   },
 }));

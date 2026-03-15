@@ -16,6 +16,7 @@ export default function SettingsLayout() {
       <Stack.Screen name="reading-norep" />
       <Stack.Screen name="reading-interval" />
       <Stack.Screen name="reading-books" />
+      <Stack.Screen name="account" />
       <Stack.Screen name="drawings" />
       <Stack.Screen name="math" />
       <Stack.Screen name="word-spacing" />

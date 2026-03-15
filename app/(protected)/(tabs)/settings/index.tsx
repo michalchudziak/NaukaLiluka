@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
@@ -12,8 +11,6 @@ import {
   getForestCampMetrics,
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
-import { authClient } from '@/services/auth-client';
-import { resetAllStores } from '@/store/reset-stores';
 
 interface SettingItemProps {
   title: string;
@@ -54,33 +51,6 @@ export default function SettingsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
-  const [signOutError, setSignOutError] = useState<string | null>(null);
-  const [isSigningOut, setIsSigningOut] = useState(false);
-
-  const handleSignOut = async () => {
-    if (isSigningOut) {
-      return;
-    }
-
-    setIsSigningOut(true);
-    setSignOutError(null);
-
-    const result = await authClient.signOut({
-      fetchOptions: {
-        throw: false,
-      },
-    });
-
-    setIsSigningOut(false);
-
-    if (result.error) {
-      setSignOutError(result.error.message ?? t('auth.signOutError'));
-      return;
-    }
-
-    resetAllStores();
-    router.replace('../sign-in');
-  };
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
@@ -171,19 +141,12 @@ export default function SettingsScreen() {
 
           <View style={styles.sectionContent}>
             <SettingItem
-              title={t('settings.account.signOut')}
-              subtitle={isSigningOut ? t('auth.signingOut') : t('settings.account.signOutSubtitle')}
-              icon="log-out-outline"
-              onPress={() => void handleSignOut()}
-              destructive
+              title={t('settings.account.manage')}
+              subtitle={t('settings.account.manageSubtitle')}
+              icon="shield-checkmark-outline"
+              onPress={() => router.push('./account')}
             />
           </View>
-
-          {signOutError ? (
-            <ThemedText selectable style={styles.errorText}>
-              {signOutError}
-            </ThemedText>
-          ) : null}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -267,14 +230,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: ForestCampTheme.colors.textMuted,
     marginTop: 2,
-  },
-  errorText: {
-    ...forestCampTypography.body,
-    fontSize: 13,
-    lineHeight: 18,
-    color: ForestCampTheme.colors.danger,
-    marginTop: 10,
-    marginLeft: 10,
   },
   destructiveText: {
     color: ForestCampTheme.colors.danger,

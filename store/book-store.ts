@@ -51,7 +51,7 @@ interface BookStore {
     type: 'words' | 'sentences'
   ) => boolean;
   reset: () => void;
-  bootstrap: () => Promise<void>;
+  syncFromCloud: () => Promise<void>;
 }
 
 const defaultActiveBookProgress: BookProgress = {
@@ -137,6 +137,8 @@ function getUniquePermutations<T>(array: T[]): T[][] {
   // Randomly shuffle which permutation goes to which session
   return shuffleArray(permutations);
 }
+
+let bookStoreVersion = 0;
 
 export const useBookStore = create<BookStore>((set, get) => ({
   activeBookProgress: defaultActiveBookProgress,
@@ -243,6 +245,7 @@ export const useBookStore = create<BookStore>((set, get) => ({
     );
     if (!already) {
       const updated = [...prev, { session, type, timestamp: Date.now() }];
+      bookStoreVersion += 1;
       set({ completedSessions: updated });
       void ConvexService.saveBookTrackSession(updated).catch(ignoreCloudFailure);
     }
@@ -266,18 +269,25 @@ export const useBookStore = create<BookStore>((set, get) => ({
     nextState.isCompleted =
       (nextState.completedTriples.length || 0) >= getRequiredBookDays(active.bookId);
 
+    bookStoreVersion += 1;
     set({ activeBookProgress: nextState });
 
     void (async () => {
+      const requestVersion = bookStoreVersion;
       const stored = await ConvexService.getBookProgress();
       const merged = normalizeBookProgressList(stored);
       merged[nextState.bookId] = nextState;
 
       await ConvexService.updateBookProgress(merged);
 
+      if (requestVersion !== bookStoreVersion) {
+        return;
+      }
+
       if (nextState.isCompleted) {
         const nextIndex = merged.findIndex((progress) => !progress.isCompleted);
         if (nextIndex !== -1) {
+          bookStoreVersion += 1;
           set({ activeBookProgress: merged[nextIndex] });
         }
       }
@@ -307,17 +317,24 @@ export const useBookStore = create<BookStore>((set, get) => ({
   },
 
   reset: () => {
+    bookStoreVersion += 1;
     set({
       activeBookProgress: defaultActiveBookProgress,
       completedSessions: [],
     });
   },
 
-  bootstrap: async () => {
+  syncFromCloud: async () => {
+    const requestVersion = ++bookStoreVersion;
     const [completions, stored] = await Promise.all([
       ConvexService.getBookTrackSessions(),
       ConvexService.getBookProgress(),
     ]);
+
+    if (requestVersion !== bookStoreVersion) {
+      return;
+    }
+
     const progressList = normalizeBookProgressList(stored);
     const active = progressList.find((p) => !p.isCompleted) || progressList[0];
 

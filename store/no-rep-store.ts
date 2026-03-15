@@ -30,8 +30,10 @@ interface NoRepStore {
   isNoRepPathCompletedToday: () => boolean;
 
   reset: () => void;
-  bootstrap: () => Promise<void>;
+  syncFromCloud: () => Promise<void>;
 }
+
+let noRepStoreVersion = 0;
 
 export const useNoRepStore = create<NoRepStore>((set, get) => ({
   displayedWords: [],
@@ -40,6 +42,7 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   sentenceCompletionTimestamps: [],
 
   addDisplayedWords: (words: string[]) => {
+    noRepStoreVersion += 1;
     const newState = {
       displayedWords: Array.from(new Set([...get().displayedWords, ...words])),
     };
@@ -50,6 +53,7 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   },
 
   addDisplayedSentences: (sentences: string[]) => {
+    noRepStoreVersion += 1;
     const newState = {
       displayedSentences: Array.from(new Set([...get().displayedSentences, ...sentences])),
     };
@@ -99,12 +103,14 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
 
   markWordsCompleted: () => {
     const newTimestamps = [...get().wordCompletionTimestamps, Date.now()];
+    noRepStoreVersion += 1;
     set({ wordCompletionTimestamps: newTimestamps });
     void ConvexService.saveNoRepCompletion('words').catch(ignoreCloudFailure);
   },
 
   markSentencesCompleted: () => {
     const newTimestamps = [...get().sentenceCompletionTimestamps, Date.now()];
+    noRepStoreVersion += 1;
     set({ sentenceCompletionTimestamps: newTimestamps });
     void ConvexService.saveNoRepCompletion('sentences').catch(ignoreCloudFailure);
   },
@@ -124,6 +130,7 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
   },
 
   reset: () => {
+    noRepStoreVersion += 1;
     set({
       displayedWords: [],
       displayedSentences: [],
@@ -132,7 +139,8 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
     });
   },
 
-  bootstrap: async () => {
+  syncFromCloud: async () => {
+    const requestVersion = ++noRepStoreVersion;
     const [storedWords, storedSentences, storedWordTimestamps, storedSentenceTimestamps] =
       await Promise.all([
         ConvexService.getNoRepProgress('words'),
@@ -140,6 +148,10 @@ export const useNoRepStore = create<NoRepStore>((set, get) => ({
         ConvexService.getNoRepCompletions('words'),
         ConvexService.getNoRepCompletions('sentences'),
       ]);
+
+    if (requestVersion !== noRepStoreVersion) {
+      return;
+    }
 
     set({
       displayedWords: storedWords || [],

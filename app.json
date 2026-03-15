@@ -7,7 +7,6 @@
     "icon": "./assets/images/app-icon.png",
     "scheme": "naukaliluka",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.michalchudziak.NaukaLiluka"
@@ -17,7 +16,6 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#2f8653"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.michalchudziak.NaukaLiluka"
     },
     "web": {
@@ -36,7 +34,10 @@
           "backgroundColor": "#2f8653"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font",
+      "expo-image",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

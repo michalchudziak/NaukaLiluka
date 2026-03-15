@@ -26,7 +26,6 @@ const functions = {
 } as const;
 
 let convexClient: ConvexReactClient | null = null;
-let cloudFailureListener: ((error: Error) => void) | null = null;
 
 type ContentType = 'words' | 'sentences';
 type BookSession = 'session1' | 'session2' | 'session3';
@@ -149,16 +148,11 @@ function buildCloudError(operation: string, cause: unknown): Error {
 function handleCloudFailure(operation: string, cause: unknown): never {
   const error = buildCloudError(operation, cause);
   console.error(`Cloud operation failed (${operation}):`, cause);
-  cloudFailureListener?.(error);
   throw error;
 }
 
-export function setCloudFailureListener(listener: ((error: Error) => void) | null) {
-  cloudFailureListener = listener;
-}
-
 export function ignoreCloudFailure() {
-  // StoreProvider already handles the blocking fallback via the shared listener.
+  // Background sync and optimistic mutations can safely ignore transport errors here.
 }
 
 // biome-ignore lint/complexity/noStaticOnlyClass: Static-only service aligns with app architecture

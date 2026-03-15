@@ -20,7 +20,7 @@ interface EquationsStore {
   isSessionCompletedToday: (session: 'session1' | 'session2') => boolean;
   maybeAdvanceTheDay: () => Promise<void>;
   reset: () => void;
-  bootstrap: () => Promise<void>;
+  syncFromCloud: () => Promise<void>;
 }
 
 const CATEGORY_ORDER: Category[] = ['integer', 'fraction', 'decimal', 'negative', 'percentage'];
@@ -52,6 +52,8 @@ const contentToSessionToken = (
   const suffix = sessionIndex === 0 ? '1' : '2';
   return `${content}${suffix}` as Session;
 };
+
+let equationsStoreVersion = 0;
 
 export const useEquationsStore = create<EquationsStore>((set, get) => ({
   currentDay: 1,
@@ -86,7 +88,10 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
       }
     }
 
-    if (newState) set(newState as any);
+    if (newState) {
+      equationsStoreVersion += 1;
+      set(newState as any);
+    }
 
     const updated = { ...get() };
     await ConvexService.updateEquationsProgress({
@@ -142,6 +147,7 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
     if (!allCompleted) return;
 
     const next = nextDayAndCategory(currentDay, currentCategory);
+    equationsStoreVersion += 1;
     set({ currentDay: next.day, currentCategory: next.category, completedSessions: [] });
 
     const updated = { ...get() };
@@ -154,6 +160,7 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
   },
 
   reset: () => {
+    equationsStoreVersion += 1;
     set({
       currentDay: 1,
       currentCategory: 'integer',
@@ -162,8 +169,14 @@ export const useEquationsStore = create<EquationsStore>((set, get) => ({
     });
   },
 
-  bootstrap: async () => {
+  syncFromCloud: async () => {
+    const requestVersion = ++equationsStoreVersion;
     const eqProgress = await ConvexService.getEquationsProgress();
+
+    if (requestVersion !== equationsStoreVersion) {
+      return;
+    }
+
     if (eqProgress) {
       set({
         currentDay: eqProgress.currentDay || 1,
