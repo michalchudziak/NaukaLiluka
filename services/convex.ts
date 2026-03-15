@@ -3,7 +3,9 @@ import { isToday } from 'date-fns';
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
 const functions = {
+  usersCurrent: 'users:current',
   usersEnsureCurrentUser: 'users:ensureCurrentUser',
+  usersUpdateProfile: 'users:updateProfile',
   settingsGet: 'settings:get',
   settingsUpsert: 'settings:upsert',
   booksListProgress: 'books:listProgress',
@@ -68,6 +70,15 @@ type SettingsSnapshot = {
       numberCount: number;
     };
   };
+};
+
+type AppUser = {
+  _id: string;
+  _creationTime: number;
+  tokenIdentifier: string;
+  email: string;
+  name?: string;
+  createdAt: number;
 };
 
 type BookProgress = {
@@ -161,11 +172,27 @@ export class ConvexService {
     getConvexClient();
   }
 
+  static async getCurrentUser(): Promise<AppUser | null> {
+    try {
+      return await getConvexClient().query(functions.usersCurrent as any, {});
+    } catch (error) {
+      handleCloudFailure('load account profile', error);
+    }
+  }
+
   static async ensureCurrentUser() {
     try {
       return await getConvexClient().mutation(functions.usersEnsureCurrentUser as any, {});
     } catch (error) {
       handleCloudFailure('initialize the current user', error);
+    }
+  }
+
+  static async updateCurrentUserProfile(profile: { name: string }): Promise<AppUser> {
+    try {
+      return await getConvexClient().mutation(functions.usersUpdateProfile as any, profile);
+    } catch (error) {
+      handleCloudFailure('save account profile', error);
     }
   }
 

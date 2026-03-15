@@ -1,7 +1,7 @@
 import { mutationGeneric as mutation, queryGeneric as query } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
 import { authComponent } from './auth';
-import { getCurrentUserByTokenIdentifier } from './lib/current_user';
+import { getCurrentUserByTokenIdentifier, requireCurrentUser } from './lib/current_user';
 import { appUserValidator } from './validators';
 
 export const current = query({
@@ -33,6 +33,8 @@ export const ensureCurrentUser = mutation({
 
     const authUser = await authComponent.getAuthUser(ctx);
     const email = identity.email ?? authUser.email;
+    const normalizedName = authUser.name.trim();
+    const profileName = normalizedName.length >= 2 ? normalizedName : undefined;
 
     if (!email) {
       throw new ConvexError({
@@ -44,19 +46,30 @@ export const ensureCurrentUser = mutation({
     const existing = await getCurrentUserByTokenIdentifier(ctx, identity.tokenIdentifier);
 
     if (existing) {
+      const updates: { email?: string; name?: string } = {};
+
       if (existing.email !== email) {
-        await ctx.db.patch(existing._id, { email });
+        updates.email = email;
+      }
+
+      if (profileName && existing.name !== profileName) {
+        updates.name = profileName;
+      }
+
+      if (updates.email || updates.name) {
+        await ctx.db.patch(existing._id, updates);
       }
 
       return {
         ...existing,
-        email,
+        ...updates,
       };
     }
 
     const userId = await ctx.db.insert('users', {
       tokenIdentifier: identity.tokenIdentifier,
       email,
+      ...(profileName ? { name: profileName } : {}),
       createdAt: Date.now(),
     });
 
@@ -70,5 +83,37 @@ export const ensureCurrentUser = mutation({
     }
 
     return created;
+  },
+});
+
+export const updateProfile = mutation({
+  args: {
+    name: v.string(),
+  },
+  returns: appUserValidator,
+  handler: async (ctx, args) => {
+    const user = await requireCurrentUser(ctx);
+    const normalizedName = args.name.trim();
+
+    if (normalizedName.length < 2) {
+      throw new ConvexError({
+        code: 'PROFILE_NAME_INVALID',
+        message: 'Name must be at least 2 characters long.',
+      });
+    }
+
+    if (user.name === normalizedName) {
+      return {
+        ...user,
+        name: normalizedName,
+      };
+    }
+
+    await ctx.db.patch(user._id, { name: normalizedName });
+
+    return {
+      ...user,
+      name: normalizedName,
+    };
   },
 });

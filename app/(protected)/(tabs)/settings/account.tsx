@@ -14,6 +14,7 @@ import {
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { authClient } from '@/services/auth-client';
+import { ConvexService } from '@/services/convex';
 import { resetAllStores } from '@/store/reset-stores';
 
 function formatDateLabel(value: unknown) {
@@ -89,6 +90,8 @@ function ActionButton({
   );
 }
 
+type AccountProfile = Awaited<ReturnType<typeof ConvexService.getCurrentUser>>;
+
 export default function AccountSettingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -97,8 +100,14 @@ export default function AccountSettingsScreen() {
   const metrics = getForestCampMetrics(width);
   const { data, isPending, refetch } = authClient.useSession();
   const user = data?.user ?? null;
-  const memberSince = useMemo(() => formatDateLabel(user?.createdAt), [user?.createdAt]);
+  const [accountProfile, setAccountProfile] = useState<AccountProfile>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+  const profileName = user?.name ?? accountProfile?.name ?? '';
+  const profileEmail = accountProfile?.email ?? user?.email ?? null;
+  const profileCreatedAt = accountProfile?.createdAt ?? user?.createdAt ?? null;
+  const memberSince = useMemo(() => formatDateLabel(profileCreatedAt), [profileCreatedAt]);
   const [displayName, setDisplayName] = useState('');
+  const hasProfileChanges = displayName.trim() !== profileName.trim();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -112,8 +121,48 @@ export default function AccountSettingsScreen() {
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
-    setDisplayName(user?.name ?? '');
-  }, [user?.name]);
+    let isCancelled = false;
+
+    if (!user) {
+      setAccountProfile(null);
+      setIsLoadingProfile(false);
+      return () => {
+        isCancelled = true;
+      };
+    }
+
+    setIsLoadingProfile(true);
+
+    void (async () => {
+      try {
+        const profile = await ConvexService.getCurrentUser();
+
+        if (isCancelled) {
+          return;
+        }
+
+        setAccountProfile(profile);
+      } catch {
+        if (isCancelled) {
+          return;
+        }
+
+        setAccountProfile(null);
+      } finally {
+        if (!isCancelled) {
+          setIsLoadingProfile(false);
+        }
+      }
+    })();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [user?.email]);
+
+  useEffect(() => {
+    setDisplayName(profileName);
+  }, [profileName]);
 
   const handleSaveProfile = async () => {
     const normalizedName = displayName.trim();
@@ -135,14 +184,31 @@ export default function AccountSettingsScreen() {
       },
     });
 
-    setIsSavingProfile(false);
-
     if (result.error) {
+      setIsSavingProfile(false);
       setProfileError(result.error.message ?? t('settings.account.profileSaveError'));
       return;
     }
 
+    try {
+      const updatedProfile = await ConvexService.updateCurrentUserProfile({
+        name: normalizedName,
+      });
+
+      setAccountProfile(updatedProfile);
+    } catch {
+      setAccountProfile((current) =>
+        current
+          ? {
+              ...current,
+              name: normalizedName,
+            }
+          : current
+      );
+    }
+
     await refetch();
+    setIsSavingProfile(false);
     setProfileSuccess(t('settings.account.profileSaved'));
   };
 
@@ -290,8 +356,9 @@ export default function AccountSettingsScreen() {
                 {t('settings.account.emailLabel')}
               </ThemedText>
               <ThemedText selectable style={styles.readonlyValue}>
-                {user?.email && isValidEmail(user.email) ? user.email : '...'}
+                {profileEmail && isValidEmail(profileEmail) ? profileEmail : '...'}
               </ThemedText>
+              <ThemedText style={styles.helperText}>{t('settings.account.emailReadonlyHint')}</ThemedText>
             </View>
 
             <View style={styles.separator} />
@@ -318,7 +385,7 @@ export default function AccountSettingsScreen() {
                   : t('settings.account.saveProfile')
               }
               onPress={() => void handleSaveProfile()}
-              disabled={isSavingProfile || !user}
+              disabled={isSavingProfile || isLoadingProfile || !user || !hasProfileChanges}
             />
           </View>
         </View>

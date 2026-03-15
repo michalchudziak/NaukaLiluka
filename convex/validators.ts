@@ -68,6 +68,7 @@ export const appUserValidator = v.object({
   _creationTime: v.number(),
   tokenIdentifier: v.string(),
   email: v.string(),
+  name: v.optional(v.string()),
   createdAt: v.number(),
 });
 
