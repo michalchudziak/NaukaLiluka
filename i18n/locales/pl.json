@@ -213,6 +213,27 @@
     "equationsSet1": "Równania - Sesja 1",
     "equationsSet2": "Równania - Sesja 2"
   },
+  "onboarding": {
+    "step1": {
+      "title": "Witaj w NaukaLiluka!",
+      "description": "Codzienna nauka metodą Glenna Domana w zaledwie kilka minut."
+    },
+    "step2": {
+      "title": "Czytanie całowyrazowe",
+      "description": "Twoje dziecko pokocha czytanie. Wystarczą 2 minuty dziennie."
+    },
+    "step3": {
+      "title": "Matematyka przez odkrywanie",
+      "description": "Buduj myślenie matematyczne od pierwszych dni życia."
+    },
+    "step4": {
+      "title": "Wiedza o świecie",
+      "description": "Rozwijaj pamięć fotograficzną i ciekawość dziecka."
+    },
+    "next": "Dalej",
+    "skip": "Pomiń",
+    "start": "Rozpocznij"
+  },
   "math": {
     "numberSets": "Liczby",
     "title": "Matematyka",
