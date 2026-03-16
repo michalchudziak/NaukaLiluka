@@ -23,7 +23,7 @@ export default function DrawingDisplayScreen() {
   const settings = useSettingsStore();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(-1);
-  const [imageOrder, setImageOrder] = useState<number[]>([]);
+  const currentImageIndexRef = useRef(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const hasMarkedRef = useRef(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -45,23 +45,16 @@ export default function DrawingDisplayScreen() {
     }
   }, [imageSet, drawingsStore]);
 
-  useEffect(() => {
-    if (!imageSet) {
-      return;
-    }
-
+  const imageOrder = useMemo(() => {
+    if (!imageSet) return [];
     const indices = Array.from({ length: imageSet.images.length }, (_, i) => i);
-
-    if (settings.drawings.randomOrder) {
-      const shuffled = [...indices];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      setImageOrder(shuffled);
-    } else {
-      setImageOrder(indices);
+    if (!settings.drawings.randomOrder) return indices;
+    const shuffled = [...indices];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
+    return shuffled;
   }, [imageSet, settings.drawings.randomOrder]);
 
   const fadeTransition = useCallback(
@@ -83,7 +76,7 @@ export default function DrawingDisplayScreen() {
   }, []);
 
   useEffect(() => {
-    if (!imageSet || isPaused) {
+    if (!imageSet || isPaused || imageOrder.length === 0) {
       clearCurrentInterval();
       return;
     }
@@ -91,27 +84,29 @@ export default function DrawingDisplayScreen() {
     clearCurrentInterval();
     intervalRef.current = setInterval(() => {
       fadeTransition(() => {
-        setCurrentImageIndex((prevIndex) => prevIndex + 1);
+        const next = currentImageIndexRef.current + 1;
+        currentImageIndexRef.current = next;
+        if (next >= imageOrder.length) {
+          clearCurrentInterval();
+          router.back();
+        } else {
+          setCurrentImageIndex(next);
+        }
       });
     }, settings.drawings.interval);
 
     return () => {
       clearCurrentInterval();
     };
-  }, [imageSet, settings.drawings.interval, fadeTransition, isPaused, clearCurrentInterval]);
-
-  useEffect(() => {
-    if (!imageSet || imageOrder.length === 0) {
-      return;
-    }
-
-    if (currentImageIndex >= imageOrder.length) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      router.back();
-    }
-  }, [currentImageIndex, imageOrder, imageSet, router.back]);
+  }, [
+    imageSet,
+    imageOrder.length,
+    settings.drawings.interval,
+    fadeTransition,
+    isPaused,
+    clearCurrentInterval,
+    router,
+  ]);
 
   const currentImage =
     imageSet && currentImageIndex >= 0 && currentImageIndex < imageOrder.length

@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import {
   ForestCampTheme,
@@ -70,29 +71,13 @@ export default function MathScreen() {
 
         <View style={styles.moduleCard}>
           {modules.map((module) => (
-            <Pressable
+            <StateActionRow
               key={module.id}
-              style={({ pressed }) => [
-                styles.moduleRow,
-                module.isCompleted && styles.moduleRowDone,
-                pressed && styles.moduleRowPressed,
-              ]}
+              title={module.title}
+              subtitle={module.isCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus')}
+              isCompleted={module.isCompleted}
               onPress={module.onPress}
-            >
-              <View
-                style={[
-                  styles.moduleDot,
-                  module.isCompleted ? styles.moduleDotDone : styles.moduleDotPending,
-                ]}
-              />
-              <View style={styles.moduleTextWrap}>
-                <ThemedText style={styles.moduleTitle}>{module.title}</ThemedText>
-                <ThemedText style={styles.moduleSubtitle}>
-                  {module.isCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus')}
-                </ThemedText>
-              </View>
-              <ThemedText style={styles.moduleArrow}>{module.isCompleted ? '✓' : '→'}</ThemedText>
-            </Pressable>
+            />
           ))}
         </View>
       </View>
@@ -200,53 +185,5 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 8,
     ...forestCampSoftShadow,
-  },
-  moduleRow: {
-    minHeight: 64,
-    borderRadius: ForestCampTheme.radius.md,
-    borderWidth: 1,
-    borderColor: ForestCampTheme.colors.border,
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  moduleRowDone: {
-    backgroundColor: '#f3f9ec',
-  },
-  moduleRowPressed: {
-    opacity: 0.75,
-  },
-  moduleDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 999,
-  },
-  moduleDotPending: {
-    backgroundColor: ForestCampTheme.colors.warning,
-  },
-  moduleDotDone: {
-    backgroundColor: ForestCampTheme.colors.success,
-  },
-  moduleTextWrap: {
-    flex: 1,
-  },
-  moduleTitle: {
-    ...forestCampTypography.heading,
-    fontSize: 17,
-    color: ForestCampTheme.colors.title,
-  },
-  moduleSubtitle: {
-    ...forestCampTypography.body,
-    marginTop: 2,
-    fontSize: 13,
-    color: ForestCampTheme.colors.textMuted,
-  },
-  moduleArrow: {
-    ...forestCampTypography.heading,
-    fontSize: 20,
-    color: ForestCampTheme.colors.primaryStrong,
   },
 });

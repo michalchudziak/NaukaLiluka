@@ -16,6 +16,10 @@ import { useDrawingsStore } from '@/store/drawings-store';
 
 const DAILY_GOALS = [4, 8, 12] as const;
 
+function ListSeparator() {
+  return <View style={styles.separator} />;
+}
+
 export default function DrawingsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -90,7 +94,7 @@ export default function DrawingsScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.title}
           contentContainerStyle={[styles.listContent, { maxWidth: metrics.maxContentWidth }]}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ItemSeparatorComponent={ListSeparator}
           showsVerticalScrollIndicator={false}
         />
       </View>

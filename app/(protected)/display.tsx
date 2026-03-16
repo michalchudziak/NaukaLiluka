@@ -18,6 +18,7 @@ export default function DisplayScreen() {
   const router = useRouter();
   const settings = useSettingsStore();
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const currentIndexRef = useRef(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const opacity = useSharedValue(1);
@@ -53,40 +54,34 @@ export default function DisplayScreen() {
     [opacity]
   );
 
+  const displayInterval = (() => {
+    const override = parseInt((params.interval as string) || '', 10);
+    const fallback = settings.reading.interval[params.type as 'words' | 'sentences'];
+    return Number.isFinite(override) && override > 0 ? override : fallback;
+  })();
+
   useEffect(() => {
     if (itemsWithSpacing.length === 0) return;
 
-    const override = parseInt((params.interval as string) || '', 10);
-    const fallback = settings.reading.interval[params.type as 'words' | 'sentences'];
-    const interval = Number.isFinite(override) && override > 0 ? override : fallback;
-
     intervalRef.current = setInterval(() => {
       fadeTransition(() => {
-        setCurrentIndex((prevIndex) => prevIndex + 1);
+        const next = currentIndexRef.current + 1;
+        currentIndexRef.current = next;
+        if (next >= itemsWithSpacing.length) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          router.back();
+        } else {
+          setCurrentIndex(next);
+        }
       });
-    }, interval);
+    }, displayInterval);
 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [
-    fadeTransition,
-    itemsWithSpacing.length,
-    params.type,
-    settings.reading.interval[params.type as 'words' | 'sentences'],
-    params.interval,
-  ]);
-
-  useEffect(() => {
-    if (currentIndex >= itemsWithSpacing.length) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      router.back();
-    }
-  }, [currentIndex, itemsWithSpacing.length, router.back]);
+  }, [fadeTransition, itemsWithSpacing.length, displayInterval, router]);
 
   if (itemsWithSpacing.length === 0 || currentIndex === -1) {
     return <AnimatedThemedView style={[styles.container, animatedStyle]} />;

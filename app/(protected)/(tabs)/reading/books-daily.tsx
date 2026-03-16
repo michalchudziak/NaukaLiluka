@@ -1,7 +1,7 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
@@ -25,7 +25,6 @@ export default function BooksDailyScreen() {
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const { getDailyData, markSessionItemCompleted, isSessionItemCompletedToday } = useBookStore();
   const dailyPlan = getDailyData();
-  const [isLoading] = useState(false);
 
   const handleTrackPress = (
     sessionId: 'session1' | 'session2' | 'session3',
@@ -99,15 +98,6 @@ export default function BooksDailyScreen() {
       </View>
     );
   };
-
-  if (isLoading) {
-    return (
-      <ThemedView style={[styles.container, styles.centerContent, { marginBottom: tabBarHeight }]}>
-        <ActivityIndicator size="large" />
-        <ThemedText style={styles.loadingText}>{t('booksDaily.loading')}</ThemedText>
-      </ThemedView>
-    );
-  }
 
   if (!dailyPlan) {
     return (
@@ -198,11 +188,6 @@ const styles = StyleSheet.create({
     color: ForestCampTheme.colors.title,
     textAlign: 'center',
     marginBottom: 10,
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: ForestCampTheme.colors.textMuted,
   },
   noContentText: {
     ...forestCampTypography.heading,

@@ -1,5 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { ScrollView, StyleSheet, Switch, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { SwitchSetting } from '@/components/settings/SwitchSetting';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import {
@@ -10,30 +11,6 @@ import {
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
-
-interface SwitchSettingProps {
-  label: string;
-  description?: string;
-  value: boolean;
-  onValueChange: (value: boolean) => void;
-}
-
-function SwitchSetting({ label, description, value, onValueChange }: SwitchSettingProps) {
-  return (
-    <View style={styles.switchContainer}>
-      <View style={styles.switchTextContainer}>
-        <ThemedText style={styles.switchLabel}>{label}</ThemedText>
-        {description && <ThemedText style={styles.switchDescription}>{description}</ThemedText>}
-      </View>
-      <Switch
-        value={value}
-        onValueChange={onValueChange}
-        trackColor={{ false: '#d3e2c5', true: ForestCampTheme.colors.success }}
-        thumbColor="#FFFFFF"
-      />
-    </View>
-  );
-}
 
 export default function ReadingBooksSettingsScreen() {
   const { t } = useTranslation();
@@ -107,29 +84,5 @@ const styles = StyleSheet.create({
     borderRadius: ForestCampTheme.radius.lg,
     overflow: 'hidden',
     ...forestCampSoftShadow,
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: ForestCampTheme.colors.card,
-  },
-  switchTextContainer: {
-    flex: 1,
-    marginRight: 10,
-  },
-  switchLabel: {
-    ...forestCampTypography.heading,
-    fontSize: 16,
-    color: ForestCampTheme.colors.title,
-  },
-  switchDescription: {
-    ...forestCampTypography.body,
-    fontSize: 13,
-    color: ForestCampTheme.colors.textMuted,
-    marginTop: 4,
-    lineHeight: 18,
   },
 });

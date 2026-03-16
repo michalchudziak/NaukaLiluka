@@ -1,13 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import {
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { NumberInput } from '@/components/settings/NumberInput';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import {
@@ -18,78 +11,6 @@ import {
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
-
-interface NumberInputProps {
-  label: string;
-  value: number;
-  onChangeValue: (value: number) => void;
-  min?: number;
-  max?: number;
-}
-
-function NumberInput({ label, value, onChangeValue, min = 1, max = 99 }: NumberInputProps) {
-  const handleDecrement = () => {
-    if (value > min) {
-      onChangeValue(value - 1);
-    }
-  };
-
-  const handleIncrement = () => {
-    if (value < max) {
-      onChangeValue(value + 1);
-    }
-  };
-
-  const handleTextChange = (text: string) => {
-    const num = parseInt(text, 10) || min;
-    if (num >= min && num <= max) {
-      onChangeValue(num);
-    }
-  };
-
-  return (
-    <View style={styles.inputContainer}>
-      <ThemedText style={styles.inputLabel}>{label}</ThemedText>
-      <View style={styles.inputControls}>
-        <TouchableOpacity
-          style={[styles.button, value <= min && styles.buttonDisabled]}
-          onPress={handleDecrement}
-          disabled={value <= min}
-        >
-          <Ionicons
-            name="remove"
-            size={20}
-            color={
-              value <= min ? ForestCampTheme.colors.textMuted : ForestCampTheme.colors.primaryStrong
-            }
-          />
-        </TouchableOpacity>
-
-        <TextInput
-          style={styles.input}
-          value={value.toString()}
-          onChangeText={handleTextChange}
-          keyboardType="number-pad"
-          selectTextOnFocus
-        />
-
-        <TouchableOpacity
-          style={[styles.button, value >= max && styles.buttonDisabled]}
-          onPress={handleIncrement}
-          disabled={value >= max}
-        >
-          <Ionicons
-            name="add"
-            size={20}
-            color={
-              value >= max ? ForestCampTheme.colors.textMuted : ForestCampTheme.colors.primaryStrong
-            }
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-}
 
 export default function ReadingNoRepSettingsScreen() {
   const { t } = useTranslation();
@@ -174,46 +95,6 @@ const styles = StyleSheet.create({
     borderRadius: ForestCampTheme.radius.lg,
     overflow: 'hidden',
     ...forestCampSoftShadow,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: ForestCampTheme.colors.card,
-  },
-  inputLabel: {
-    ...forestCampTypography.heading,
-    fontSize: 16,
-    color: ForestCampTheme.colors.title,
-    flex: 1,
-  },
-  inputControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  button: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: ForestCampTheme.colors.cardMuted,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonDisabled: {
-    opacity: 0.55,
-  },
-  input: {
-    width: 54,
-    height: 34,
-    marginHorizontal: 10,
-    textAlign: 'center',
-    fontSize: 17,
-    borderRadius: 10,
-    backgroundColor: '#eff7e8',
-    color: ForestCampTheme.colors.title,
-    ...forestCampTypography.heading,
   },
   separator: {
     height: 1,

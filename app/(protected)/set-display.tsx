@@ -39,6 +39,7 @@ export default function SetDisplayScreen() {
   const insets = useSafeAreaInsets();
   const { math } = useSettingsStore();
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const currentIndexRef = useRef(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { width, height } = useWindowDimensions();
 
@@ -164,7 +165,14 @@ export default function SetDisplayScreen() {
 
     intervalRef.current = setInterval(() => {
       fadeTransition(() => {
-        setCurrentIndex((prevIndex) => prevIndex + 1);
+        const next = currentIndexRef.current + 1;
+        currentIndexRef.current = next;
+        if (next >= numbers.length) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          router.back();
+        } else {
+          setCurrentIndex(next);
+        }
       });
     }, math.numbers.interval);
 
@@ -173,16 +181,7 @@ export default function SetDisplayScreen() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [numbers.length, fadeTransition, math.numbers.interval]);
-
-  useEffect(() => {
-    if (currentIndex >= numbers.length) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      router.back();
-    }
-  }, [currentIndex, numbers.length, router]);
+  }, [numbers.length, fadeTransition, math.numbers.interval, router]);
 
   if (numbers.length === 0) {
     return <AnimatedThemedView style={[styles.container, animatedStyle]} />;

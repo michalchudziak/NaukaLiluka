@@ -29,7 +29,7 @@ if (!API_KEY) {
 fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 const STYLE_SUFFIX =
-  'Style: flat vector illustration, soft pastel colors using greens (#2f8653, #eef6e7), cream (#fffdf5), and soft earth tones. No text, no words, no letters, no numbers anywhere in the image. Clean, modern children\'s app illustration style. Warm and inviting.';
+  "Style: flat vector illustration, soft pastel colors using greens (#2f8653, #eef6e7), cream (#fffdf5), and soft earth tones. No text, no words, no letters, no numbers anywhere in the image. Clean, modern children's app illustration style. Warm and inviting.";
 
 const images = [
   {

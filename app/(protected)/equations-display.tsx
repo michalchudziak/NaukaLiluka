@@ -19,6 +19,7 @@ export default function EquationsDisplayScreen() {
   const { math } = useSettingsStore();
 
   const [currentIndex, setCurrentIndex] = useState(-1);
+  const currentIndexRef = useRef(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const opacity = useSharedValue(1);
@@ -51,21 +52,21 @@ export default function EquationsDisplayScreen() {
 
     intervalRef.current = setInterval(() => {
       fadeTransition(() => {
-        setCurrentIndex((prev) => prev + 1);
+        const next = currentIndexRef.current + 1;
+        currentIndexRef.current = next;
+        if (next >= equations.length) {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+          router.back();
+        } else {
+          setCurrentIndex(next);
+        }
       });
     }, math.equations.interval);
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [equations.length, fadeTransition, math.equations.interval]);
-
-  useEffect(() => {
-    if (currentIndex >= equations.length) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      router.back();
-    }
-  }, [currentIndex, equations.length, router]);
+  }, [equations.length, fadeTransition, math.equations.interval, router]);
 
   if (equations.length === 0 || currentIndex === -1) {
     return <AnimatedThemedView style={[styles.container, animatedStyle]} />;

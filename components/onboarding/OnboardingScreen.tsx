@@ -90,19 +90,19 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
           </View>
         </GestureDetector>
 
-      <View style={styles.content}>
-        <View style={styles.textBlock}>
-          <ThemedText style={styles.title}>
-            {t(`onboarding.${onboardingSteps[stepIndex].key}.title`)}
-          </ThemedText>
-          <ThemedText style={styles.description}>
-            {t(`onboarding.${onboardingSteps[stepIndex].key}.description`)}
-          </ThemedText>
-        </View>
+        <View style={styles.content}>
+          <View style={styles.textBlock}>
+            <ThemedText style={styles.title}>
+              {t(`onboarding.${onboardingSteps[stepIndex].key}.title`)}
+            </ThemedText>
+            <ThemedText style={styles.description}>
+              {t(`onboarding.${onboardingSteps[stepIndex].key}.description`)}
+            </ThemedText>
+          </View>
 
-        <OnboardingDots count={onboardingSteps.length} activeIndex={stepIndex} />
+          <OnboardingDots count={onboardingSteps.length} activeIndex={stepIndex} />
 
-        <OnboardingButtons isLastStep={isLastStep} onNext={handleNext} onSkip={onComplete} />
+          <OnboardingButtons isLastStep={isLastStep} onNext={handleNext} onSkip={onComplete} />
         </View>
       </SafeAreaView>
     </GestureHandlerRootView>

@@ -15,6 +15,10 @@ import { useBookStore } from '@/store/book-store';
 import { useSettingsStore } from '@/store/settings-store';
 import type { Book } from '@/types/book';
 
+function ListSeparator() {
+  return <ThemedView style={styles.separator} />;
+}
+
 export default function BooksListScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -62,7 +66,7 @@ export default function BooksListScreen() {
             maxWidth: metrics.maxContentWidth,
           },
         ]}
-        ItemSeparatorComponent={() => <ThemedView style={styles.separator} />}
+        ItemSeparatorComponent={ListSeparator}
       />
     </ThemedView>
   );

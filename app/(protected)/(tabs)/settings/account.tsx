@@ -107,6 +107,11 @@ export default function AccountSettingsScreen() {
   const profileCreatedAt = accountProfile?.createdAt ?? user?.createdAt ?? null;
   const memberSince = useMemo(() => formatDateLabel(profileCreatedAt), [profileCreatedAt]);
   const [displayName, setDisplayName] = useState('');
+  const [prevProfileName, setPrevProfileName] = useState('');
+  if (profileName !== prevProfileName) {
+    setPrevProfileName(profileName);
+    setDisplayName(profileName);
+  }
   const hasProfileChanges = displayName.trim() !== profileName.trim();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -120,10 +125,12 @@ export default function AccountSettingsScreen() {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
+  const userEmail = user?.email ?? null;
+
   useEffect(() => {
     let isCancelled = false;
 
-    if (!user) {
+    if (!userEmail) {
       setAccountProfile(null);
       setIsLoadingProfile(false);
       return () => {
@@ -158,11 +165,7 @@ export default function AccountSettingsScreen() {
     return () => {
       isCancelled = true;
     };
-  }, [user?.email]);
-
-  useEffect(() => {
-    setDisplayName(profileName);
-  }, [profileName]);
+  }, [userEmail]);
 
   const handleSaveProfile = async () => {
     const normalizedName = displayName.trim();
@@ -358,7 +361,9 @@ export default function AccountSettingsScreen() {
               <ThemedText selectable style={styles.readonlyValue}>
                 {profileEmail && isValidEmail(profileEmail) ? profileEmail : '...'}
               </ThemedText>
-              <ThemedText style={styles.helperText}>{t('settings.account.emailReadonlyHint')}</ThemedText>
+              <ThemedText style={styles.helperText}>
+                {t('settings.account.emailReadonlyHint')}
+              </ThemedText>
             </View>
 
             <View style={styles.separator} />

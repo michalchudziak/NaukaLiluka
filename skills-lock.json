@@ -1,16 +1,6 @@
 {
   "version": 1,
   "skills": {
-    "convex": {
-      "source": "waynesutton/convexskills",
-      "sourceType": "github",
-      "computedHash": "de7a20d081cd19bf8bce4038bd62d038a0a88f218f85afb35320d09b052fb534"
-    },
-    "convex-best-practices": {
-      "source": "waynesutton/convexskills",
-      "sourceType": "github",
-      "computedHash": "3b24d2afbb5859e3a3640c1e47e2ac9ace81e9737ec76b891951999361c92ab1"
-    },
     "agent-device": {
       "source": "callstackincubator/agent-device",
       "sourceType": "github",
@@ -25,6 +15,16 @@
       "source": "google-gemini/gemini-cli",
       "sourceType": "github",
       "computedHash": "270f0dd1d4c15a798bad5253a309cdc2056fe5322f99ba06ca22ce50581adc02"
+    },
+    "convex": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "de7a20d081cd19bf8bce4038bd62d038a0a88f218f85afb35320d09b052fb534"
+    },
+    "convex-best-practices": {
+      "source": "waynesutton/convexskills",
+      "sourceType": "github",
+      "computedHash": "3b24d2afbb5859e3a3640c1e47e2ac9ace81e9737ec76b891951999361c92ab1"
     },
     "expo-deployment": {
       "source": "expo/skills",
@@ -45,6 +45,11 @@
       "source": "expo/skills",
       "sourceType": "github",
       "computedHash": "6c14e4efb34a9c4759e8b959f82dec328f87dd89a022957c6737086984b9b106"
+    },
+    "react-useeffect": {
+      "source": "softaworks/agent-toolkit",
+      "sourceType": "github",
+      "computedHash": "8c24990b50f431a570f3ad1f60632dee154431861547103047f6ce80092ca734"
     },
     "vercel-composition-patterns": {
       "source": "vercel-labs/agent-skills",

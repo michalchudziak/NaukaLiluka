@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useMemo } from 'react';
-import { Dimensions, StyleSheet, Text, type TextProps, View } from 'react-native';
+import { StyleSheet, Text, type TextProps, useWindowDimensions, View } from 'react-native';
 
 interface AutoSizeTextProps extends Omit<TextProps, 'style'> {
   children: React.ReactNode;
@@ -36,7 +36,7 @@ export const AutoSizeText: React.FC<AutoSizeTextProps> = ({
   maxLength,
   ...textProps
 }) => {
-  const { width: screenWidth } = Dimensions.get('window');
+  const { width: screenWidth } = useWindowDimensions();
 
   const fontSize = useMemo(() => {
     const childLength = typeof children === 'string' ? children.length : 0;

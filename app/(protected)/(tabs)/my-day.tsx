@@ -2,9 +2,10 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import { format, isToday } from 'date-fns';
 import { pl } from 'date-fns/locale';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import {
   ForestCampTheme,
@@ -26,6 +27,56 @@ type RoutineItem = {
   onPress: () => void;
 };
 
+function RoutineSection({
+  title,
+  routines,
+  badgeVariant,
+  showCompleted,
+}: {
+  title: string;
+  routines: RoutineItem[];
+  badgeVariant: 'reading' | 'drawings' | 'math';
+  showCompleted: boolean;
+}) {
+  const { t } = useTranslation();
+  const items = showCompleted ? routines : routines.filter((r) => !r.isCompleted);
+
+  if (items.length === 0) return null;
+
+  const done = routines.filter((r) => r.isCompleted).length;
+  const percent = Math.round((done / routines.length) * 100);
+
+  return (
+    <View style={styles.sectionCard}>
+      <View style={styles.sectionHeader}>
+        <ThemedText style={styles.sectionTitle}>{title}</ThemedText>
+        <View
+          style={[
+            styles.sectionPercentBadge,
+            badgeVariant === 'reading' && styles.sectionPercentReading,
+            badgeVariant === 'drawings' && styles.sectionPercentDrawings,
+            badgeVariant === 'math' && styles.sectionPercentMath,
+          ]}
+        >
+          <ThemedText style={styles.sectionPercentText}>{percent}%</ThemedText>
+        </View>
+      </View>
+
+      <View style={styles.sectionRows}>
+        {items.map((routine) => (
+          <StateActionRow
+            key={routine.id}
+            title={routine.title}
+            subtitle={routine.isCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus')}
+            isCompleted={routine.isCompleted}
+            onPress={routine.onPress}
+          />
+        ))}
+      </View>
+    </View>
+  );
+}
+
 export default function MyDayScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
@@ -38,94 +89,42 @@ export default function MyDayScreen() {
   const { isSessionCompletedToday: isMathSessionCompletedToday, currentDay } = useMathStore();
   const { isSessionCompletedToday: isEqSessionCompletedToday } = useEquationsStore();
 
-  const [isNoRepCompleted, setIsNoRepCompleted] = useState(false);
-  const [isSession1Completed, setIsSession1Completed] = useState(false);
-  const [isSession2Completed, setIsSession2Completed] = useState(false);
-  const [isSession3Completed, setIsSession3Completed] = useState(false);
-  const [isDrawingsCompleted, setIsDrawingsCompleted] = useState(false);
-  const [isMathSession1Completed, setIsMathSession1Completed] = useState(false);
-  const [isMathSession2Completed, setIsMathSession2Completed] = useState(false);
-  const [isEqSession1Completed, setIsEqSession1Completed] = useState(false);
-  const [isEqSession2Completed, setIsEqSession2Completed] = useState(false);
   const [showCompleted, setShowCompleted] = useState(true);
+
   const todayLabel = useMemo(() => {
     const formatted = format(new Date(), 'EEEE, d MMMM', { locale: pl });
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   }, []);
 
-  useEffect(() => {
-    const checkCompletions = async () => {
-      const routine1 = isNoRepPathCompletedToday();
-      setIsNoRepCompleted(routine1);
+  // Derived completion state - computed during render, no polling needed.
+  // Zustand subscriptions trigger re-renders when store data changes.
+  const isNoRepCompleted = isNoRepPathCompletedToday();
 
-      const todayCompletions = bookStore.completedSessions.filter((c) => isToday(c.timestamp));
-      const plan = bookStore.getDailyData();
+  const plan = bookStore.getDailyData();
+  const todayCompletions = bookStore.completedSessions.filter((c) => isToday(c.timestamp));
+  const planIsToday = !!plan && isToday(plan.timestamp);
 
-      if (plan && isToday(plan.timestamp)) {
-        const session1WordsCompleted = todayCompletions.some(
-          (c) => c.session === 'session1' && c.type === 'words'
-        );
-        const session1SentencesNeeded = plan.sessions.session1.sentences.length > 0;
-        const session1SentencesCompleted =
-          !session1SentencesNeeded ||
-          todayCompletions.some((c) => c.session === 'session1' && c.type === 'sentences');
-        setIsSession1Completed(session1WordsCompleted && session1SentencesCompleted);
+  const isBookSessionDone = (sessionKey: 'session1' | 'session2' | 'session3') => {
+    if (!planIsToday || !plan) return false;
+    const wordsOk = todayCompletions.some((c) => c.session === sessionKey && c.type === 'words');
+    const needsSentences = plan.sessions[sessionKey].sentences.length > 0;
+    return (
+      wordsOk &&
+      (!needsSentences ||
+        todayCompletions.some((c) => c.session === sessionKey && c.type === 'sentences'))
+    );
+  };
 
-        const session2WordsCompleted = todayCompletions.some(
-          (c) => c.session === 'session2' && c.type === 'words'
-        );
-        const session2SentencesNeeded = plan.sessions.session2.sentences.length > 0;
-        const session2SentencesCompleted =
-          !session2SentencesNeeded ||
-          todayCompletions.some((c) => c.session === 'session2' && c.type === 'sentences');
-        setIsSession2Completed(session2WordsCompleted && session2SentencesCompleted);
+  const isSession1Completed = isBookSessionDone('session1');
+  const isSession2Completed = isBookSessionDone('session2');
+  const isSession3Completed = isBookSessionDone('session3');
 
-        const session3WordsCompleted = todayCompletions.some(
-          (c) => c.session === 'session3' && c.type === 'words'
-        );
-        const session3SentencesNeeded = plan.sessions.session3.sentences.length > 0;
-        const session3SentencesCompleted =
-          !session3SentencesNeeded ||
-          todayCompletions.some((c) => c.session === 'session3' && c.type === 'sentences');
-        setIsSession3Completed(session3WordsCompleted && session3SentencesCompleted);
-      } else {
-        setIsSession1Completed(false);
-        setIsSession2Completed(false);
-        setIsSession3Completed(false);
-      }
+  const isDrawingsCompleted = drawingsStore.getTodayPresentationCount() > 0;
 
-      setIsDrawingsCompleted(drawingsStore.getTodayPresentationCount() > 0);
-
-      if (currentDay > 30) {
-        const eq1 = isEqSessionCompletedToday('session1');
-        const eq2 = isEqSessionCompletedToday('session2');
-        setIsEqSession1Completed(eq1);
-        setIsEqSession2Completed(eq2);
-        setIsMathSession1Completed(false);
-        setIsMathSession2Completed(false);
-      } else {
-        const mathSet1 = isMathSessionCompletedToday('session1');
-        const mathSet2 = isMathSessionCompletedToday('session2');
-        setIsMathSession1Completed(mathSet1);
-        setIsMathSession2Completed(mathSet2);
-        setIsEqSession1Completed(false);
-        setIsEqSession2Completed(false);
-      }
-    };
-
-    checkCompletions();
-    const interval = setInterval(checkCompletions, 1000);
-
-    return () => clearInterval(interval);
-  }, [
-    isNoRepPathCompletedToday,
-    bookStore.completedSessions,
-    bookStore.getDailyData,
-    drawingsStore,
-    isMathSessionCompletedToday,
-    isEqSessionCompletedToday,
-    currentDay,
-  ]);
+  const isMathSession1Completed = currentDay <= 30 && isMathSessionCompletedToday('session1');
+  const isMathSession2Completed = currentDay <= 30 && isMathSessionCompletedToday('session2');
+  const isEqSession1Completed = currentDay > 30 && isEqSessionCompletedToday('session1');
+  const isEqSession2Completed = currentDay > 30 && isEqSessionCompletedToday('session2');
 
   type TabName = 'my-day' | 'reading' | 'math' | 'drawings' | 'settings';
 
@@ -269,82 +268,11 @@ export default function MyDayScreen() {
         ];
 
   const allRoutines = [...readingRoutines, ...drawingRoutines, ...mathRoutines];
-
-  const completedCount = allRoutines.filter((routine) => routine.isCompleted).length;
+  const completedCount = allRoutines.filter((r) => r.isCompleted).length;
   const totalCount = allRoutines.length;
-  const remainingCount = Math.max(0, totalCount - completedCount);
+  const remainingCount = totalCount - completedCount;
   const completionPercent = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
-
-  const nextRoutine = allRoutines.find((routine) => !routine.isCompleted) ?? null;
-
-  const sectionPercent = (routines: RoutineItem[]) => {
-    if (routines.length === 0) {
-      return 0;
-    }
-    const done = routines.filter((routine) => routine.isCompleted).length;
-    return Math.round((done / routines.length) * 100);
-  };
-
-  const visibleRoutines = (routines: RoutineItem[]) =>
-    showCompleted ? routines : routines.filter((routine) => !routine.isCompleted);
-
-  const renderRoutineSection = (
-    title: string,
-    routines: RoutineItem[],
-    badgeVariant: 'reading' | 'drawings' | 'math'
-  ) => {
-    const items = visibleRoutines(routines);
-
-    if (items.length === 0) {
-      return null;
-    }
-
-    return (
-      <View style={styles.sectionCard}>
-        <View style={styles.sectionHeader}>
-          <ThemedText style={styles.sectionTitle}>{title}</ThemedText>
-          <View
-            style={[
-              styles.sectionPercentBadge,
-              badgeVariant === 'reading' && styles.sectionPercentReading,
-              badgeVariant === 'drawings' && styles.sectionPercentDrawings,
-              badgeVariant === 'math' && styles.sectionPercentMath,
-            ]}
-          >
-            <ThemedText style={styles.sectionPercentText}>{sectionPercent(routines)}%</ThemedText>
-          </View>
-        </View>
-
-        <View style={styles.sectionRows}>
-          {items.map((routine) => (
-            <Pressable
-              key={routine.id}
-              style={({ pressed }) => [
-                styles.routineRow,
-                routine.isCompleted && styles.routineRowDone,
-                pressed && styles.routineRowPressed,
-              ]}
-              onPress={routine.onPress}
-            >
-              <View
-                style={[
-                  styles.routineStatusDot,
-                  routine.isCompleted ? styles.routineStatusDone : styles.routineStatusPending,
-                ]}
-              />
-              <View style={styles.routineTextWrap}>
-                <ThemedText style={styles.routineTitle}>{routine.title}</ThemedText>
-                <ThemedText style={styles.routineSubtitle}>
-                  {routine.isCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus')}
-                </ThemedText>
-              </View>
-              <ThemedText style={styles.routineArrow}>{routine.isCompleted ? '✓' : '→'}</ThemedText>
-            </Pressable>
-          ))}
-        </View>
-      </View>
-    );
-  };
+  const nextRoutine = allRoutines.find((r) => !r.isCompleted) ?? null;
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
@@ -422,9 +350,24 @@ export default function MyDayScreen() {
             </View>
           </View>
 
-          {renderRoutineSection(t('myDay.readingSection'), readingRoutines, 'reading')}
-          {renderRoutineSection(t('myDay.drawingsSection'), drawingRoutines, 'drawings')}
-          {renderRoutineSection(t('myDay.mathSection'), mathRoutines, 'math')}
+          <RoutineSection
+            title={t('myDay.readingSection')}
+            routines={readingRoutines}
+            badgeVariant="reading"
+            showCompleted={showCompleted}
+          />
+          <RoutineSection
+            title={t('myDay.drawingsSection')}
+            routines={drawingRoutines}
+            badgeVariant="drawings"
+            showCompleted={showCompleted}
+          />
+          <RoutineSection
+            title={t('myDay.mathSection')}
+            routines={mathRoutines}
+            badgeVariant="math"
+            showCompleted={showCompleted}
+          />
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -625,56 +568,5 @@ const styles = StyleSheet.create({
   },
   sectionRows: {
     gap: 8,
-  },
-  routineRow: {
-    minHeight: 64,
-    borderRadius: ForestCampTheme.radius.md,
-    borderWidth: 1,
-    borderColor: ForestCampTheme.colors.border,
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  routineRowDone: {
-    backgroundColor: '#f3f9ec',
-  },
-  routineRowPressed: {
-    opacity: 0.75,
-  },
-  routineStatusDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 999,
-  },
-  routineStatusPending: {
-    backgroundColor: ForestCampTheme.colors.warning,
-  },
-  routineStatusDone: {
-    backgroundColor: ForestCampTheme.colors.success,
-  },
-  routineTextWrap: {
-    flex: 1,
-    gap: 2,
-  },
-  routineTitle: {
-    ...forestCampTypography.heading,
-    fontSize: 16,
-    lineHeight: 20,
-    color: ForestCampTheme.colors.title,
-  },
-  routineSubtitle: {
-    ...forestCampTypography.body,
-    fontSize: 13,
-    lineHeight: 16,
-    color: ForestCampTheme.colors.textMuted,
-  },
-  routineArrow: {
-    ...forestCampTypography.heading,
-    color: ForestCampTheme.colors.primaryStrong,
-    fontSize: 20,
-    lineHeight: 20,
   },
 });
