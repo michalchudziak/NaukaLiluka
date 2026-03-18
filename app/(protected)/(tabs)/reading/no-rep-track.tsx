@@ -12,10 +12,8 @@ import {
   forestCampTypography,
   getForestCampMetrics,
 } from '@/constants/ForestCampTheme';
-import sentencesData from '@/content/no-rep/sentences.json';
-import wordsData from '@/content/no-rep/words.json';
+import { useChooseAndMark, useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useNoRepStore } from '@/store/no-rep-store';
 
 export default function NoRepScreen() {
   const { width } = useWindowDimensions();
@@ -23,20 +21,17 @@ export default function NoRepScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState('#000000');
-  const displayedWords = useNoRepStore((state) => state.displayedWords);
-  const displayedSentences = useNoRepStore((state) => state.displayedSentences);
-  const chooseAndMarkWords = useNoRepStore((state) => state.chooseAndMarkWords);
-  const chooseAndMarkSentences = useNoRepStore((state) => state.chooseAndMarkSentences);
-  const isWordsCompletedToday = useNoRepStore((state) => state.isWordsCompletedToday);
-  const isSentencesCompletedToday = useNoRepStore((state) => state.isSentencesCompletedToday);
-  const wordsCompletedToday = isWordsCompletedToday();
-  const sentencesCompletedToday = isSentencesCompletedToday();
+  const status = useNoRepStatus();
+  const chooseAndMark = useChooseAndMark();
   const tabBarHeight = useBottomTabBarHeight();
 
-  const handleWordsPress = async () => {
-    const randomWords = await chooseAndMarkWords();
+  const wordsCompletedToday = status?.isWordsCompletedToday ?? false;
+  const sentencesCompletedToday = status?.isSentencesCompletedToday ?? false;
 
-    if (randomWords.length === 0) {
+  const handleWordsPress = async () => {
+    const selected = await chooseAndMark({ contentType: 'words' });
+
+    if (selected.length === 0) {
       Alert.alert(t('noRep.noMoreWords'));
       return;
     }
@@ -44,7 +39,7 @@ export default function NoRepScreen() {
     router.push({
       pathname: '/display',
       params: {
-        items: JSON.stringify(randomWords),
+        items: JSON.stringify(selected),
         color: selectedColor,
         type: 'words',
       },
@@ -52,9 +47,9 @@ export default function NoRepScreen() {
   };
 
   const handleSentencesPress = async () => {
-    const randomSentences = await chooseAndMarkSentences();
+    const selected = await chooseAndMark({ contentType: 'sentences' });
 
-    if (randomSentences.length === 0) {
+    if (selected.length === 0) {
       Alert.alert(t('noRep.noMoreSentences'));
       return;
     }
@@ -62,7 +57,7 @@ export default function NoRepScreen() {
     router.push({
       pathname: '/display',
       params: {
-        items: JSON.stringify(randomSentences),
+        items: JSON.stringify(selected),
         color: selectedColor,
         type: 'sentences',
       },
@@ -99,12 +94,15 @@ export default function NoRepScreen() {
       >
         <View style={[styles.textContainer, { maxWidth: metrics.maxContentWidth }]}>
           <ThemedText style={styles.counter}>
-            {t('noRep.knownWordsCount', { count: displayedWords.length, total: wordsData.length })}
+            {t('noRep.knownWordsCount', {
+              count: status?.displayedWordsCount ?? 0,
+              total: status?.totalWordsCount ?? 0,
+            })}
           </ThemedText>
           <ThemedText style={styles.counter}>
             {t('noRep.knownSentencesCount', {
-              count: displayedSentences.length,
-              total: sentencesData.length,
+              count: status?.displayedSentencesCount ?? 0,
+              total: status?.totalSentencesCount ?? 0,
             })}
           </ThemedText>
         </View>

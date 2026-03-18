@@ -9,18 +9,19 @@ import {
   forestCampTypography,
   getForestCampMetrics,
 } from '@/constants/ForestCampTheme';
+import { useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
-import { useNoRepStore } from '@/store/no-rep-store';
 
 export default function ReadingScreen() {
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
   const { t } = useTranslation();
   const router = useRouter();
-  const noRepStore = useNoRepStore();
+  const noRepStatus = useNoRepStatus();
   const bookStore = useBookStore();
-  const isNoRepPathCompleted = noRepStore.isNoRepPathCompletedToday();
+  const isNoRepPathCompleted =
+    (noRepStatus?.isWordsCompletedToday && noRepStatus?.isSentencesCompletedToday) ?? false;
   const isBookTrackCompleted = bookStore.isDayCompleted();
 
   const modules = [

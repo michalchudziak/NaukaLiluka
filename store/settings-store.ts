@@ -127,8 +127,16 @@ function mergeSettings(stored: Partial<SettingsSnapshot> | null | undefined): Se
   };
 }
 
-function persistSettings(snapshot: SettingsSnapshot) {
-  void ConvexService.updateSettings(snapshot).catch(ignoreCloudFailure);
+function extractSnapshot(state: SettingsState): SettingsSnapshot {
+  return {
+    reading: state.reading,
+    drawings: state.drawings,
+    math: state.math,
+  };
+}
+
+function persistSettings(state: SettingsState) {
+  void ConvexService.updateSettings(extractSnapshot(state)).catch(ignoreCloudFailure);
 }
 
 let settingsStateVersion = 0;

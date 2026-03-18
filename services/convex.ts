@@ -13,10 +13,6 @@ const functions = {
   booksListTrackSessions: 'books:listTrackSessions',
   booksInsertTrackSession: 'books:insertTrackSession',
   booksGetLatestDailyPlan: 'books:getLatestDailyPlan',
-  noRepGetProgress: 'noRep:getProgress',
-  noRepSetProgress: 'noRep:setProgress',
-  noRepListCompletions: 'noRep:listCompletions',
-  noRepInsertCompletion: 'noRep:insertCompletion',
   mathGetProgress: 'math:getProgress',
   mathUpsertProgress: 'math:upsertProgress',
   mathInsertSessionCompletion: 'math:insertSessionCompletion',
@@ -250,48 +246,6 @@ export class ConvexService {
       await getConvexClient().mutation(functions.booksInsertTrackSession as any, lastSession);
     } catch (error) {
       handleCloudFailure('save reading session completion', error);
-    }
-  }
-
-  static async getNoRepProgress(contentType: ContentType): Promise<string[]> {
-    try {
-      return await getConvexClient().query(functions.noRepGetProgress as any, {
-        contentType,
-      });
-    } catch (error) {
-      handleCloudFailure(`load no-repetition ${contentType}`, error);
-    }
-  }
-
-  static async updateNoRepProgress(contentType: ContentType, items: string[]) {
-    try {
-      await getConvexClient().mutation(functions.noRepSetProgress as any, {
-        contentType,
-        items,
-      });
-    } catch (error) {
-      handleCloudFailure(`save no-repetition ${contentType}`, error);
-    }
-  }
-
-  static async getNoRepCompletions(contentType: ContentType): Promise<number[]> {
-    try {
-      return await getConvexClient().query(functions.noRepListCompletions as any, {
-        contentType,
-      });
-    } catch (error) {
-      handleCloudFailure(`load no-repetition completion history for ${contentType}`, error);
-    }
-  }
-
-  static async saveNoRepCompletion(contentType: ContentType) {
-    try {
-      await getConvexClient().mutation(functions.noRepInsertCompletion as any, {
-        contentType,
-        timestamp: Date.now(),
-      });
-    } catch (error) {
-      handleCloudFailure(`save no-repetition completion for ${contentType}`, error);
     }
   }
 

@@ -11,7 +11,6 @@ import { useBookStore } from './book-store';
 import { useDrawingsStore } from './drawings-store';
 import { useEquationsStore } from './equations-store';
 import { useMathStore } from './math-store';
-import { useNoRepStore } from './no-rep-store';
 import { resetAllStores } from './reset-stores';
 import { useSettingsStore } from './settings-store';
 
@@ -66,7 +65,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       await useSettingsStore.getState().syncFromCloud().catch(ignoreCloudFailure);
 
       await Promise.all([
-        useNoRepStore.getState().syncFromCloud().catch(ignoreCloudFailure),
         useBookStore.getState().syncFromCloud().catch(ignoreCloudFailure),
         useDrawingsStore.getState().syncFromCloud().catch(ignoreCloudFailure),
         useMathStore.getState().syncFromCloud().catch(ignoreCloudFailure),

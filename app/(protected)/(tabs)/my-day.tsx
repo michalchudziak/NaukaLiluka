@@ -13,12 +13,12 @@ import {
   forestCampTypography,
   getForestCampMetrics,
 } from '@/constants/ForestCampTheme';
+import { useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
 import { useDrawingsStore } from '@/store/drawings-store';
 import { useEquationsStore } from '@/store/equations-store';
 import { useMathStore } from '@/store/math-store';
-import { useNoRepStore } from '@/store/no-rep-store';
 
 type RoutineItem = {
   id: string;
@@ -83,7 +83,7 @@ export default function MyDayScreen() {
   const bottomTabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
-  const { isNoRepPathCompletedToday } = useNoRepStore();
+  const noRepStatus = useNoRepStatus();
   const bookStore = useBookStore();
   const drawingsStore = useDrawingsStore();
   const { isSessionCompletedToday: isMathSessionCompletedToday, currentDay } = useMathStore();
@@ -98,7 +98,8 @@ export default function MyDayScreen() {
 
   // Derived completion state - computed during render, no polling needed.
   // Zustand subscriptions trigger re-renders when store data changes.
-  const isNoRepCompleted = isNoRepPathCompletedToday();
+  const isNoRepCompleted =
+    (noRepStatus?.isWordsCompletedToday && noRepStatus?.isSentencesCompletedToday) ?? false;
 
   const plan = bookStore.getDailyData();
   const todayCompletions = bookStore.completedSessions.filter((c) => isToday(c.timestamp));
