@@ -60,6 +60,8 @@
     "sentences": "Zdania",
     "title": "Ścieżka bez powtórzeń",
     "back": "Wróć",
+    "guideTitle": "Jak to działa?",
+    "guideBody": "Prezentuj dziecku słowa i zdania wyświetlone na ekranie. Dziecko powinno widzieć ekran oraz Twoje usta podczas czytania. Liczbę prezentowanych słów i zdań możesz zmienić w ustawieniach. Ukończenie obu bloków — Słowa i Zdania — zalicza tę ścieżkę na dany dzień.",
     "knownWordsCount": "{{count}} z {{total}} znanych słów",
     "knownSentencesCount": "{{count}} z {{total}} znanych zdań",
     "noMoreWords": "Przerobione wszystkie słowa",

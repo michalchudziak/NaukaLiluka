@@ -1,7 +1,8 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
@@ -15,6 +16,9 @@ import {
 import { useChooseAndMark, useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const guideImage = require('@/assets/images/guides/no-rep.png');
+
 export default function NoRepScreen() {
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
@@ -24,9 +28,12 @@ export default function NoRepScreen() {
   const status = useNoRepStatus();
   const chooseAndMark = useChooseAndMark();
   const tabBarHeight = useBottomTabBarHeight();
+  const headerHeight = useHeaderHeight();
 
   const wordsCompletedToday = status?.isWordsCompletedToday ?? false;
   const sentencesCompletedToday = status?.isSentencesCompletedToday ?? false;
+
+  const imageSize = Math.min(width * 0.35, 160);
 
   const handleWordsPress = async () => {
     const selected = await chooseAndMark({ contentType: 'words' });
@@ -83,15 +90,35 @@ export default function NoRepScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedView
-        style={[
-          styles.content,
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
           {
-            marginBottom: tabBarHeight + 16,
+            paddingTop: headerHeight + 8,
+            paddingBottom: tabBarHeight + 16,
             paddingHorizontal: metrics.screenPadding,
           },
         ]}
+        showsVerticalScrollIndicator={false}
       >
+        <ThemedText style={[styles.title, metrics.isTablet && styles.titleTablet]}>
+          {t('noRep.title')}
+        </ThemedText>
+
+        <View style={[styles.guideCard, { maxWidth: metrics.maxContentWidth }]}>
+          <View style={styles.guideRow}>
+            <Image
+              source={guideImage}
+              style={[styles.guideImage, { width: imageSize, height: imageSize }]}
+              resizeMode="cover"
+            />
+            <View style={styles.guideTextWrap}>
+              <ThemedText style={styles.guideTitle}>{t('noRep.guideTitle')}</ThemedText>
+              <ThemedText style={styles.guideBody}>{t('noRep.guideBody')}</ThemedText>
+            </View>
+          </View>
+        </View>
+
         <View style={[styles.textContainer, { maxWidth: metrics.maxContentWidth }]}>
           <ThemedText style={styles.counter}>
             {t('noRep.knownWordsCount', {
@@ -133,7 +160,7 @@ export default function NoRepScreen() {
             label={t('reading.selectColor')}
           />
         </View>
-      </ThemedView>
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -143,10 +170,55 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ForestCampTheme.colors.background,
   },
-  content: {
-    flex: 1,
-    paddingTop: 14,
+  title: {
+    ...forestCampTypography.display,
+    fontSize: 30,
+    lineHeight: 34,
+    color: ForestCampTheme.colors.title,
+    alignSelf: 'flex-start',
+  },
+  titleTablet: {
+    fontSize: 36,
+    lineHeight: 40,
+  },
+  scrollContent: {
+    flexGrow: 1,
     width: '100%',
+    gap: 14,
+  },
+  guideCard: {
+    width: '100%',
+    borderRadius: ForestCampTheme.radius.xl,
+    borderWidth: 2,
+    borderColor: ForestCampTheme.colors.border,
+    backgroundColor: ForestCampTheme.colors.card,
+    padding: 14,
+    alignSelf: 'center',
+    ...forestCampSoftShadow,
+  },
+  guideRow: {
+    flexDirection: 'row',
+    gap: 14,
+    alignItems: 'center',
+  },
+  guideImage: {
+    borderRadius: ForestCampTheme.radius.md,
+  },
+  guideTextWrap: {
+    flex: 1,
+    gap: 4,
+  },
+  guideTitle: {
+    ...forestCampTypography.heading,
+    fontSize: 17,
+    lineHeight: 22,
+    color: ForestCampTheme.colors.title,
+  },
+  guideBody: {
+    ...forestCampTypography.body,
+    fontSize: 14,
+    lineHeight: 20,
+    color: ForestCampTheme.colors.textMuted,
   },
   actionsCard: {
     width: '100%',
@@ -174,11 +246,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 14,
     paddingVertical: 10,
-    marginBottom: 14,
   },
   pickerWrap: {
     width: '100%',
-    marginTop: 14,
-    marginBottom: 8,
   },
 });
