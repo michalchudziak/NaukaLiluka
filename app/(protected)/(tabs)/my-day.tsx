@@ -12,6 +12,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -285,7 +286,7 @@ export default function MyDayScreen() {
             {
               gap: metrics.sectionGap,
               maxWidth: metrics.maxContentWidth,
-              paddingBottom: bottomTabBarHeight + 12,
+              paddingBottom: bottomTabBarHeight + spacing.md,
             },
           ]}
         >
@@ -401,26 +402,26 @@ const styles = StyleSheet.create({
   content: {
     width: '100%',
     alignSelf: 'center',
-    paddingTop: 10,
+    paddingTop: spacing.md,
   },
   heroCard: {
     borderRadius: ForestCampTheme.radius.xl,
     backgroundColor: ForestCampTheme.colors.card,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
-    padding: 16,
-    gap: 12,
+    padding: spacing.lg,
+    gap: spacing.md,
     ...forestCampSoftShadow,
   },
   heroHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
+    gap: spacing.md,
   },
   heroHeaderCopy: {
     flex: 1,
-    gap: 4,
+    gap: spacing.xs,
   },
   heroTitle: {
     ...forestCampTypography.heading,
@@ -436,8 +437,8 @@ const styles = StyleSheet.create({
   },
   heroPercentBadge: {
     minWidth: 74,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderRadius: ForestCampTheme.radius.md,
     backgroundColor: '#dcefd1',
     alignItems: 'center',
@@ -462,13 +463,13 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
   },
   statCard: {
     flex: 1,
     borderRadius: ForestCampTheme.radius.md,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
     alignItems: 'center',
     backgroundColor: ForestCampTheme.colors.cardMuted,
     borderWidth: 1,
@@ -489,7 +490,7 @@ const styles = StyleSheet.create({
   },
   heroActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
   },
   toggleButton: {
     flex: 1,
@@ -500,7 +501,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#edf6e5',
-    paddingHorizontal: 10,
+    paddingHorizontal: spacing.md,
   },
   toggleButtonText: {
     ...forestCampTypography.heading,
@@ -517,7 +518,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: ForestCampTheme.colors.primary,
-    paddingHorizontal: 10,
+    paddingHorizontal: spacing.md,
   },
   nextStepButtonText: {
     ...forestCampTypography.heading,
@@ -530,8 +531,8 @@ const styles = StyleSheet.create({
     backgroundColor: ForestCampTheme.colors.card,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
-    padding: 14,
-    gap: 12,
+    padding: spacing.lg,
+    gap: spacing.md,
     ...forestCampSoftShadow,
   },
   sectionHeader: {
@@ -547,8 +548,8 @@ const styles = StyleSheet.create({
   },
   sectionPercentBadge: {
     minWidth: 56,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     borderRadius: 999,
     alignItems: 'center',
   },
@@ -568,6 +569,6 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
   sectionRows: {
-    gap: 8,
+    gap: spacing.sm,
   },
 });

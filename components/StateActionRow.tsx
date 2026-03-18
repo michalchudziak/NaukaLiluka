@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, View } from 'react-native';
-import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
+import { ForestCampTheme, forestCampTypography, spacing } from '@/constants/ForestCampTheme';
 import { ThemedText } from './ThemedText';
 
 interface StateActionRowProps {
@@ -41,11 +41,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: '#ffffff',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: spacing.md,
   },
   rowDone: {
     backgroundColor: '#f3f9ec',
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   textWrap: {
     flex: 1,
-    gap: 2,
+    gap: spacing.xxs,
   },
   title: {
     ...forestCampTypography.heading,

@@ -31,6 +31,18 @@ npm run lint:check
 npm run format
 ```
 
+## Styling
+
+Use the design token system in `constants/ForestCampTheme.ts` for all UI values. Never hardcode raw numbers for spacing.
+
+- **Spacing**: Use `spacing` tokens (`import { spacing } from '@/constants/ForestCampTheme'`) for all `padding*`, `margin*`, and `gap` values. Scale: `xxs`(2) `xs`(4) `sm`(8) `md`(12) `lg`(16) `xl`(20) `2xl`(24) `3xl`(32) `4xl`(40). Pick the closest token — do not introduce new ad-hoc values.
+- **Responsive spacing**: Use `getForestCampMetrics(width)` for values that should adapt to screen size (`screenPadding`, `sectionGap`, `cardPadding`).
+- **Colors**: Use `ForestCampTheme.colors.*`.
+- **Border radius**: Use `ForestCampTheme.radius.*` (`sm` `md` `lg` `xl`).
+- **Typography**: Use `forestCampTypography.*` (`display` `heading` `body` `mono`).
+- **Shadows**: Use `forestCampShadow` or `forestCampSoftShadow`.
+- Raw numbers are acceptable for element-specific dimensions (icon sizes, progress bar heights), `borderWidth`, `fontSize`/`lineHeight`, and calculated alignment offsets.
+
 ## Working Rules
 
 - Preserve the existing Expo Router structure and `@/` path aliases.

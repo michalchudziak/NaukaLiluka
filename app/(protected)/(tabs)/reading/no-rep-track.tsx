@@ -12,6 +12,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { useChooseAndMark, useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -94,8 +95,8 @@ export default function NoRepScreen() {
         contentContainerStyle={[
           styles.scrollContent,
           {
-            paddingTop: headerHeight + 8,
-            paddingBottom: tabBarHeight + 16,
+            paddingTop: headerHeight + spacing.sm,
+            paddingBottom: tabBarHeight + spacing.lg,
             paddingHorizontal: metrics.screenPadding,
           },
         ]}
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     width: '100%',
-    gap: 14,
+    gap: spacing.lg,
   },
   guideCard: {
     width: '100%',
@@ -192,13 +193,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
-    padding: 14,
+    padding: spacing.lg,
     alignSelf: 'center',
     ...forestCampSoftShadow,
   },
   guideRow: {
     flexDirection: 'row',
-    gap: 14,
+    gap: spacing.lg,
     alignItems: 'center',
   },
   guideImage: {
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   },
   guideTextWrap: {
     flex: 1,
-    gap: 4,
+    gap: spacing.xs,
   },
   guideTitle: {
     ...forestCampTypography.heading,
@@ -226,8 +227,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
-    padding: 16,
-    gap: 10,
+    padding: spacing.lg,
+    gap: spacing.md,
     alignSelf: 'center',
     ...forestCampSoftShadow,
   },
@@ -244,8 +245,8 @@ const styles = StyleSheet.create({
     borderColor: ForestCampTheme.colors.border,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   pickerWrap: {
     width: '100%',

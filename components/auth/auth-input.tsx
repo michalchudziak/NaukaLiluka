@@ -1,6 +1,6 @@
 import { StyleSheet, TextInput, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
+import { ForestCampTheme, forestCampTypography, spacing } from '@/constants/ForestCampTheme';
 
 export function AuthInput({
   label,
@@ -29,7 +29,7 @@ export function AuthInput({
 
 const styles = StyleSheet.create({
   wrapper: {
-    gap: 8,
+    gap: spacing.sm,
   },
   label: {
     ...forestCampTypography.heading,
@@ -43,8 +43,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.cardMuted,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     color: ForestCampTheme.colors.text,
     ...forestCampTypography.body,
     fontSize: 16,

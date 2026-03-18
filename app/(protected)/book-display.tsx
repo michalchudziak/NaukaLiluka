@@ -10,6 +10,7 @@ import Animated, {
 import { AutoSizeText } from '@/components/AutoSizeText';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { spacing } from '@/constants/ForestCampTheme';
 import { books } from '@/content/books';
 import { useSettingsStore } from '@/store/settings-store';
 
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.xl,
   },
   titleText: {
     fontSize: 60,
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   sentenceText: {
-    marginVertical: 10,
+    marginVertical: spacing.md,
   },
   imageContainer: {
     flex: 1,
@@ -202,19 +203,19 @@ const styles = StyleSheet.create({
   summaryTitle: {
     fontSize: 60,
     fontWeight: 'bold',
-    marginVertical: 20,
+    marginVertical: spacing.xl,
     paddingTop: 50,
   },
   summaryTextContainer: {
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing.xl,
     backgroundColor: 'transparent',
     alignItems: 'center',
   },
   summaryText: {
     fontSize: 48,
     lineHeight: 48,
-    marginVertical: 2,
+    marginVertical: spacing.xxs,
     fontWeight: 'bold',
     textAlign: 'left',
     color: '#000000',

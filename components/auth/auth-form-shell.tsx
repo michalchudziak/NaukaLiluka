@@ -13,6 +13,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 
 export function AuthFormShell({
@@ -45,7 +46,7 @@ export function AuthFormShell({
           styles.scrollContent,
           {
             paddingHorizontal: metrics.screenPadding,
-            paddingVertical: metrics.isTablet ? 40 : 24,
+            paddingVertical: metrics.isTablet ? spacing['4xl'] : spacing['2xl'],
           },
         ]}
       >
@@ -86,19 +87,19 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 520,
     alignSelf: 'center',
-    gap: 24,
+    gap: spacing['2xl'],
     borderRadius: ForestCampTheme.radius.xl,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
-    padding: 24,
+    padding: spacing['2xl'],
     ...forestCampSoftShadow,
   },
   cardTablet: {
-    padding: 32,
+    padding: spacing['3xl'],
   },
   header: {
-    gap: 10,
+    gap: spacing.md,
   },
   title: {
     ...forestCampTypography.display,
@@ -119,11 +120,11 @@ const styles = StyleSheet.create({
     color: ForestCampTheme.colors.textMuted,
   },
   form: {
-    gap: 16,
+    gap: spacing.lg,
   },
   footer: {
     alignItems: 'center',
-    gap: 6,
+    gap: spacing.sm,
   },
   footerText: {
     ...forestCampTypography.body,

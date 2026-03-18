@@ -9,6 +9,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useBookStore } from '@/store/book-store';
@@ -53,7 +54,7 @@ export default function BookTrackScreen() {
         style={[
           styles.content,
           {
-            marginBottom: tabBarHeight + 8,
+            marginBottom: tabBarHeight + spacing.sm,
             paddingHorizontal: metrics.screenPadding,
           },
         ]}
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 12,
+    paddingTop: spacing.md,
     width: '100%',
   },
   title: {
@@ -100,12 +101,12 @@ const styles = StyleSheet.create({
     lineHeight: 34,
     color: ForestCampTheme.colors.title,
     alignSelf: 'flex-start',
-    marginBottom: 14,
+    marginBottom: spacing.lg,
   },
   titleTablet: {
     fontSize: 36,
     lineHeight: 40,
-    marginBottom: 18,
+    marginBottom: spacing.xl,
   },
   actionsCard: {
     width: '100%',
@@ -113,8 +114,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
-    padding: 16,
-    gap: 10,
+    padding: spacing.lg,
+    gap: spacing.md,
     alignSelf: 'center',
     ...forestCampSoftShadow,
   },

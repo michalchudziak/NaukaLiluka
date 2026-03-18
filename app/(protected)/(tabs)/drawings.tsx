@@ -9,6 +9,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import drawingsData from '@/content/drawings/index';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -120,31 +121,31 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 34,
     color: ForestCampTheme.colors.title,
-    marginTop: 12,
-    marginBottom: 12,
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
   },
   titleTablet: {
     fontSize: 38,
     lineHeight: 42,
-    marginTop: 14,
-    marginBottom: 14,
+    marginTop: spacing.lg,
+    marginBottom: spacing.lg,
   },
   header: {
     width: '100%',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
     borderRadius: ForestCampTheme.radius.lg,
     backgroundColor: ForestCampTheme.colors.card,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
-    gap: 10,
+    gap: spacing.md,
     ...forestCampSoftShadow,
   },
   headerTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   totalCounter: {
     ...forestCampTypography.heading,
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8f4de',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing.md,
   },
   goalChipText: {
     ...forestCampTypography.heading,
@@ -188,15 +189,15 @@ const styles = StyleSheet.create({
   listContent: {
     width: '100%',
     alignSelf: 'center',
-    paddingTop: 14,
-    paddingBottom: 20,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   setCard: {
     backgroundColor: ForestCampTheme.colors.card,
     borderRadius: ForestCampTheme.radius.lg,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
-    padding: 16,
+    padding: spacing.lg,
     ...forestCampSoftShadow,
   },
   setCardPressed: {
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
     ...forestCampTypography.heading,
     color: ForestCampTheme.colors.title,
     fontSize: 22,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   setCount: {
     ...forestCampTypography.body,

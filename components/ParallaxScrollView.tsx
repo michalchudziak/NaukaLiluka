@@ -9,6 +9,7 @@ import Animated, {
 
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
+import { spacing } from '@/constants/ForestCampTheme';
 
 const HEADER_HEIGHT = 250;
 
@@ -71,8 +72,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 32,
-    gap: 16,
+    padding: spacing['3xl'],
+    gap: spacing.lg,
     overflow: 'hidden',
   },
 });

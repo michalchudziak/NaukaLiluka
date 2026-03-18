@@ -11,6 +11,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { authClient } from '@/services/auth-client';
@@ -297,7 +298,7 @@ export default function AccountSettingsScreen() {
           {
             paddingHorizontal: metrics.screenPadding,
             maxWidth: metrics.maxContentWidth,
-            paddingBottom: tabBarHeight + 20,
+            paddingBottom: tabBarHeight + spacing.xl,
           },
         ]}
       >
@@ -502,8 +503,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     width: '100%',
     alignSelf: 'center',
-    paddingTop: 12,
-    gap: 18,
+    paddingTop: spacing.md,
+    gap: spacing.xl,
   },
   pageTitle: {
     ...forestCampTypography.display,
@@ -526,14 +527,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.borderStrong,
     borderRadius: ForestCampTheme.radius.xl,
-    padding: 18,
-    gap: 16,
+    padding: spacing.xl,
+    gap: spacing.lg,
     ...forestCampSoftShadow,
   },
   heroTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: spacing.lg,
   },
   heroBadge: {
     width: 58,
@@ -545,7 +546,7 @@ const styles = StyleSheet.create({
   },
   heroTextBlock: {
     flex: 1,
-    gap: 4,
+    gap: spacing.xs,
   },
   heroTitle: {
     ...forestCampTypography.heading,
@@ -562,7 +563,7 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: spacing.md,
   },
   metaPill: {
     flexGrow: 1,
@@ -571,9 +572,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.cardMuted,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    gap: 2,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    gap: spacing.xxs,
   },
   metaLabel: {
     ...forestCampTypography.body,
@@ -588,33 +589,33 @@ const styles = StyleSheet.create({
     color: ForestCampTheme.colors.title,
   },
   section: {
-    gap: 8,
+    gap: spacing.sm,
   },
   sectionTitle: {
     ...forestCampTypography.heading,
     fontSize: 15,
     lineHeight: 18,
     color: ForestCampTheme.colors.textMuted,
-    marginLeft: 10,
+    marginLeft: spacing.md,
   },
   sectionDescription: {
     ...forestCampTypography.body,
     fontSize: 14,
     lineHeight: 20,
     color: ForestCampTheme.colors.textMuted,
-    marginHorizontal: 10,
+    marginHorizontal: spacing.md,
   },
   card: {
     backgroundColor: ForestCampTheme.colors.card,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     borderRadius: ForestCampTheme.radius.lg,
-    padding: 16,
-    gap: 14,
+    padding: spacing.lg,
+    gap: spacing.lg,
     ...forestCampSoftShadow,
   },
   readonlyRow: {
-    gap: 6,
+    gap: spacing.sm,
   },
   readonlyLabel: {
     ...forestCampTypography.heading,
@@ -640,8 +641,8 @@ const styles = StyleSheet.create({
   },
   feedbackBox: {
     borderRadius: ForestCampTheme.radius.md,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
   },
   feedbackError: {
     backgroundColor: '#fff1ed',
@@ -670,8 +671,8 @@ const styles = StyleSheet.create({
     borderRadius: ForestCampTheme.radius.md,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
   },
   actionButtonPrimary: {
     backgroundColor: ForestCampTheme.colors.primary,
@@ -699,11 +700,11 @@ const styles = StyleSheet.create({
   sessionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: spacing.md,
     borderRadius: ForestCampTheme.radius.md,
     backgroundColor: ForestCampTheme.colors.cardMuted,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   sessionBody: {
     flex: 1,

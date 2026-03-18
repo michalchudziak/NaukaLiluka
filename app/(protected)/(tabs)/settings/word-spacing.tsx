@@ -8,6 +8,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useSettingsStore } from '@/store/settings-store';
@@ -47,7 +48,7 @@ export default function WordSpacingSettingsScreen() {
           {
             paddingHorizontal: metrics.screenPadding,
             maxWidth: metrics.maxContentWidth,
-            paddingBottom: tabBarHeight + 8,
+            paddingBottom: tabBarHeight + spacing.sm,
           },
         ]}
         showsVerticalScrollIndicator={false}
@@ -88,18 +89,18 @@ const styles = StyleSheet.create({
   scrollContent: {
     width: '100%',
     alignSelf: 'center',
-    paddingTop: 14,
-    paddingBottom: 20,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xl,
   },
   section: {
-    marginTop: 10,
+    marginTop: spacing.md,
   },
   sectionDescription: {
     ...forestCampTypography.body,
     fontSize: 14,
     color: ForestCampTheme.colors.textMuted,
-    marginHorizontal: 10,
-    marginBottom: 14,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.lg,
     lineHeight: 20,
   },
   settingsContent: {
@@ -114,24 +115,24 @@ const styles = StyleSheet.create({
     ...forestCampTypography.body,
     fontSize: 13,
     color: ForestCampTheme.colors.textMuted,
-    marginHorizontal: 10,
-    marginTop: 14,
+    marginHorizontal: spacing.md,
+    marginTop: spacing.lg,
     lineHeight: 18,
   },
   previewContainer: {
-    marginTop: 20,
-    marginHorizontal: 10,
+    marginTop: spacing.xl,
+    marginHorizontal: spacing.md,
   },
   previewLabel: {
     ...forestCampTypography.body,
     fontSize: 14,
     color: ForestCampTheme.colors.textMuted,
-    marginBottom: 10,
+    marginBottom: spacing.md,
   },
   previewBox: {
     backgroundColor: ForestCampTheme.colors.cardMuted,
     borderRadius: ForestCampTheme.radius.md,
-    padding: 18,
+    padding: spacing.xl,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: ForestCampTheme.colors.border,

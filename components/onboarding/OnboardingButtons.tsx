@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Button } from '@/components/Button';
 import { ThemedText } from '@/components/ThemedText';
-import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
+import { ForestCampTheme, forestCampTypography, spacing } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface OnboardingButtonsProps {
@@ -34,17 +34,17 @@ export function OnboardingButtons({ isLastStep, onNext, onSkip }: OnboardingButt
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: 16,
+    gap: spacing.lg,
   },
   button: {
     flex: 0,
     width: '100%',
     minHeight: 0,
     maxHeight: undefined,
-    padding: 14,
+    padding: spacing.lg,
   },
   skipButton: {
-    paddingVertical: 8,
+    paddingVertical: spacing.sm,
   },
   skipHidden: {
     opacity: 0,

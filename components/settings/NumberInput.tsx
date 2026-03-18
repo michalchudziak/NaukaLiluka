@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
+import { ForestCampTheme, forestCampTypography, spacing } from '@/constants/ForestCampTheme';
 
 interface NumberInputProps {
   label: string;
@@ -87,8 +87,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: ForestCampTheme.colors.card,
   },
   label: {
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 10,
+    marginHorizontal: spacing.md,
   },
   input: {
     width: 62,
@@ -131,6 +131,6 @@ const styles = StyleSheet.create({
     ...forestCampTypography.body,
     fontSize: 14,
     color: ForestCampTheme.colors.textMuted,
-    marginLeft: 4,
+    marginLeft: spacing.xs,
   },
 });

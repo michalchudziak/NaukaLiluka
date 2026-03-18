@@ -5,7 +5,7 @@ import { AuthFormShell } from '@/components/auth/auth-form-shell';
 import { AuthInput } from '@/components/auth/auth-input';
 import { Button } from '@/components/Button';
 import { ThemedText } from '@/components/ThemedText';
-import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
+import { ForestCampTheme, forestCampTypography, spacing } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { authClient, isAuthConfigured } from '@/services/auth-client';
 
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f0b0a4',
     backgroundColor: '#fff1ed',
-    padding: 12,
+    padding: spacing.md,
   },
   errorText: {
     ...forestCampTypography.body,

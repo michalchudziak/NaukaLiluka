@@ -1,6 +1,6 @@
 import { StyleSheet, Switch, View } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
+import { ForestCampTheme, forestCampTypography, spacing } from '@/constants/ForestCampTheme';
 
 interface SwitchSettingProps {
   label: string;
@@ -31,13 +31,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: ForestCampTheme.colors.card,
   },
   textContainer: {
     flex: 1,
-    marginRight: 10,
+    marginRight: spacing.md,
   },
   label: {
     ...forestCampTypography.heading,
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     ...forestCampTypography.body,
     fontSize: 13,
     color: ForestCampTheme.colors.textMuted,
-    marginTop: 4,
+    marginTop: spacing.xs,
     lineHeight: 18,
   },
 });

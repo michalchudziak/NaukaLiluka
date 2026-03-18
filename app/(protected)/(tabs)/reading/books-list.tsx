@@ -8,6 +8,7 @@ import {
   ForestCampTheme,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { books } from '@/content/books';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -62,7 +63,7 @@ export default function BooksListScreen() {
           styles.listContent,
           {
             paddingHorizontal: metrics.screenPadding,
-            paddingBottom: bottomTabBarHeight + 12,
+            paddingBottom: bottomTabBarHeight + spacing.md,
             maxWidth: metrics.maxContentWidth,
           },
         ]}
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: ForestCampTheme.colors.background,
   },
   header: {
-    paddingTop: 12,
+    paddingTop: spacing.md,
   },
   title: {
     ...forestCampTypography.display,
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   listContent: {
     alignSelf: 'center',
     width: '100%',
-    paddingTop: 12,
+    paddingTop: spacing.md,
   },
   separator: {
     height: 12,

@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { ForestCampTheme } from '@/constants/ForestCampTheme';
+import { ForestCampTheme, spacing } from '@/constants/ForestCampTheme';
 
 interface OnboardingDotsProps {
   count: number;
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   dot: {
     height: 8,

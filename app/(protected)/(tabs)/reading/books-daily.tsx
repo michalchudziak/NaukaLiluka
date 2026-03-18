@@ -11,6 +11,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { WordColors } from '@/constants/WordColors';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -113,7 +114,7 @@ export default function BooksDailyScreen() {
         contentContainerStyle={[
           styles.scrollContent,
           {
-            marginBottom: tabBarHeight + 8,
+            marginBottom: tabBarHeight + spacing.sm,
             paddingHorizontal: metrics.screenPadding,
             maxWidth: metrics.maxContentWidth,
           },
@@ -150,9 +151,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     alignSelf: 'center',
-    paddingTop: 14,
-    paddingBottom: 30,
-    gap: 14,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing['3xl'],
+    gap: spacing.lg,
   },
   centerContent: {
     justifyContent: 'center',
@@ -161,15 +162,15 @@ const styles = StyleSheet.create({
   sessionsContainer: {
     flex: 1,
     justifyContent: 'center',
-    gap: 18,
+    gap: spacing.xl,
   },
   sessionRow: {
-    gap: 10,
+    gap: spacing.md,
     borderRadius: ForestCampTheme.radius.lg,
     backgroundColor: ForestCampTheme.colors.card,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
-    padding: 14,
+    padding: spacing.lg,
     ...forestCampSoftShadow,
   },
   sessionLabel: {
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
     color: ForestCampTheme.colors.title,
   },
   actionsContainer: {
-    gap: 10,
+    gap: spacing.md,
   },
   bookTitle: {
     ...forestCampTypography.display,
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
     lineHeight: 38,
     color: ForestCampTheme.colors.title,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: spacing.md,
   },
   noContentText: {
     ...forestCampTypography.heading,

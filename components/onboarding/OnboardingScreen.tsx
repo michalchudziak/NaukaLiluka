@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { OnboardingButtons } from '@/components/onboarding/OnboardingButtons';
 import { OnboardingDots } from '@/components/onboarding/OnboardingDots';
 import { ThemedText } from '@/components/ThemedText';
-import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
+import { ForestCampTheme, forestCampTypography, spacing } from '@/constants/ForestCampTheme';
 import { onboardingSteps } from '@/content/onboarding';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -128,13 +128,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   content: {
-    paddingHorizontal: 32,
-    paddingBottom: 24,
-    gap: 24,
+    paddingHorizontal: spacing['3xl'],
+    paddingBottom: spacing['2xl'],
+    gap: spacing['2xl'],
   },
   textBlock: {
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   title: {
     ...forestCampTypography.display,

@@ -8,6 +8,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 12,
+    paddingTop: spacing.md,
     width: '100%',
   },
   title: {
@@ -103,20 +104,20 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 34,
     color: ForestCampTheme.colors.title,
-    marginBottom: 14,
+    marginBottom: spacing.lg,
   },
   titleTablet: {
     fontSize: 38,
     lineHeight: 42,
-    marginBottom: 18,
+    marginBottom: spacing.xl,
   },
   heroCard: {
     borderRadius: ForestCampTheme.radius.lg,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
-    padding: 14,
-    gap: 10,
+    padding: spacing.lg,
+    gap: spacing.md,
     ...forestCampSoftShadow,
   },
   heroHeader: {
@@ -132,8 +133,8 @@ const styles = StyleSheet.create({
   percentBadge: {
     borderRadius: 999,
     backgroundColor: '#dcefd1',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
   },
   percentBadgeText: {
     ...forestCampTypography.heading,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     backgroundColor: ForestCampTheme.colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing.md,
   },
   nextButtonText: {
     ...forestCampTypography.heading,
@@ -178,13 +179,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   moduleCard: {
-    marginTop: 14,
+    marginTop: spacing.lg,
     borderRadius: ForestCampTheme.radius.lg,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
-    padding: 12,
-    gap: 8,
+    padding: spacing.md,
+    gap: spacing.sm,
     ...forestCampSoftShadow,
   },
 });

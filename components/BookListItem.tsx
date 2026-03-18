@@ -5,6 +5,7 @@ import {
   ForestCampTheme,
   forestCampSoftShadow,
   forestCampTypography,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import type { Book } from '@/types/book';
 
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: spacing.lg,
     borderRadius: ForestCampTheme.radius.lg,
     borderWidth: 2,
     ...forestCampSoftShadow,
@@ -70,10 +71,10 @@ const styles = StyleSheet.create({
     ...forestCampTypography.heading,
     fontSize: 18,
     color: ForestCampTheme.colors.title,
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   bookStats: {
-    gap: 4,
+    gap: spacing.xs,
     backgroundColor: 'transparent',
   },
   bookInfo: {

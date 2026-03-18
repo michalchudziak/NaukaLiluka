@@ -6,6 +6,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import {
   Circle,
@@ -110,29 +111,29 @@ export function ShapePicker({ selectedShape, onShapeSelect, label }: ShapePicker
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: spacing.xl,
     borderRadius: ForestCampTheme.radius.lg,
     backgroundColor: ForestCampTheme.colors.cardMuted,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
-    padding: 16,
+    padding: spacing.lg,
     ...forestCampSoftShadow,
   },
   label: {
     ...forestCampTypography.heading,
     fontSize: 18,
     lineHeight: 22,
-    marginBottom: 12,
+    marginBottom: spacing.md,
     color: ForestCampTheme.colors.title,
   },
   shapeSwatches: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 10,
+    gap: spacing.md,
   },
   shapeSwatchesTablet: {
-    gap: 14,
+    gap: spacing.lg,
   },
   shapeSwatch: {
     width: 54,

@@ -9,6 +9,7 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -59,7 +60,7 @@ export default function SettingsScreen() {
         contentContainerStyle={[
           styles.scrollContent,
           {
-            paddingBottom: tabBarHeight + 16,
+            paddingBottom: tabBarHeight + spacing.lg,
             paddingHorizontal: metrics.screenPadding,
             maxWidth: metrics.maxContentWidth,
           },
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     width: '100%',
     alignSelf: 'center',
-    paddingTop: 12,
+    paddingTop: spacing.md,
   },
   pageTitle: {
     ...forestCampTypography.display,
@@ -177,15 +178,15 @@ const styles = StyleSheet.create({
     lineHeight: 42,
   },
   section: {
-    marginTop: 18,
+    marginTop: spacing.xl,
   },
   sectionTitle: {
     ...forestCampTypography.heading,
     fontSize: 15,
     lineHeight: 18,
     color: ForestCampTheme.colors.textMuted,
-    marginLeft: 10,
-    marginBottom: 8,
+    marginLeft: spacing.md,
+    marginBottom: spacing.sm,
   },
   sectionContent: {
     backgroundColor: ForestCampTheme.colors.card,
@@ -197,8 +198,8 @@ const styles = StyleSheet.create({
   },
   settingItem: {
     backgroundColor: ForestCampTheme.colors.card,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   settingItemContent: {
     flexDirection: 'row',
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e4f0da',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: spacing.md,
   },
   destructiveIcon: {
     backgroundColor: '#fbe0d8',
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
     ...forestCampTypography.body,
     fontSize: 13,
     color: ForestCampTheme.colors.textMuted,
-    marginTop: 2,
+    marginTop: spacing.xxs,
   },
   destructiveText: {
     color: ForestCampTheme.colors.danger,

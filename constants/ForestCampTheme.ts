@@ -40,6 +40,17 @@ export const ForestCampTheme = {
     danger: '#d85f4a',
     tabSurface: '#f8f6df',
   },
+  spacing: {
+    xxs: 2,
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 20,
+    '2xl': 24,
+    '3xl': 32,
+    '4xl': 40,
+  },
   radius: {
     xl: 30,
     lg: 22,
@@ -89,6 +100,8 @@ export const forestCampTypography: Record<'display' | 'heading' | 'body' | 'mono
     letterSpacing: 0.2,
   },
 };
+
+export const spacing = ForestCampTheme.spacing;
 
 export const forestCampShadow: ViewStyle = {
   shadowColor: '#385231',

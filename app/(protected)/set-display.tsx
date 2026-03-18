@@ -24,6 +24,7 @@ import {
 } from '@/components/shapes';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { spacing } from '@/constants/ForestCampTheme';
 import { useSettingsStore } from '@/store/settings-store';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
@@ -258,8 +259,8 @@ const styles = StyleSheet.create({
     top: 0,
     left: 20,
     borderRadius: 15,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   counterText: {
     fontSize: 10,

@@ -12,6 +12,7 @@ import {
   forestCampShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 
 interface ButtonProps {
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     borderColor: ForestCampTheme.colors.primaryStrong,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 18,
+    padding: spacing.xl,
     minHeight: 94,
     maxHeight: 152,
     backgroundColor: ForestCampTheme.colors.primary,
@@ -69,8 +70,8 @@ const styles = StyleSheet.create({
   },
   buttonTablet: {
     minHeight: 112,
-    paddingVertical: 20,
-    paddingHorizontal: 22,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing['2xl'],
   },
   buttonDisabled: {
     backgroundColor: ForestCampTheme.colors.borderStrong,
@@ -97,6 +98,6 @@ const styles = StyleSheet.create({
     color: '#eef3e8',
   },
   icon: {
-    marginTop: 2,
+    marginTop: spacing.xxs,
   },
 });
