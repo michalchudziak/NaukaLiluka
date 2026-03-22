@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useNavigation, useRouter } from 'expo-router';
-import { useLayoutEffect, useState } from 'react';
+import { Stack, useRouter } from 'expo-router';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ShapePicker, type ShapeType } from '@/components/ShapePicker';
@@ -29,15 +29,8 @@ export default function EquationsScreen() {
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { completedSessions, getDailyData, markSessionCompleted } = useEquationsStore();
   const { math } = useSettingsStore();
-  const navigation = useNavigation();
 
   const dailyData: DailyData = getDailyData();
-
-  useLayoutEffect(() => {
-    if (dailyData) {
-      navigation.setOptions({ title: t('math.equations.dayTitle', { day: dailyData.activeDay }) });
-    }
-  }, [navigation, dailyData, t]);
 
   const handleSessionPress = async (content: 'subitizing' | 'equations', sessionIndex: number) => {
     if (!dailyData) return;
@@ -116,6 +109,9 @@ export default function EquationsScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <Stack.Screen
+        options={{ title: t('math.equations.dayTitle', { day: dailyData.activeDay }) }}
+      />
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,

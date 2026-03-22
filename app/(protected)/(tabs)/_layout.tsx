@@ -1,6 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet, useWindowDimensions } from 'react-native';
-
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import {
@@ -12,11 +11,14 @@ import {
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 
+const MAX_TAB_BAR_WIDTH = 600;
+
 export default function TabLayout() {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
   const isTablet = metrics.isTablet;
+  const tabBarInset = isTablet ? Math.max(spacing.xl, (width - MAX_TAB_BAR_WIDTH) / 2) : spacing.xl;
 
   return (
     <Tabs
@@ -42,7 +44,14 @@ export default function TabLayout() {
         tabBarStyle: [
           styles.tabBarBase,
           isTablet ? styles.tabBarTablet : styles.tabBarPhone,
-          Platform.OS === 'ios' ? styles.tabBarIos : styles.tabBarDefault,
+          {
+            position: 'absolute' as const,
+            left: tabBarInset,
+            right: tabBarInset,
+            bottom: 10,
+            borderRadius: 30,
+            overflow: 'hidden' as const,
+          },
         ],
         tabBarLabelStyle: isTablet ? styles.tabLabelTablet : styles.tabLabelPhone,
         tabBarItemStyle: isTablet ? styles.tabItemTablet : styles.tabItemPhone,
@@ -107,22 +116,6 @@ const styles = StyleSheet.create({
     height: 92,
     paddingTop: 10,
     paddingBottom: 14,
-  },
-  tabBarIos: {
-    position: 'absolute',
-    left: spacing.xl,
-    right: spacing.xl,
-    bottom: 10,
-    borderRadius: 30,
-    overflow: 'hidden',
-  },
-  tabBarDefault: {
-    position: 'absolute',
-    left: spacing.xl,
-    right: spacing.xl,
-    bottom: 10,
-    borderRadius: 30,
-    overflow: 'hidden',
   },
   tabLabelPhone: {
     ...forestCampTypography.heading,
