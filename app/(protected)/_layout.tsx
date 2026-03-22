@@ -1,20 +1,12 @@
 import { useConvexAuth } from 'convex/react';
 import { Redirect, Stack } from 'expo-router';
-import { useEffect } from 'react';
 import { AuthStatusScreen } from '@/components/auth/auth-status-screen';
 import { useTranslation } from '@/hooks/useTranslation';
-import { resetAllStores } from '@/store/reset-stores';
-import { StoreProvider } from '@/store/store-provider';
+import { ProtectedAppProvider } from '@/providers/protected-app-provider';
 
 export default function ProtectedLayout() {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading } = useConvexAuth();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      resetAllStores();
-    }
-  }, [isAuthenticated, isLoading]);
 
   if (isLoading) {
     return (
@@ -27,7 +19,7 @@ export default function ProtectedLayout() {
   }
 
   return (
-    <StoreProvider>
+    <ProtectedAppProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="display" options={{ headerShown: false }} />
@@ -36,6 +28,6 @@ export default function ProtectedLayout() {
         <Stack.Screen name="set-display" options={{ headerShown: false }} />
         <Stack.Screen name="equations-display" options={{ headerShown: false }} />
       </Stack>
-    </StoreProvider>
+    </ProtectedAppProvider>
   );
 }

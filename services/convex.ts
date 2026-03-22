@@ -5,44 +5,9 @@ const functions = {
   usersCurrent: 'users:current',
   usersEnsureCurrentUser: 'users:ensureCurrentUser',
   usersUpdateProfile: 'users:updateProfile',
-  settingsGet: 'settings:get',
-  settingsUpsert: 'settings:upsert',
 } as const;
 
 let convexClient: ConvexReactClient | null = null;
-
-type SettingsSnapshot = {
-  reading: {
-    noRep: {
-      words: number;
-      sentences: number;
-    };
-    interval: {
-      words: number;
-      sentences: number;
-    };
-    books: {
-      allowAllBooks: boolean;
-    };
-    wordSpacing: number;
-  };
-  drawings: {
-    showCaptions: boolean;
-    interval: number;
-    randomOrder: boolean;
-    showFacts: boolean;
-  };
-  math: {
-    equations: {
-      interval: number;
-      equationCount: number;
-    };
-    numbers: {
-      interval: number;
-      numberCount: number;
-    };
-  };
-};
 
 type AppUser = {
   _id: string;
@@ -94,10 +59,6 @@ function handleCloudFailure(operation: string, cause: unknown): never {
   throw error;
 }
 
-export function ignoreCloudFailure() {
-  // Background sync and optimistic mutations can safely ignore transport errors here.
-}
-
 // biome-ignore lint/complexity/noStaticOnlyClass: Static-only service aligns with app architecture
 export class ConvexService {
   static validateConfiguration() {
@@ -125,24 +86,6 @@ export class ConvexService {
       return await getConvexClient().mutation(functions.usersUpdateProfile as any, profile);
     } catch (error) {
       handleCloudFailure('save account profile', error);
-    }
-  }
-
-  static async getSettings(): Promise<SettingsSnapshot> {
-    try {
-      return await getConvexClient().query(functions.settingsGet as any, {});
-    } catch (error) {
-      handleCloudFailure('load settings', error);
-    }
-  }
-
-  static async updateSettings(settings: SettingsSnapshot) {
-    try {
-      await getConvexClient().mutation(functions.settingsUpsert as any, {
-        snapshot: settings,
-      });
-    } catch (error) {
-      handleCloudFailure('save settings', error);
     }
   }
 }

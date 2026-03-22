@@ -6,9 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
-import { CloudConfigurationError, ConvexService, ignoreCloudFailure } from '@/services/convex';
-import { resetAllStores } from './reset-stores';
-import { useSettingsStore } from './settings-store';
+import { CloudConfigurationError, ConvexService } from '@/services/convex';
 
 type BootstrapStatus = 'loading' | 'ready' | 'error';
 
@@ -50,17 +48,11 @@ function ErrorState({ error, onRetry }: { error: Error; onRetry: () => void }) {
   );
 }
 
-export function StoreProvider({ children }: { children: React.ReactNode }) {
+export function ProtectedAppProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const [status, setStatus] = useState<BootstrapStatus>('loading');
   const [error, setError] = useState<Error | null>(null);
   const initializationRunId = useRef(0);
-
-  const syncStoresInBackground = useCallback(() => {
-    void (async () => {
-      await useSettingsStore.getState().syncFromCloud().catch(ignoreCloudFailure);
-    })();
-  }, []);
 
   const initializeAuthenticatedApp = useCallback(async () => {
     const runId = initializationRunId.current + 1;
@@ -78,8 +70,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }
 
       setStatus('ready');
-
-      syncStoresInBackground();
     } catch (error) {
       if (initializationRunId.current !== runId) {
         return;
@@ -88,7 +78,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setError(normalizeError(error));
       setStatus('error');
     }
-  }, [syncStoresInBackground]);
+  }, []);
 
   useEffect(() => {
     if (isLoading) {
@@ -97,7 +87,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     if (!isAuthenticated) {
       initializationRunId.current += 1;
-      resetAllStores();
       setError(null);
       setStatus('loading');
       return;

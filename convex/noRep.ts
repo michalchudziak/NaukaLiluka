@@ -2,7 +2,8 @@ import { mutationGeneric as mutation, queryGeneric as query } from 'convex/serve
 import { v } from 'convex/values';
 import { requireCurrentUser } from './lib/current_user';
 import { getContentPool } from './lib/noRepContent';
-import { contentTypeValidator, defaultSettings } from './validators';
+import { defaultSettings } from './settingsSnapshot';
+import { contentTypeValidator } from './validators';
 
 export const getStatus = query({
   args: {

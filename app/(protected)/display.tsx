@@ -9,14 +9,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import { AutoSizeText } from '@/components/AutoSizeText';
 import { ThemedView } from '@/components/ThemedView';
-import { useSettingsStore } from '@/store/settings-store';
+import { useAppSettings } from '@/hooks/useSettings';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
 export default function DisplayScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const settings = useSettingsStore();
+  const settings = useAppSettings();
   const [currentIndex, setCurrentIndex] = useState(-1);
   const currentIndexRef = useRef(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

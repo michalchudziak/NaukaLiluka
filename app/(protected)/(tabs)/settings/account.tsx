@@ -16,7 +16,6 @@ import {
 import { useTranslation } from '@/hooks/useTranslation';
 import { authClient } from '@/services/auth-client';
 import { ConvexService } from '@/services/convex';
-import { resetAllStores } from '@/store/reset-stores';
 
 function formatDateLabel(value: unknown) {
   if (!value) {
@@ -282,7 +281,6 @@ export default function AccountSettingsScreen() {
       return;
     }
 
-    resetAllStores();
     router.replace('/sign-in');
   };
 

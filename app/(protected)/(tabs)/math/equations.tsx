@@ -21,8 +21,8 @@ import {
   useCompleteEquationSession,
   useEquationsStatus,
 } from '@/hooks/useMath';
+import { useAppSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useSettingsStore } from '@/store/settings-store';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const guideImage = require('@/assets/images/guides/math.png');
@@ -37,7 +37,7 @@ export default function EquationsScreen() {
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { currentDay, completedSessionsToday, dailyData } = useEquationsStatus();
   const completeSession = useCompleteEquationSession();
-  const { math } = useSettingsStore();
+  const { math } = useAppSettings();
 
   const handleSessionPress = async (content: 'subitizing' | 'equations', sessionIndex: number) => {
     const token = `${content}${sessionIndex === 0 ? '1' : '2'}` as EquationSession;

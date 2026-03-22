@@ -10,15 +10,16 @@ import {
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
+import { useAppSettings, useSettingsActions } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useSettingsStore } from '@/store/settings-store';
 
 export default function ReadingNoRepSettingsScreen() {
   const { t } = useTranslation();
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
-  const { reading, updateReadingNoRepWords, updateReadingNoRepSentences } = useSettingsStore();
+  const { reading } = useAppSettings();
+  const { updateReadingNoRepWords, updateReadingNoRepSentences } = useSettingsActions();
 
   return (
     <ThemedView style={styles.container}>

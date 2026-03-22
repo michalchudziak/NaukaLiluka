@@ -11,21 +11,21 @@ import {
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
+import { useAppSettings, useSettingsActions } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useSettingsStore } from '@/store/settings-store';
 
 export default function DrawingsSettingsScreen() {
   const { t } = useTranslation();
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
+  const { drawings } = useAppSettings();
   const {
-    drawings,
     updateDrawingsShowCaptions,
     updateDrawingsShowFacts,
     updateDrawingsInterval,
     updateDrawingsRandomOrder,
-  } = useSettingsStore();
+  } = useSettingsActions();
 
   return (
     <ThemedView style={styles.container}>

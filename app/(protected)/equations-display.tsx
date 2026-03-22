@@ -9,14 +9,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import { AutoSizeText } from '@/components/AutoSizeText';
 import { ThemedView } from '@/components/ThemedView';
-import { useSettingsStore } from '@/store/settings-store';
+import { useAppSettings } from '@/hooks/useSettings';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
 export default function EquationsDisplayScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { math } = useSettingsStore();
+  const { math } = useAppSettings();
 
   const [currentIndex, setCurrentIndex] = useState(-1);
   const currentIndexRef = useRef(-1);

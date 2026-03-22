@@ -12,7 +12,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { spacing } from '@/constants/ForestCampTheme';
 import { books } from '@/content/books';
-import { useSettingsStore } from '@/store/settings-store';
+import { useAppSettings } from '@/hooks/useSettings';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
@@ -21,7 +21,7 @@ type DisplayState = 'title' | 'sentences' | 'image' | 'summary';
 export default function BookDisplayScreen() {
   const { bookIndex } = useLocalSearchParams<{ bookIndex: string }>();
   const router = useRouter();
-  const { reading } = useSettingsStore();
+  const { reading } = useAppSettings();
 
   const [currentPageIndex, setCurrentPageIndex] = useState(-1); // -1 for title
   const [displayState, setDisplayState] = useState<DisplayState>('title');

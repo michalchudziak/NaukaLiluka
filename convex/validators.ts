@@ -1,4 +1,5 @@
 import { v } from 'convex/values';
+import { defaultSettings } from './settingsSnapshot';
 
 export const contentTypeValidator = v.union(v.literal('words'), v.literal('sentences'));
 
@@ -71,39 +72,6 @@ export const appUserValidator = v.object({
   name: v.optional(v.string()),
   createdAt: v.number(),
 });
-
-export const defaultSettings = {
-  reading: {
-    noRep: {
-      words: 3,
-      sentences: 3,
-    },
-    interval: {
-      words: 1500,
-      sentences: 2500,
-    },
-    books: {
-      allowAllBooks: true,
-    },
-    wordSpacing: 1,
-  },
-  drawings: {
-    showCaptions: true,
-    interval: 1500,
-    randomOrder: false,
-    showFacts: false,
-  },
-  math: {
-    equations: {
-      interval: 1500,
-      equationCount: 5,
-    },
-    numbers: {
-      interval: 1000,
-      numberCount: 10,
-    },
-  },
-} as const;
 
 export const drawingStatusValidator = v.object({
   completedToday: v.boolean(),

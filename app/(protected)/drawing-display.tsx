@@ -14,7 +14,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { spacing } from '@/constants/ForestCampTheme';
 import drawingSets from '@/content/drawings';
 import { useCompleteDrawingSession } from '@/hooks/useDrawings';
-import { useSettingsStore } from '@/store/settings-store';
+import { useAppSettings } from '@/hooks/useSettings';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
@@ -22,7 +22,7 @@ export default function DrawingDisplayScreen() {
   const { setId } = useLocalSearchParams<{ setId: string }>();
   const router = useRouter();
   const completeDrawingSession = useCompleteDrawingSession();
-  const settings = useSettingsStore();
+  const settings = useAppSettings();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(-1);
   const currentImageIndexRef = useRef(-1);

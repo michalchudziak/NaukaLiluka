@@ -3,7 +3,7 @@ import { startOfDay } from 'date-fns';
 import { buildEquationScheme } from '@/content/math/equation-scheme';
 import { getNumbersLearningScheme } from '@/content/math/learning-scheme';
 import { api } from '@/convex/_generated/api';
-import { useSettingsStore } from '@/store/settings-store';
+import { useAppSettings } from '@/hooks/useSettings';
 
 export type MathSession =
   | 'subitizingOrdered'
@@ -17,7 +17,8 @@ export type EquationCategory = 'integer' | 'fraction' | 'decimal' | 'negative' |
 export function useMathStatus() {
   const todayStartMs = startOfDay(new Date()).getTime();
   const status = useQuery(api.math.getStatus, { todayStartMs });
-  const numberCount = useSettingsStore((state) => state.math.numbers.numberCount);
+  const { math } = useAppSettings();
+  const numberCount = math.numbers.numberCount;
   const currentDay = status?.currentDay ?? 1;
 
   return {
@@ -46,7 +47,8 @@ export function useCompleteMathSession() {
 export function useEquationsStatus() {
   const todayStartMs = startOfDay(new Date()).getTime();
   const status = useQuery(api.equations.getStatus, { todayStartMs });
-  const equationCount = useSettingsStore((state) => state.math.equations.equationCount);
+  const { math } = useAppSettings();
+  const equationCount = math.equations.equationCount;
   const currentDay = status?.currentDay ?? 1;
   const currentCategory = status?.currentCategory ?? 'integer';
 

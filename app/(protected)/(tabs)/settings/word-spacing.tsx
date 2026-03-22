@@ -10,8 +10,8 @@ import {
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
+import { useAppSettings, useSettingsActions } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useSettingsStore } from '@/store/settings-store';
 
 function PreviewText({ spacing }: { spacing: number }) {
   const { t } = useTranslation();
@@ -35,7 +35,8 @@ export default function WordSpacingSettingsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
-  const { reading, updateReadingWordSpacing } = useSettingsStore();
+  const { reading } = useAppSettings();
+  const { updateReadingWordSpacing } = useSettingsActions();
 
   const wordSpacing = reading.wordSpacing ?? 1;
 

@@ -19,6 +19,7 @@ import type * as lib_noRepContent from "../lib/noRepContent.js";
 import type * as math from "../math.js";
 import type * as noRep from "../noRep.js";
 import type * as settings from "../settings.js";
+import type * as settingsSnapshot from "../settingsSnapshot.js";
 import type * as users from "../users.js";
 import type * as validators from "../validators.js";
 
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   math: typeof math;
   noRep: typeof noRep;
   settings: typeof settings;
+  settingsSnapshot: typeof settingsSnapshot;
   users: typeof users;
   validators: typeof validators;
 }>;

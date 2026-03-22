@@ -18,8 +18,8 @@ import {
 import { WordColors } from '@/constants/WordColors';
 import type { SessionContent } from '@/content/math/learning-scheme';
 import { type MathSession, useCompleteMathSession, useMathStatus } from '@/hooks/useMath';
+import { useAppSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useSettingsStore } from '@/store/settings-store';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const guideImage = require('@/assets/images/guides/math.png');
@@ -34,7 +34,7 @@ export default function SetsScreen() {
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { currentDay, dailyData, isSessionCompletedToday } = useMathStatus();
   const completeSession = useCompleteMathSession();
-  const { math } = useSettingsStore();
+  const { math } = useAppSettings();
 
   const handleSessionPress = async (sessionContent: SessionContent) => {
     const numbers = sessionContent.isOrdered

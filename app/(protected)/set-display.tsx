@@ -25,7 +25,7 @@ import {
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { spacing } from '@/constants/ForestCampTheme';
-import { useSettingsStore } from '@/store/settings-store';
+import { useAppSettings } from '@/hooks/useSettings';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
@@ -38,7 +38,7 @@ export default function SetDisplayScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { math } = useSettingsStore();
+  const { math } = useAppSettings();
   const [currentIndex, setCurrentIndex] = useState(-1);
   const currentIndexRef = useRef(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

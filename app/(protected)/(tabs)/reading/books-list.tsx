@@ -7,8 +7,8 @@ import { ThemedView } from '@/components/ThemedView';
 import { ForestCampTheme, getForestCampMetrics, spacing } from '@/constants/ForestCampTheme';
 import { books } from '@/content/books';
 import { useBookListProgress, useBookStatus } from '@/hooks/useBooks';
+import { useAppSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useSettingsStore } from '@/store/settings-store';
 import type { Book } from '@/types/book';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -25,7 +25,7 @@ export default function BooksListScreen() {
   const metrics = getForestCampMetrics(width);
   const bookStatus = useBookStatus();
   const progressList = useBookListProgress();
-  const settings = useSettingsStore();
+  const settings = useAppSettings();
   const bottomTabBarHeight = useBottomTabBarHeight();
 
   const handleBookPress = (bookIndex: number) => {
