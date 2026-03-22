@@ -9,11 +9,14 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
+      "icon": "./assets/images/app-icon.png",
       "bundleIdentifier": "com.michalchudziak.NaukaLiluka"
     },
     "android": {
+      "icon": "./assets/images/app-icon.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
+        "monochromeImage": "./assets/images/adaptive-icon-monochrome.png",
         "backgroundColor": "#2f8653"
       },
       "package": "com.michalchudziak.NaukaLiluka"
@@ -28,10 +31,20 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#2f8653"
+          "android": {
+            "image": "./assets/images/splash-icon.png",
+            "imageWidth": 320,
+            "resizeMode": "contain",
+            "backgroundColor": "#2f8653"
+          },
+          "ios": {
+            "image": "./assets/images/splash-icon.png",
+            "tabletImage": "./assets/images/splash-tablet.png",
+            "imageWidth": 380,
+            "resizeMode": "contain",
+            "backgroundColor": "#2f8653",
+            "tabletBackgroundColor": "#2f8653"
+          }
         }
       ],
       "expo-secure-store",

@@ -16,7 +16,7 @@
   "auth": {
     "loadingTitle": "Sprawdzanie sesji",
     "loadingDescription": "Przygotowuję logowanie i sprawdzam, czy konto jest już aktywne.",
-    "configurationError": "Brakuje konfiguracji logowania. Ustaw EXPO_PUBLIC_CONVEX_SITE_URL oraz BETTER_AUTH_SECRET.",
+    "configurationError": "Brakuje konfiguracji logowania.",
     "emailLabel": "Adres e-mail",
     "emailPlaceholder": "twoj@email.com",
     "nameLabel": "Imię opiekuna",
