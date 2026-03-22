@@ -2,6 +2,7 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { BookListItem } from '@/components/BookListItem';
+import { GuideCard } from '@/components/GuideCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import {
@@ -11,10 +12,13 @@ import {
   spacing,
 } from '@/constants/ForestCampTheme';
 import { books } from '@/content/books';
+import { useBookListProgress, useBookStatus } from '@/hooks/useBooks';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useBookStore } from '@/store/book-store';
 import { useSettingsStore } from '@/store/settings-store';
 import type { Book } from '@/types/book';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const guideImage = require('@/assets/images/guides/book.png');
 
 function ListSeparator() {
   return <ThemedView style={styles.separator} />;
@@ -25,7 +29,8 @@ export default function BooksListScreen() {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
-  const activeBook = useBookStore((s) => s.activeBookProgress);
+  const bookStatus = useBookStatus();
+  const progressList = useBookListProgress();
   const settings = useSettingsStore();
   const bottomTabBarHeight = useBottomTabBarHeight();
 
@@ -35,8 +40,10 @@ export default function BooksListScreen() {
 
   const renderBook = ({ item, index }: { item: Book; index: number }) => {
     const isCompleted =
-      index < (activeBook?.bookId ?? 0) ||
-      (index === (activeBook?.bookId ?? 0) && (activeBook?.isCompleted ?? false));
+      index < (bookStatus?.activeBookIndex ?? 0) ||
+      (index === (bookStatus?.activeBookIndex ?? 0) &&
+        (bookStatus?.activeBookCompleted ?? false)) ||
+      (progressList?.some((p) => p.bookIndex === index && p.isCompleted) ?? false);
     const allowAllBooks = settings.reading.books.allowAllBooks;
     const isAccessible = allowAllBooks || isCompleted;
 
@@ -50,15 +57,24 @@ export default function BooksListScreen() {
     );
   };
 
+  const listHeader = (
+    <View style={styles.headerContent}>
+      <ThemedText style={styles.title}>{t('booksList.title')}</ThemedText>
+      <GuideCard
+        image={guideImage}
+        title={t('booksList.guideTitle')}
+        body={t('booksList.guideBody')}
+      />
+    </View>
+  );
+
   return (
     <ThemedView style={styles.container}>
-      <View style={[styles.header, { paddingHorizontal: metrics.screenPadding }]}>
-        <ThemedText style={styles.title}>{t('booksList.title')}</ThemedText>
-      </View>
       <FlatList
         data={books}
         renderItem={renderBook}
         keyExtractor={(item) => item.book.title}
+        ListHeaderComponent={listHeader}
         contentContainerStyle={[
           styles.listContent,
           {
@@ -78,8 +94,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ForestCampTheme.colors.background,
   },
-  header: {
+  headerContent: {
+    gap: spacing.lg,
     paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
   title: {
     ...forestCampTypography.display,
@@ -90,7 +108,6 @@ const styles = StyleSheet.create({
   listContent: {
     alignSelf: 'center',
     width: '100%',
-    paddingTop: spacing.md,
   },
   separator: {
     height: 12,

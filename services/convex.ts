@@ -1,5 +1,4 @@
 import { ConvexReactClient } from 'convex/react';
-import { isToday } from 'date-fns';
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
 const functions = {
@@ -8,11 +7,6 @@ const functions = {
   usersUpdateProfile: 'users:updateProfile',
   settingsGet: 'settings:get',
   settingsUpsert: 'settings:upsert',
-  booksListProgress: 'books:listProgress',
-  booksReplaceProgress: 'books:replaceProgress',
-  booksListTrackSessions: 'books:listTrackSessions',
-  booksInsertTrackSession: 'books:insertTrackSession',
-  booksGetLatestDailyPlan: 'books:getLatestDailyPlan',
   mathGetProgress: 'math:getProgress',
   mathUpsertProgress: 'math:upsertProgress',
   mathInsertSessionCompletion: 'math:insertSessionCompletion',
@@ -25,8 +19,6 @@ const functions = {
 
 let convexClient: ConvexReactClient | null = null;
 
-type ContentType = 'words' | 'sentences';
-type BookSession = 'session1' | 'session2' | 'session3';
 type MathSession =
   | 'subitizingOrdered'
   | 'subitizingUnordered'
@@ -75,20 +67,6 @@ type AppUser = {
   email: string;
   name?: string;
   createdAt: number;
-};
-
-type BookProgress = {
-  bookId: number;
-  bookTitle: string;
-  completedTriples: number[];
-  progressTimestamp: number;
-  isCompleted: boolean;
-};
-
-type BookTrackSession = {
-  session: BookSession;
-  type: ContentType;
-  timestamp: number;
 };
 
 type MathProgress = {
@@ -210,45 +188,6 @@ export class ConvexService {
     }
   }
 
-  static async getBookProgress(): Promise<BookProgress[]> {
-    try {
-      return await getConvexClient().query(functions.booksListProgress as any, {});
-    } catch (error) {
-      handleCloudFailure('load book progress', error);
-    }
-  }
-
-  static async updateBookProgress(bookProgress: BookProgress[]) {
-    try {
-      await getConvexClient().mutation(functions.booksReplaceProgress as any, {
-        progress: bookProgress,
-      });
-    } catch (error) {
-      handleCloudFailure('save book progress', error);
-    }
-  }
-
-  static async getBookTrackSessions(): Promise<BookTrackSession[]> {
-    try {
-      return await getConvexClient().query(functions.booksListTrackSessions as any, {});
-    } catch (error) {
-      handleCloudFailure('load reading session completions', error);
-    }
-  }
-
-  static async saveBookTrackSession(sessions: BookTrackSession[]) {
-    const lastSession = sessions[sessions.length - 1];
-    if (!lastSession) {
-      return;
-    }
-
-    try {
-      await getConvexClient().mutation(functions.booksInsertTrackSession as any, lastSession);
-    } catch (error) {
-      handleCloudFailure('save reading session completion', error);
-    }
-  }
-
   static async getMathProgress(): Promise<MathProgress> {
     try {
       return await getConvexClient().query(functions.mathGetProgress as any, {});
@@ -331,20 +270,6 @@ export class ConvexService {
       );
     } catch (error) {
       handleCloudFailure('save drawing presentation', error);
-    }
-  }
-
-  static async getTodaysDailyPlan() {
-    try {
-      const plan = await getConvexClient().query(functions.booksGetLatestDailyPlan as any, {});
-
-      if (!plan || !isToday(new Date(plan.timestamp))) {
-        return null;
-      }
-
-      return plan;
-    } catch (error) {
-      handleCloudFailure("load today's reading plan", error);
     }
   }
 }

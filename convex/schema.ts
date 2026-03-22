@@ -1,7 +1,6 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import {
-  bookDailySessionContentValidator,
   contentTypeValidator,
   equationCategoryValidator,
   equationSessionValidator,
@@ -30,9 +29,7 @@ export default defineSchema({
     completedTriples: v.array(v.number()),
     progressTimestamp: v.number(),
     isCompleted: v.boolean(),
-  })
-    .index('by_user_and_book_key', ['userId', 'bookKey'])
-    .index('by_user_and_book_index', ['userId', 'bookIndex']),
+  }).index('by_user_and_book_index', ['userId', 'bookIndex']),
 
   bookTrackSessions: defineTable({
     userId: v.id('users'),
@@ -40,17 +37,6 @@ export default defineSchema({
     contentType: contentTypeValidator,
     completedAt: v.number(),
   }).index('by_user_and_completed_at', ['userId', 'completedAt']),
-
-  dailyPlans: defineTable({
-    userId: v.id('users'),
-    bookId: v.string(),
-    selectedWordTripleIndex: v.number(),
-    selectedSentenceTripleIndex: v.number(),
-    session1Content: bookDailySessionContentValidator,
-    session2Content: bookDailySessionContentValidator,
-    session3Content: bookDailySessionContentValidator,
-    createdAt: v.number(),
-  }).index('by_user_and_created_at', ['userId', 'createdAt']),
 
   noRepProgress: defineTable({
     userId: v.id('users'),

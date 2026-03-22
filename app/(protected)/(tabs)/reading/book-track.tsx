@@ -1,6 +1,7 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { StyleSheet, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { GuideCard } from '@/components/GuideCard';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -11,8 +12,11 @@ import {
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
+import { useBookStatus } from '@/hooks/useBooks';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useBookStore } from '@/store/book-store';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const guideImage = require('@/assets/images/guides/book.png');
 
 export default function BookTrackScreen() {
   const { width } = useWindowDimensions();
@@ -20,8 +24,8 @@ export default function BookTrackScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
-  const isDayCompleted = useBookStore((state) => state.isDayCompleted);
-  const isTrainingCompleted = isDayCompleted();
+  const bookStatus = useBookStatus();
+  const isTrainingCompleted = bookStatus?.isDayCompleted ?? false;
 
   const handleTrainingPress = () => {
     router.push('/reading/books-daily');
@@ -50,18 +54,26 @@ export default function BookTrackScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedView
-        style={[
-          styles.content,
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
           {
-            marginBottom: tabBarHeight + spacing.sm,
+            paddingBottom: tabBarHeight + spacing.lg,
             paddingHorizontal: metrics.screenPadding,
           },
         ]}
+        showsVerticalScrollIndicator={false}
       >
         <ThemedText style={[styles.title, metrics.isTablet && styles.titleTablet]}>
           {t('bookTrack.title')}
         </ThemedText>
+
+        <GuideCard
+          image={guideImage}
+          title={t('bookTrack.guideTitle')}
+          body={t('bookTrack.guideBody')}
+        />
+
         <ThemedView
           style={[
             styles.actionsCard,
@@ -80,7 +92,7 @@ export default function BookTrackScreen() {
             />
           ))}
         </ThemedView>
-      </ThemedView>
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -90,10 +102,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ForestCampTheme.colors.background,
   },
-  content: {
-    flex: 1,
-    paddingTop: spacing.md,
+  scrollContent: {
+    flexGrow: 1,
     width: '100%',
+    paddingTop: spacing.md,
+    gap: spacing.lg,
   },
   title: {
     ...forestCampTypography.display,
@@ -101,12 +114,10 @@ const styles = StyleSheet.create({
     lineHeight: 34,
     color: ForestCampTheme.colors.title,
     alignSelf: 'flex-start',
-    marginBottom: spacing.lg,
   },
   titleTablet: {
     fontSize: 36,
     lineHeight: 40,
-    marginBottom: spacing.xl,
   },
   actionsCard: {
     width: '100%',

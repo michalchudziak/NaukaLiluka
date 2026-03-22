@@ -71,7 +71,9 @@
     "title": "Ścieżka książkowa",
     "training": "Trening",
     "books": "Książki",
-    "back": "Wróć"
+    "back": "Wróć",
+    "guideTitle": "Trening vs Książki",
+    "guideBody": "Trening to codzienna nauka nowych słów i zdań w 3 sesjach — ukończ je, aby zaliczyć dzień. Książki to zbiór ukończonych lektur, które możesz w dowolnym momencie czytać dziecku od nowa."
   },
   "booksDaily": {
     "title": "Codzienny trening",
@@ -83,11 +85,15 @@
     "sentences": "Zdania",
     "selectColor": "Wybierz kolor",
     "loading": "Ładowanie planu dnia...",
-    "noContent": "Brak dostępnych książek do treningu"
+    "noContent": "Brak dostępnych książek do treningu",
+    "guideTitle": "Jak działa trening?",
+    "guideBody": "Każdego dnia przeprowadź 3 sesje. W każdej sesji prezentuj dziecku wyświetlone słowa, a w sesji 3 również zdania. Po ukończeniu wszystkich sesji zestaw zostaje zaliczony i następnego dnia pojawi się kolejny. Gdy ukończysz wszystkie zestawy, książka jest gotowa."
   },
   "booksList": {
     "title": "Lista książek",
-    "back": "Wróć"
+    "back": "Wróć",
+    "guideTitle": "Odblokowywanie książek",
+    "guideBody": "Książki odblokowują się po kolei. Ukończ wszystkie zestawy słów i zdań z bieżącej książki w codziennym treningu, aby odblokować następną. Ukończone książki możesz czytać dziecku w dowolnym momencie."
   },
   "settings": {
     "title": "Ustawienia",

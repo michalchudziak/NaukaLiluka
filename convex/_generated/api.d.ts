@@ -13,6 +13,7 @@ import type * as books from "../books.js";
 import type * as drawings from "../drawings.js";
 import type * as equations from "../equations.js";
 import type * as http from "../http.js";
+import type * as lib_bookContent from "../lib/bookContent.js";
 import type * as lib_current_user from "../lib/current_user.js";
 import type * as lib_noRepContent from "../lib/noRepContent.js";
 import type * as math from "../math.js";
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   drawings: typeof drawings;
   equations: typeof equations;
   http: typeof http;
+  "lib/bookContent": typeof lib_bookContent;
   "lib/current_user": typeof lib_current_user;
   "lib/noRepContent": typeof lib_noRepContent;
   math: typeof math;

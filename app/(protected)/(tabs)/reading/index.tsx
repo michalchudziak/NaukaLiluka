@@ -10,9 +10,9 @@ import {
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
+import { useBookStatus } from '@/hooks/useBooks';
 import { useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useBookStore } from '@/store/book-store';
 
 export default function ReadingScreen() {
   const { width } = useWindowDimensions();
@@ -20,10 +20,10 @@ export default function ReadingScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const noRepStatus = useNoRepStatus();
-  const bookStore = useBookStore();
+  const bookStatus = useBookStatus();
   const isNoRepPathCompleted =
     (noRepStatus?.isWordsCompletedToday && noRepStatus?.isSentencesCompletedToday) ?? false;
-  const isBookTrackCompleted = bookStore.isDayCompleted();
+  const isBookTrackCompleted = bookStatus?.isDayCompleted ?? false;
 
   const modules = [
     {

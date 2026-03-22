@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
-import { format, isToday } from 'date-fns';
+import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -14,9 +14,9 @@ import {
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
+import { useBookStatus } from '@/hooks/useBooks';
 import { useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useBookStore } from '@/store/book-store';
 import { useDrawingsStore } from '@/store/drawings-store';
 import { useEquationsStore } from '@/store/equations-store';
 import { useMathStore } from '@/store/math-store';
@@ -85,7 +85,7 @@ export default function MyDayScreen() {
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
   const noRepStatus = useNoRepStatus();
-  const bookStore = useBookStore();
+  const bookStatus = useBookStatus();
   const drawingsStore = useDrawingsStore();
   const { isSessionCompletedToday: isMathSessionCompletedToday, currentDay } = useMathStore();
   const { isSessionCompletedToday: isEqSessionCompletedToday } = useEquationsStore();
@@ -102,24 +102,14 @@ export default function MyDayScreen() {
   const isNoRepCompleted =
     (noRepStatus?.isWordsCompletedToday && noRepStatus?.isSentencesCompletedToday) ?? false;
 
-  const plan = bookStore.getDailyData();
-  const todayCompletions = bookStore.completedSessions.filter((c) => isToday(c.timestamp));
-  const planIsToday = !!plan && isToday(plan.timestamp);
+  const s1 = bookStatus?.sessions.session1;
+  const s2 = bookStatus?.sessions.session2;
+  const s3 = bookStatus?.sessions.session3;
 
-  const isBookSessionDone = (sessionKey: 'session1' | 'session2' | 'session3') => {
-    if (!planIsToday || !plan) return false;
-    const wordsOk = todayCompletions.some((c) => c.session === sessionKey && c.type === 'words');
-    const needsSentences = plan.sessions[sessionKey].sentences.length > 0;
-    return (
-      wordsOk &&
-      (!needsSentences ||
-        todayCompletions.some((c) => c.session === sessionKey && c.type === 'sentences'))
-    );
-  };
-
-  const isSession1Completed = isBookSessionDone('session1');
-  const isSession2Completed = isBookSessionDone('session2');
-  const isSession3Completed = isBookSessionDone('session3');
+  const isSession1Completed = s1?.isWordsCompleted ?? false;
+  const isSession2Completed = s2?.isWordsCompleted ?? false;
+  const isSession3Completed =
+    (s3?.isWordsCompleted && (!s3?.hasSentences || s3?.isSentencesCompleted)) ?? false;
 
   const isDrawingsCompleted = drawingsStore.getTodayPresentationCount() > 0;
 

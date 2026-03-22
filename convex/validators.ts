@@ -105,20 +105,6 @@ export const defaultSettings = {
   },
 } as const;
 
-export const bookProgressValidator = v.object({
-  bookId: v.number(),
-  bookTitle: v.string(),
-  completedTriples: v.array(v.number()),
-  progressTimestamp: v.number(),
-  isCompleted: v.boolean(),
-});
-
-export const bookTrackSessionValidator = v.object({
-  session: bookSessionNameValidator,
-  type: contentTypeValidator,
-  timestamp: v.number(),
-});
-
 export const drawingPresentationValidator = v.object({
   setTitle: v.string(),
   timestamp: v.number(),
@@ -163,23 +149,4 @@ export const equationsSessionCompletionValidator = v.object({
   day: v.number(),
   category: equationCategoryValidator,
   timestamp: v.number(),
-});
-
-export const bookDailySessionContentValidator = v.object({
-  words: v.array(v.string()),
-  sentences: v.array(v.string()),
-  isWordsCompleted: v.boolean(),
-  isSentencesCompleted: v.boolean(),
-});
-
-export const bookDailyPlanValidator = v.object({
-  timestamp: v.number(),
-  bookId: v.string(),
-  selectedWordTripleIndex: v.number(),
-  selectedSentenceTripleIndex: v.number(),
-  sessions: v.object({
-    session1: bookDailySessionContentValidator,
-    session2: bookDailySessionContentValidator,
-    session3: bookDailySessionContentValidator,
-  }),
 });

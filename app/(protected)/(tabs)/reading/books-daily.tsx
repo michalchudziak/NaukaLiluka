@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
+import { GuideCard } from '@/components/GuideCard';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -14,8 +15,11 @@ import {
   spacing,
 } from '@/constants/ForestCampTheme';
 import { WordColors } from '@/constants/WordColors';
+import { useBookDailyContent, useCompleteBookSession } from '@/hooks/useBooks';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useBookStore } from '@/store/book-store';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const guideImage = require('@/assets/images/guides/book.png');
 
 export default function BooksDailyScreen() {
   const { t } = useTranslation();
@@ -24,8 +28,8 @@ export default function BooksDailyScreen() {
   const metrics = getForestCampMetrics(width);
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
-  const { getDailyData, markSessionItemCompleted, isSessionItemCompletedToday } = useBookStore();
-  const dailyPlan = getDailyData();
+  const dailyPlan = useBookDailyContent();
+  const completeSession = useCompleteBookSession();
 
   const handleTrackPress = (
     sessionId: 'session1' | 'session2' | 'session3',
@@ -35,7 +39,7 @@ export default function BooksDailyScreen() {
       return;
     }
 
-    const sessionContent = dailyPlan.sessions[sessionId];
+    const sessionContent = dailyPlan.content[sessionId];
     const items = type === 'words' ? sessionContent.words : sessionContent.sentences;
 
     router.push({
@@ -47,29 +51,27 @@ export default function BooksDailyScreen() {
       },
     });
 
-    markSessionItemCompleted(sessionId, type);
+    void completeSession(sessionId, type);
   };
 
   const renderSession = (sessionNumber: number) => {
     const sessionKey = `session${sessionNumber}` as 'session1' | 'session2' | 'session3';
-    const sessionData = dailyPlan?.sessions[sessionKey];
+    const sessionStatus = dailyPlan?.sessions[sessionKey];
 
-    const hasWords = sessionData?.words && sessionData.words.length > 0;
-    const hasSentences = sessionData?.sentences && sessionData.sentences.length > 0;
     const actions = [
-      hasWords
+      sessionStatus?.hasWords
         ? {
             id: 'words',
             title: t('booksDaily.words'),
-            isCompleted: isSessionItemCompletedToday(sessionKey, 'words'),
+            isCompleted: sessionStatus.isWordsCompleted,
             onPress: () => handleTrackPress(sessionKey, 'words'),
           }
         : null,
-      hasSentences
+      sessionStatus?.hasSentences
         ? {
             id: 'sentences',
             title: t('booksDaily.sentences'),
-            isCompleted: isSessionItemCompletedToday(sessionKey, 'sentences'),
+            isCompleted: sessionStatus.isSentencesCompleted,
             onPress: () => handleTrackPress(sessionKey, 'sentences'),
           }
         : null,
@@ -114,7 +116,7 @@ export default function BooksDailyScreen() {
         contentContainerStyle={[
           styles.scrollContent,
           {
-            marginBottom: tabBarHeight + spacing.sm,
+            paddingBottom: tabBarHeight + spacing.lg,
             paddingHorizontal: metrics.screenPadding,
             maxWidth: metrics.maxContentWidth,
           },
@@ -122,8 +124,14 @@ export default function BooksDailyScreen() {
         showsVerticalScrollIndicator={false}
       >
         <ThemedText type="subtitle" style={styles.bookTitle}>
-          {dailyPlan.bookId}
+          {dailyPlan.activeBookTitle}
         </ThemedText>
+
+        <GuideCard
+          image={guideImage}
+          title={t('booksDaily.guideTitle')}
+          body={t('booksDaily.guideBody')}
+        />
 
         <View style={styles.sessionsContainer}>
           {renderSession(1)}
@@ -148,11 +156,9 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
     width: '100%',
     alignSelf: 'center',
     paddingTop: spacing.lg,
-    paddingBottom: spacing['3xl'],
     gap: spacing.lg,
   },
   centerContent: {
@@ -160,8 +166,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sessionsContainer: {
-    flex: 1,
-    justifyContent: 'center',
     gap: spacing.xl,
   },
   sessionRow: {
@@ -188,7 +192,6 @@ const styles = StyleSheet.create({
     lineHeight: 38,
     color: ForestCampTheme.colors.title,
     textAlign: 'center',
-    marginBottom: spacing.md,
   },
   noContentText: {
     ...forestCampTypography.heading,
