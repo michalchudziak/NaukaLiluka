@@ -13,8 +13,6 @@ const functions = {
   equationsGetProgress: 'equations:getProgress',
   equationsUpsertProgress: 'equations:upsertProgress',
   equationsInsertSessionCompletion: 'equations:insertSessionCompletion',
-  drawingsListPresentations: 'drawings:listPresentations',
-  drawingsInsertPresentation: 'drawings:insertPresentation',
 } as const;
 
 let convexClient: ConvexReactClient | null = null;
@@ -246,30 +244,6 @@ export class ConvexService {
       });
     } catch (error) {
       handleCloudFailure('save equations session completion', error);
-    }
-  }
-
-  static async getDrawingPresentations(): Promise<{ setTitle: string; timestamp: number }[]> {
-    try {
-      return await getConvexClient().query(functions.drawingsListPresentations as any, {});
-    } catch (error) {
-      handleCloudFailure('load drawing presentations', error);
-    }
-  }
-
-  static async saveDrawingPresentation(presentations: { setTitle: string; timestamp: number }[]) {
-    const lastPresentation = presentations[presentations.length - 1];
-    if (!lastPresentation) {
-      return;
-    }
-
-    try {
-      await getConvexClient().mutation(
-        functions.drawingsInsertPresentation as any,
-        lastPresentation
-      );
-    } catch (error) {
-      handleCloudFailure('save drawing presentation', error);
     }
   }
 }

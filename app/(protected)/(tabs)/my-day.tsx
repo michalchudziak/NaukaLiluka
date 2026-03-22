@@ -14,9 +14,9 @@ import {
   spacing,
 } from '@/constants/ForestCampTheme';
 import { useBookStatus } from '@/hooks/useBooks';
+import { useDrawingsStatus } from '@/hooks/useDrawings';
 import { useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useDrawingsStore } from '@/store/drawings-store';
 import { useEquationsStore } from '@/store/equations-store';
 import { useMathStore } from '@/store/math-store';
 
@@ -85,7 +85,7 @@ export default function MyDayScreen() {
   const metrics = getForestCampMetrics(width);
   const noRepStatus = useNoRepStatus();
   const bookStatus = useBookStatus();
-  const drawingsStore = useDrawingsStore();
+  const drawingsStatus = useDrawingsStatus();
   const { isSessionCompletedToday: isMathSessionCompletedToday, currentDay } = useMathStore();
   const { isSessionCompletedToday: isEqSessionCompletedToday } = useEquationsStore();
 
@@ -110,7 +110,7 @@ export default function MyDayScreen() {
   const isSession3Completed =
     (s3?.isWordsCompleted && (!s3?.hasSentences || s3?.isSentencesCompleted)) ?? false;
 
-  const isDrawingsCompleted = drawingsStore.getTodayPresentationCount() > 0;
+  const isDrawingsCompleted = drawingsStatus?.completedToday ?? false;
 
   const isMathSession1Completed = currentDay <= 30 && isMathSessionCompletedToday('session1');
   const isMathSession2Completed = currentDay <= 30 && isMathSessionCompletedToday('session2');

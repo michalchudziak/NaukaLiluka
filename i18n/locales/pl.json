@@ -192,8 +192,8 @@
     "requestError": "Aplikacja nie może teraz połączyć się z chmurą. Sprawdź połączenie i spróbuj ponownie."
   },
   "drawings": {
-    "totalToday": "Prezentacje dzisiaj: {{count}}",
-    "presentedToday": "Pokazane dzisiaj: {{count}} razy"
+    "totalToday": "Sesja dzisiaj: {{count}}/1",
+    "presentedToday": "Zaliczone dzisiaj: {{count}} razy"
   },
   "myDay": {
     "title": "Dziejsze rutyny",

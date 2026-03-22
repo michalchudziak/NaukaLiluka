@@ -35,9 +35,19 @@ export default function TabLayout() {
         headerShown: false,
         headerShadowVisible: false,
         headerStyle: { backgroundColor: ForestCampTheme.colors.background },
+<<<<<<< ours
         headerTitleAlign: 'center',
         headerTintColor: ForestCampTheme.colors.primaryStrong,
         headerTitle: ({ children }) => <ThemedTitle>{children}</ThemedTitle>,
+=======
+        headerTitleAlign: 'left',
+        headerTintColor: ForestCampTheme.colors.primaryStrong,
+        headerTitleStyle: {
+          ...forestCampTypography.display,
+          fontSize: isTablet ? 36 : 30,
+          color: ForestCampTheme.colors.title,
+        },
+>>>>>>> theirs
         tabBarButton: HapticTab,
         tabBarHideOnKeyboard: true,
         tabBarStyle: [
@@ -61,7 +71,12 @@ export default function TabLayout() {
         name="my-day"
         options={{
           headerShown: true,
+<<<<<<< ours
           title: t('tabs.myDay'),
+=======
+          headerTitle: t('myDay.title'),
+          tabBarLabel: t('tabs.myDay'),
+>>>>>>> theirs
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="today" color={color} />,
         }}
       />
@@ -115,6 +130,25 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 14,
   },
+<<<<<<< ours
+=======
+  tabBarIos: {
+    position: 'absolute',
+    left: spacing.xl,
+    right: spacing.xl,
+    bottom: 10,
+    borderRadius: 30,
+    overflow: 'hidden',
+  },
+  tabBarDefault: {
+    position: 'absolute',
+    left: spacing.xl,
+    right: spacing.xl,
+    bottom: 10,
+    borderRadius: 30,
+    overflow: 'hidden',
+  },
+>>>>>>> theirs
   tabLabelPhone: {
     ...forestCampTypography.heading,
     fontSize: 11,
