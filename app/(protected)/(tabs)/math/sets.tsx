@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useNavigation, useRouter } from 'expo-router';
+import { useLayoutEffect, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ShapePicker, type ShapeType } from '@/components/ShapePicker';
@@ -29,8 +29,15 @@ export default function SetsScreen() {
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { getDailyData, markSessionCompleted, isSessionCompletedToday } = useMathStore();
   const { math } = useSettingsStore();
+  const navigation = useNavigation();
 
   const dailyData = getDailyData();
+
+  useLayoutEffect(() => {
+    if (dailyData) {
+      navigation.setOptions({ title: t('math.sets.dayTitle', { day: dailyData.activeDay }) });
+    }
+  }, [navigation, dailyData, t]);
 
   const handleSessionPress = async (sessionContent: SessionContent) => {
     if (!dailyData) return;
@@ -131,10 +138,6 @@ export default function SetsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText type="subtitle" style={styles.dayTitle}>
-          {t('math.sets.dayTitle', { day: dailyData.activeDay })}
-        </ThemedText>
-
         <View style={styles.sessionsContainer}>
           {renderSession(1)}
           {dailyData.sessionContent.length > 1 && renderSession(2)}
@@ -196,14 +199,6 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     gap: 10,
-  },
-  dayTitle: {
-    ...forestCampTypography.display,
-    fontSize: 34,
-    lineHeight: 38,
-    color: ForestCampTheme.colors.title,
-    textAlign: 'center',
-    marginBottom: 10,
   },
   noContentText: {
     ...forestCampTypography.heading,

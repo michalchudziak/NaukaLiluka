@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useNavigation, useRouter } from 'expo-router';
+import { useLayoutEffect, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { GuideCard } from '@/components/GuideCard';
@@ -30,6 +30,13 @@ export default function BooksDailyScreen() {
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const dailyPlan = useBookDailyContent();
   const completeSession = useCompleteBookSession();
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    if (dailyPlan) {
+      navigation.setOptions({ title: dailyPlan.activeBookTitle });
+    }
+  }, [navigation, dailyPlan]);
 
   const handleTrackPress = (
     sessionId: 'session1' | 'session2' | 'session3',
@@ -123,10 +130,6 @@ export default function BooksDailyScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText type="subtitle" style={styles.bookTitle}>
-          {dailyPlan.activeBookTitle}
-        </ThemedText>
-
         <GuideCard
           image={guideImage}
           title={t('booksDaily.guideTitle')}
@@ -185,13 +188,6 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     gap: spacing.md,
-  },
-  bookTitle: {
-    ...forestCampTypography.display,
-    fontSize: 34,
-    lineHeight: 38,
-    color: ForestCampTheme.colors.title,
-    textAlign: 'center',
   },
   noContentText: {
     ...forestCampTypography.heading,

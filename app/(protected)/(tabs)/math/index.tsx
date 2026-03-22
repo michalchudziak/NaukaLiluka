@@ -1,6 +1,5 @@
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import {
@@ -42,12 +41,8 @@ export default function MathScreen() {
   const nextModule = modules.find((module) => !module.isCompleted) ?? modules[0];
 
   return (
-    <SafeAreaView edges={['top']} style={styles.container}>
+    <View style={styles.container}>
       <View style={[styles.content, { paddingHorizontal: metrics.screenPadding }]}>
-        <ThemedText style={[styles.title, metrics.isTablet && styles.titleTablet]}>
-          {t('tabs.math')}
-        </ThemedText>
-
         <View style={styles.heroCard}>
           <View style={styles.heroHeader}>
             <ThemedText style={styles.heroTitle}>{t('myDay.mathSection')}</ThemedText>
@@ -82,7 +77,7 @@ export default function MathScreen() {
           ))}
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -95,18 +90,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: spacing.md,
     width: '100%',
-  },
-  title: {
-    ...forestCampTypography.display,
-    fontSize: 30,
-    lineHeight: 34,
-    color: ForestCampTheme.colors.title,
-    marginBottom: spacing.lg,
-  },
-  titleTablet: {
-    fontSize: 38,
-    lineHeight: 42,
-    marginBottom: spacing.xl,
   },
   heroCard: {
     borderRadius: ForestCampTheme.radius.lg,

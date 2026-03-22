@@ -1,3 +1,4 @@
+import { startOfDay } from 'date-fns';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
@@ -12,7 +13,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { spacing } from '@/constants/ForestCampTheme';
 import drawingSets from '@/content/drawings';
-import { useDrawingsStore } from '@/store/drawings-store';
+import { useCompleteDrawingSession } from '@/hooks/useDrawings';
 import { useSettingsStore } from '@/store/settings-store';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
@@ -20,13 +21,13 @@ const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 export default function DrawingDisplayScreen() {
   const { setId } = useLocalSearchParams<{ setId: string }>();
   const router = useRouter();
-  const drawingsStore = useDrawingsStore();
+  const completeDrawingSession = useCompleteDrawingSession();
   const settings = useSettingsStore();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(-1);
   const currentImageIndexRef = useRef(-1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const hasMarkedRef = useRef(false);
+  const hasCompletedRef = useRef(false);
   const [isPaused, setIsPaused] = useState(false);
 
   const opacity = useSharedValue(1);
@@ -38,13 +39,6 @@ export default function DrawingDisplayScreen() {
   });
 
   const imageSet = drawingSets.find((set) => set.title === setId);
-
-  useEffect(() => {
-    if (imageSet && !hasMarkedRef.current) {
-      hasMarkedRef.current = true;
-      drawingsStore.markSetPresented(imageSet.title);
-    }
-  }, [imageSet, drawingsStore]);
 
   const imageOrder = useMemo(() => {
     if (!imageSet) return [];
@@ -76,6 +70,20 @@ export default function DrawingDisplayScreen() {
     }
   }, []);
 
+  const handleSessionComplete = useCallback(() => {
+    if (imageSet && !hasCompletedRef.current) {
+      hasCompletedRef.current = true;
+      void completeDrawingSession({
+        setTitle: imageSet.title,
+        todayStartMs: startOfDay(new Date()).getTime(),
+      }).catch((error) => {
+        console.error('Failed to complete drawing session:', error);
+      });
+    }
+
+    router.back();
+  }, [completeDrawingSession, imageSet, router]);
+
   useEffect(() => {
     if (!imageSet || isPaused || imageOrder.length === 0) {
       clearCurrentInterval();
@@ -89,7 +97,7 @@ export default function DrawingDisplayScreen() {
         currentImageIndexRef.current = next;
         if (next >= imageOrder.length) {
           clearCurrentInterval();
-          router.back();
+          handleSessionComplete();
         } else {
           setCurrentImageIndex(next);
         }
@@ -106,7 +114,7 @@ export default function DrawingDisplayScreen() {
     fadeTransition,
     isPaused,
     clearCurrentInterval,
-    router,
+    handleSessionComplete,
   ]);
 
   const currentImage =

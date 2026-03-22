@@ -8,6 +8,7 @@ import {
   forestCampShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -27,6 +28,15 @@ export default function TabLayout() {
         tabBarActiveTintColor: ForestCampTheme.colors.primaryStrong,
         tabBarInactiveTintColor: ForestCampTheme.colors.textMuted,
         headerShown: false,
+        headerShadowVisible: false,
+        headerStyle: { backgroundColor: ForestCampTheme.colors.background },
+        headerTitleAlign: 'left',
+        headerTintColor: ForestCampTheme.colors.primaryStrong,
+        headerTitleStyle: {
+          ...forestCampTypography.display,
+          fontSize: isTablet ? 36 : 30,
+          color: ForestCampTheme.colors.title,
+        },
         tabBarButton: HapticTab,
         tabBarHideOnKeyboard: true,
         tabBarStyle: [
@@ -42,7 +52,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="my-day"
         options={{
-          title: t('tabs.myDay'),
+          headerShown: true,
+          headerTitle: t('myDay.title'),
+          tabBarLabel: t('tabs.myDay'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="today" color={color} />,
         }}
       />
@@ -63,6 +75,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="drawings"
         options={{
+          headerShown: true,
           title: t('tabs.pictures'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="draw" color={color} />,
         }}
@@ -97,16 +110,16 @@ const styles = StyleSheet.create({
   },
   tabBarIos: {
     position: 'absolute',
-    left: 12,
-    right: 12,
+    left: spacing.xl,
+    right: spacing.xl,
     bottom: 10,
     borderRadius: 30,
     overflow: 'hidden',
   },
   tabBarDefault: {
     position: 'absolute',
-    left: 12,
-    right: 12,
+    left: spacing.xl,
+    right: spacing.xl,
     bottom: 10,
     borderRadius: 30,
     overflow: 'hidden',

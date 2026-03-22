@@ -1,5 +1,4 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useHeaderHeight } from '@react-navigation/elements';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -29,7 +28,6 @@ export default function NoRepScreen() {
   const status = useNoRepStatus();
   const chooseAndMark = useChooseAndMark();
   const tabBarHeight = useBottomTabBarHeight();
-  const headerHeight = useHeaderHeight();
 
   const wordsCompletedToday = status?.isWordsCompletedToday ?? false;
   const sentencesCompletedToday = status?.isSentencesCompletedToday ?? false;
@@ -95,17 +93,13 @@ export default function NoRepScreen() {
         contentContainerStyle={[
           styles.scrollContent,
           {
-            paddingTop: headerHeight + spacing.sm,
+            paddingTop: spacing.md,
             paddingBottom: tabBarHeight + spacing.lg,
             paddingHorizontal: metrics.screenPadding,
           },
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText style={[styles.title, metrics.isTablet && styles.titleTablet]}>
-          {t('noRep.title')}
-        </ThemedText>
-
         <View style={[styles.guideCard, { maxWidth: metrics.maxContentWidth }]}>
           <View style={styles.guideRow}>
             <Image
@@ -170,17 +164,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ForestCampTheme.colors.background,
-  },
-  title: {
-    ...forestCampTypography.display,
-    fontSize: 30,
-    lineHeight: 34,
-    color: ForestCampTheme.colors.title,
-    alignSelf: 'flex-start',
-  },
-  titleTablet: {
-    fontSize: 36,
-    lineHeight: 40,
   },
   scrollContent: {
     flexGrow: 1,

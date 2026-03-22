@@ -1,37 +1,70 @@
 import { mutationGeneric as mutation, queryGeneric as query } from 'convex/server';
 import { v } from 'convex/values';
 import { requireCurrentUser } from './lib/current_user';
-import { drawingPresentationValidator } from './validators';
+import { drawingStatusValidator } from './validators';
 
-export const listPresentations = query({
-  args: {},
-  returns: v.array(drawingPresentationValidator),
-  handler: async (ctx) => {
+export const getTodayStatus = query({
+  args: {
+    todayStartMs: v.number(),
+  },
+  returns: drawingStatusValidator,
+  handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);
-    const presentations = await ctx.db
+    const completion = await ctx.db
       .query('drawingPresentations')
       .withIndex('by_user_and_presented_at', (q) => q.eq('userId', user._id))
-      .order('desc')
-      .collect();
+      .filter((q) => q.gte(q.field('presentedAt'), args.todayStartMs))
+      .first();
 
-    return presentations.map((item) => ({
-      setTitle: item.setTitle,
-      timestamp: item.presentedAt,
-    }));
+    if (!completion) {
+      return {
+        completedToday: false,
+        completedSetTitle: null,
+        completedAt: null,
+      };
+    }
+
+    return {
+      completedToday: true,
+      completedSetTitle: completion.setTitle,
+      completedAt: completion.presentedAt,
+    };
   },
 });
 
-export const insertPresentation = mutation({
-  args: drawingPresentationValidator.fields,
-  returns: v.null(),
+export const completeSession = mutation({
+  args: {
+    setTitle: v.string(),
+    todayStartMs: v.number(),
+  },
+  returns: drawingStatusValidator,
   handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);
+    const existingCompletion = await ctx.db
+      .query('drawingPresentations')
+      .withIndex('by_user_and_presented_at', (q) => q.eq('userId', user._id))
+      .filter((q) => q.gte(q.field('presentedAt'), args.todayStartMs))
+      .first();
+
+    if (existingCompletion) {
+      return {
+        completedToday: true,
+        completedSetTitle: existingCompletion.setTitle,
+        completedAt: existingCompletion.presentedAt,
+      };
+    }
+
+    const completedAt = Date.now();
     await ctx.db.insert('drawingPresentations', {
       userId: user._id,
       setTitle: args.setTitle,
-      presentedAt: args.timestamp,
+      presentedAt: completedAt,
     });
 
-    return null;
+    return {
+      completedToday: true,
+      completedSetTitle: args.setTitle,
+      completedAt,
+    };
   },
 });

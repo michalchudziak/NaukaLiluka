@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useNavigation, useRouter } from 'expo-router';
+import { useLayoutEffect, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
 import { ShapePicker, type ShapeType } from '@/components/ShapePicker';
@@ -29,8 +29,15 @@ export default function EquationsScreen() {
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { completedSessions, getDailyData, markSessionCompleted } = useEquationsStore();
   const { math } = useSettingsStore();
+  const navigation = useNavigation();
 
   const dailyData: DailyData = getDailyData();
+
+  useLayoutEffect(() => {
+    if (dailyData) {
+      navigation.setOptions({ title: t('math.equations.dayTitle', { day: dailyData.activeDay }) });
+    }
+  }, [navigation, dailyData, t]);
 
   const handleSessionPress = async (content: 'subitizing' | 'equations', sessionIndex: number) => {
     if (!dailyData) return;
@@ -120,10 +127,6 @@ export default function EquationsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText type="subtitle" style={styles.dayTitle}>
-          {t('math.equations.dayTitle', { day: dailyData.activeDay })}
-        </ThemedText>
-
         <View style={styles.sessionsContainer}>
           {renderSession(1)}
           {renderSession(2)}
@@ -185,14 +188,6 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     gap: 10,
-  },
-  dayTitle: {
-    ...forestCampTypography.display,
-    fontSize: 34,
-    lineHeight: 38,
-    color: ForestCampTheme.colors.title,
-    textAlign: 'center',
-    marginBottom: 10,
   },
   noContentText: {
     ...forestCampTypography.heading,

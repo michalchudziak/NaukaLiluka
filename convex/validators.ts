@@ -105,9 +105,10 @@ export const defaultSettings = {
   },
 } as const;
 
-export const drawingPresentationValidator = v.object({
-  setTitle: v.string(),
-  timestamp: v.number(),
+export const drawingStatusValidator = v.object({
+  completedToday: v.boolean(),
+  completedSetTitle: v.union(v.string(), v.null()),
+  completedAt: v.union(v.number(), v.null()),
 });
 
 export const mathProgressValidator = v.object({

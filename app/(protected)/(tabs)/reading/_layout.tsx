@@ -1,22 +1,37 @@
 import { Stack } from 'expo-router';
-import { ForestCampTheme } from '@/constants/ForestCampTheme';
+import { useWindowDimensions } from 'react-native';
+import {
+  ForestCampTheme,
+  forestCampTypography,
+  getForestCampMetrics,
+} from '@/constants/ForestCampTheme';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ReadingLayout() {
+  const { t } = useTranslation();
+  const { width } = useWindowDimensions();
+  const { isTablet } = getForestCampMetrics(width);
+
   return (
     <Stack
       screenOptions={{
-        headerTransparent: true,
-        headerTitle: '',
-        headerBackButtonDisplayMode: 'minimal',
         headerShadowVisible: false,
+        headerStyle: { backgroundColor: ForestCampTheme.colors.background },
+        headerTitleAlign: 'left',
+        headerBackButtonDisplayMode: 'minimal',
         headerTintColor: ForestCampTheme.colors.primaryStrong,
+        headerTitleStyle: {
+          ...forestCampTypography.display,
+          fontSize: isTablet ? 36 : 30,
+          color: ForestCampTheme.colors.title,
+        },
       }}
     >
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="no-rep-track" />
-      <Stack.Screen name="book-track" />
+      <Stack.Screen name="index" options={{ title: t('tabs.reading') }} />
+      <Stack.Screen name="no-rep-track" options={{ title: t('noRep.title') }} />
+      <Stack.Screen name="book-track" options={{ title: t('bookTrack.title') }} />
       <Stack.Screen name="books-daily" />
-      <Stack.Screen name="books-list" />
+      <Stack.Screen name="books-list" options={{ title: t('booksList.title') }} />
     </Stack>
   );
 }
