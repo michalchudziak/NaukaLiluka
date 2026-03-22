@@ -53,7 +53,9 @@
     "booksList": "Lista książek",
     "selectColor": "Wybierz kolor",
     "wordsTrack": "Słowa",
-    "sentencesTrack": "Zdania"
+    "sentencesTrack": "Zdania",
+    "guideTitle": "Jak korzystać?",
+    "guideBody": "Wybierz ścieżkę i czytaj dziecku to, co widzisz na ekranie. Książki prowadzą przez trening i gotowe lektury, a Bez powtórzeń pokazuje nowe słowa i zdania."
   },
   "noRep": {
     "words": "Słowa",
@@ -193,7 +195,9 @@
   },
   "drawings": {
     "totalToday": "Sesja dzisiaj: {{count}}/1",
-    "presentedToday": "Zaliczone dzisiaj: {{count}} razy"
+    "presentedToday": "Zaliczone dzisiaj: {{count}} razy",
+    "guideTitle": "Jak to działa?",
+    "guideBody": "Pokazuj dziecku obrazki i czytaj je na głos. W ustawieniach możesz włączyć ledwo widoczne ciekawostki. Przytrzymaj palec na ekranie, aby zatrzymać obrazek."
   },
   "myDay": {
     "title": "Dziejsze rutyny",

@@ -1,5 +1,7 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { GuideCard } from '@/components/GuideCard';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import {
@@ -13,11 +15,15 @@ import { useBookStatus } from '@/hooks/useBooks';
 import { useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const guideImage = require('@/assets/images/guides/reading.png');
+
 export default function ReadingScreen() {
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
   const { t } = useTranslation();
   const router = useRouter();
+  const tabBarHeight = useBottomTabBarHeight();
   const noRepStatus = useNoRepStatus();
   const bookStatus = useBookStatus();
   const isNoRepPathCompleted =
@@ -45,8 +51,17 @@ export default function ReadingScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.content, { paddingHorizontal: metrics.screenPadding }]}>
-        <View style={styles.heroCard}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingHorizontal: metrics.screenPadding,
+            paddingBottom: tabBarHeight + spacing.lg,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={[styles.heroCard, { maxWidth: metrics.maxContentWidth }]}>
           <View style={styles.heroHeader}>
             <ThemedText style={styles.heroTitle}>{t('myDay.readingSection')}</ThemedText>
             <View style={styles.percentBadge}>
@@ -68,7 +83,13 @@ export default function ReadingScreen() {
           </View>
         </View>
 
-        <View style={styles.moduleCard}>
+        <GuideCard
+          image={guideImage}
+          title={t('reading.guideTitle')}
+          body={t('reading.guideBody')}
+        />
+
+        <View style={[styles.moduleCard, { maxWidth: metrics.maxContentWidth }]}>
           {modules.map((module) => (
             <StateActionRow
               key={module.id}
@@ -79,7 +100,7 @@ export default function ReadingScreen() {
             />
           ))}
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -90,17 +111,20 @@ const styles = StyleSheet.create({
     backgroundColor: ForestCampTheme.colors.background,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     paddingTop: spacing.md,
     width: '100%',
+    gap: spacing.lg,
   },
   heroCard: {
+    width: '100%',
     borderRadius: ForestCampTheme.radius.lg,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
     padding: spacing.lg,
     gap: spacing.md,
+    alignSelf: 'center',
     ...forestCampSoftShadow,
   },
   heroHeader: {
@@ -162,13 +186,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   moduleCard: {
-    marginTop: spacing.lg,
+    width: '100%',
     borderRadius: ForestCampTheme.radius.lg,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
     padding: spacing.md,
     gap: spacing.sm,
+    alignSelf: 'center',
     ...forestCampSoftShadow,
   },
 });

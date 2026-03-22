@@ -1,5 +1,7 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { FlatList, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { GuideCard } from '@/components/GuideCard';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import {
@@ -13,6 +15,9 @@ import drawingsData from '@/content/drawings/index';
 import { useDrawingsStatus } from '@/hooks/useDrawings';
 import { useTranslation } from '@/hooks/useTranslation';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const guideImage = require('@/assets/images/guides/drawing.png');
+
 function ListSeparator() {
   return <View style={styles.separator} />;
 }
@@ -24,6 +29,7 @@ export default function DrawingsScreen() {
   const todayTotal = status?.completedToday ? 1 : 0;
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
+  const tabBarHeight = useBottomTabBarHeight();
 
   const progressPercent = todayTotal * 100;
 
@@ -52,35 +58,51 @@ export default function DrawingsScreen() {
     );
   };
 
+  const listHeader = (
+    <View style={styles.headerContent}>
+      <GuideCard
+        image={guideImage}
+        title={t('drawings.guideTitle')}
+        body={t('drawings.guideBody')}
+      />
+
+      <ThemedView style={styles.header}>
+        <View style={styles.headerTop}>
+          <ThemedText type="subtitle" style={styles.totalCounter}>
+            {t('drawings.totalToday', { count: todayTotal })}
+          </ThemedText>
+        </View>
+
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
+        </View>
+
+        <ThemedText style={styles.progressText}>
+          {todayTotal > 0 ? t('myDay.doneStatus') : t('myDay.pendingStatus')}
+        </ThemedText>
+      </ThemedView>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <View style={[styles.content, { paddingHorizontal: metrics.screenPadding }]}>
-        <ThemedView style={styles.header}>
-          <View style={styles.headerTop}>
-            <ThemedText type="subtitle" style={styles.totalCounter}>
-              {t('drawings.totalToday', { count: todayTotal })}
-            </ThemedText>
-          </View>
-
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
-          </View>
-
-          <ThemedText style={styles.progressText}>
-            {todayTotal > 0 ? t('myDay.doneStatus') : t('myDay.pendingStatus')}
-          </ThemedText>
-        </ThemedView>
-
-        <FlatList
-          style={styles.list}
-          data={drawingsData}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.title}
-          contentContainerStyle={[styles.listContent, { maxWidth: metrics.maxContentWidth }]}
-          ItemSeparatorComponent={ListSeparator}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
+      <FlatList
+        style={styles.list}
+        data={drawingsData}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.title}
+        ListHeaderComponent={listHeader}
+        contentContainerStyle={[
+          styles.listContent,
+          {
+            paddingHorizontal: metrics.screenPadding,
+            paddingBottom: tabBarHeight + spacing.lg,
+            maxWidth: metrics.maxContentWidth,
+          },
+        ]}
+        ItemSeparatorComponent={ListSeparator}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 }
@@ -90,13 +112,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: ForestCampTheme.colors.background,
   },
-  content: {
-    flex: 1,
-    alignItems: 'stretch',
-    width: '100%',
-  },
   list: {
     width: '100%',
+  },
+  headerContent: {
+    gap: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
   },
   header: {
     width: '100%',
@@ -139,8 +161,6 @@ const styles = StyleSheet.create({
   listContent: {
     width: '100%',
     alignSelf: 'center',
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
   },
   setCard: {
     backgroundColor: ForestCampTheme.colors.card,

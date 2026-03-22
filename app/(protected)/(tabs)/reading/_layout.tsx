@@ -1,30 +1,20 @@
 import { Stack } from 'expo-router';
-import { useWindowDimensions } from 'react-native';
-import {
-  ForestCampTheme,
-  forestCampTypography,
-  getForestCampMetrics,
-} from '@/constants/ForestCampTheme';
+import { ThemedTitle } from '@/components/ThemedTitle';
+import { ForestCampTheme } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ReadingLayout() {
   const { t } = useTranslation();
-  const { width } = useWindowDimensions();
-  const { isTablet } = getForestCampMetrics(width);
 
   return (
     <Stack
       screenOptions={{
         headerShadowVisible: false,
         headerStyle: { backgroundColor: ForestCampTheme.colors.background },
-        headerTitleAlign: 'left',
+        headerTitleAlign: 'center',
         headerBackButtonDisplayMode: 'minimal',
         headerTintColor: ForestCampTheme.colors.primaryStrong,
-        headerTitleStyle: {
-          ...forestCampTypography.display,
-          fontSize: isTablet ? 36 : 30,
-          color: ForestCampTheme.colors.title,
-        },
+        headerTitle: ({ children }) => <ThemedTitle>{children}</ThemedTitle>,
       }}
     >
       <Stack.Screen name="index" options={{ title: t('tabs.reading') }} />

@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
+import { ThemedTitle } from '@/components/ThemedTitle';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import {
   ForestCampTheme,
@@ -32,13 +33,9 @@ export default function TabLayout() {
         headerShown: false,
         headerShadowVisible: false,
         headerStyle: { backgroundColor: ForestCampTheme.colors.background },
-        headerTitleAlign: 'left',
+        headerTitleAlign: 'center',
         headerTintColor: ForestCampTheme.colors.primaryStrong,
-        headerTitleStyle: {
-          ...forestCampTypography.display,
-          fontSize: isTablet ? 36 : 30,
-          color: ForestCampTheme.colors.title,
-        },
+        headerTitle: ({ children }) => <ThemedTitle>{children}</ThemedTitle>,
         tabBarButton: HapticTab,
         tabBarHideOnKeyboard: true,
         tabBarStyle: [
@@ -62,8 +59,7 @@ export default function TabLayout() {
         name="my-day"
         options={{
           headerShown: true,
-          headerTitle: t('myDay.title'),
-          tabBarLabel: t('tabs.myDay'),
+          title: t('tabs.myDay'),
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="today" color={color} />,
         }}
       />
@@ -102,6 +98,8 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBarBase: {
+    marginHorizontal: spacing.xl,
+    alignSelf: 'center',
     borderWidth: 1,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.tabSurface,
