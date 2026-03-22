@@ -63,13 +63,6 @@ export default defineSchema({
     completedSessions: v.array(mathSessionValidator),
   }).index('by_user', ['userId']),
 
-  mathSessionCompletions: defineTable({
-    userId: v.id('users'),
-    sessionType: mathSessionValidator,
-    dayNumber: v.number(),
-    completedAt: v.number(),
-  }).index('by_user_and_completed_at', ['userId', 'completedAt']),
-
   equationsProgress: defineTable({
     userId: v.id('users'),
     currentDay: v.number(),
@@ -77,12 +70,4 @@ export default defineSchema({
     lastSessionDate: v.union(v.string(), v.null()),
     completedSessions: v.array(equationSessionValidator),
   }).index('by_user', ['userId']),
-
-  equationsSessionCompletions: defineTable({
-    userId: v.id('users'),
-    sessionType: equationSessionValidator,
-    category: equationCategoryValidator,
-    dayNumber: v.number(),
-    completedAt: v.number(),
-  }).index('by_user_and_completed_at', ['userId', 'completedAt']),
 });

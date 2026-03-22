@@ -250,6 +250,8 @@
     "numberSets": "Liczby",
     "title": "Matematyka",
     "back": "Wróć",
+    "guideTitle": "Jak korzystać z matematyki?",
+    "guideBody": "Najpierw codziennie pracujecie z liczbami i zbiorami. Po ukończeniu tego etapu przechodzicie do równań. Każdy ekran prowadzi przez dwa krótkie bloki, które zaliczają dzień.",
     "sets": {
       "title": "Liczby",
       "back": "Wróć",
@@ -257,6 +259,8 @@
       "numbers": "Liczby",
       "ordered": "Uporządkowane",
       "unordered": "Nieuporządkowane",
+      "guideTitle": "Jak pokazywać liczby?",
+      "guideBody": "W każdej sesji pokazuj dziecku to, co widzisz na ekranie: najpierw zbiory do podliczania, a później także liczby uporządkowane i nieuporządkowane. Po ukończeniu obu sesji dzień liczb jest zaliczony.",
       "selectColor": "Wybierz kolor",
       "selectShape": "Wybierz kształt",
       "dayTitle": "Dzień {{day}}"
@@ -265,6 +269,8 @@
       "title": "Równania",
       "subitizing": "Podliczanie",
       "equations": "Równania",
+      "guideTitle": "Jak pokazywać równania?",
+      "guideBody": "Po etapie liczb przechodzicie do równań. W zależności od dnia pojawiają się same równania albo krótka rozgrzewka z podliczaniem. Ukończenie obu sesji przygotowuje kolejny dzień lub kategorię.",
       "dayTitle": "Dzień {{day}}"
     }
   }

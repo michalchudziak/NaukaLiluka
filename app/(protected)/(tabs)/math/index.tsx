@@ -1,5 +1,7 @@
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { GuideCard } from '@/components/GuideCard';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import {
@@ -9,29 +11,32 @@ import {
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
+import { useEquationsStatus, useMathStatus } from '@/hooks/useMath';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useEquationsStore } from '@/store/equations-store';
-import { useMathStore } from '@/store/math-store';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const guideImage = require('@/assets/images/guides/math.png');
 
 export default function MathScreen() {
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
   const { t } = useTranslation();
   const router = useRouter();
-  const { isDayCompleted, currentDay } = useMathStore();
-  const { isDayCompleted: isEquationsDayCompleted } = useEquationsStore();
+  const tabBarHeight = useBottomTabBarHeight();
+  const { isDayCompleted, currentDay, hasGraduatedToEquations } = useMathStatus();
+  const { isDayCompleted: isEquationsDayCompleted } = useEquationsStatus();
 
   const modules = [
     {
       id: 'number-sets',
       title: t('math.numberSets'),
-      isCompleted: isDayCompleted(),
+      isCompleted: hasGraduatedToEquations || isDayCompleted,
       onPress: () => router.push('/math/sets'),
     },
     {
       id: 'equations',
       title: t('math.equations.title'),
-      isCompleted: isEquationsDayCompleted(),
+      isCompleted: hasGraduatedToEquations ? isEquationsDayCompleted : false,
       onPress: () => router.push('/math/equations'),
     },
   ] as const;
@@ -42,8 +47,17 @@ export default function MathScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.content, { paddingHorizontal: metrics.screenPadding }]}>
-        <View style={styles.heroCard}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingHorizontal: metrics.screenPadding,
+            paddingBottom: tabBarHeight + spacing.lg,
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={[styles.heroCard, { maxWidth: metrics.maxContentWidth }]}>
           <View style={styles.heroHeader}>
             <ThemedText style={styles.heroTitle}>{t('myDay.mathSection')}</ThemedText>
             <View style={styles.percentBadge}>
@@ -65,7 +79,9 @@ export default function MathScreen() {
           </View>
         </View>
 
-        <View style={styles.moduleCard}>
+        <GuideCard image={guideImage} title={t('math.guideTitle')} body={t('math.guideBody')} />
+
+        <View style={[styles.moduleCard, { maxWidth: metrics.maxContentWidth }]}>
           {modules.map((module) => (
             <StateActionRow
               key={module.id}
@@ -76,7 +92,7 @@ export default function MathScreen() {
             />
           ))}
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -87,17 +103,20 @@ const styles = StyleSheet.create({
     backgroundColor: ForestCampTheme.colors.background,
   },
   content: {
-    flex: 1,
+    flexGrow: 1,
     paddingTop: spacing.md,
     width: '100%',
+    gap: spacing.lg,
   },
   heroCard: {
+    width: '100%',
     borderRadius: ForestCampTheme.radius.lg,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
     padding: spacing.lg,
     gap: spacing.md,
+    alignSelf: 'center',
     ...forestCampSoftShadow,
   },
   heroHeader: {
@@ -161,13 +180,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   moduleCard: {
-    marginTop: spacing.lg,
+    width: '100%',
     borderRadius: ForestCampTheme.radius.lg,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
     backgroundColor: ForestCampTheme.colors.card,
     padding: spacing.md,
     gap: spacing.sm,
+    alignSelf: 'center',
     ...forestCampSoftShadow,
   },
 });

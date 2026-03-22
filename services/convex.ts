@@ -7,23 +7,9 @@ const functions = {
   usersUpdateProfile: 'users:updateProfile',
   settingsGet: 'settings:get',
   settingsUpsert: 'settings:upsert',
-  mathGetProgress: 'math:getProgress',
-  mathUpsertProgress: 'math:upsertProgress',
-  mathInsertSessionCompletion: 'math:insertSessionCompletion',
-  equationsGetProgress: 'equations:getProgress',
-  equationsUpsertProgress: 'equations:upsertProgress',
-  equationsInsertSessionCompletion: 'equations:insertSessionCompletion',
 } as const;
 
 let convexClient: ConvexReactClient | null = null;
-
-type MathSession =
-  | 'subitizingOrdered'
-  | 'subitizingUnordered'
-  | 'numbersOrdered'
-  | 'numbersUnordered';
-type EquationSession = 'subitizing1' | 'subitizing2' | 'equations1' | 'equations2';
-type EquationCategory = 'integer' | 'fraction' | 'decimal' | 'negative' | 'percentage';
 
 type SettingsSnapshot = {
   reading: {
@@ -65,32 +51,6 @@ type AppUser = {
   email: string;
   name?: string;
   createdAt: number;
-};
-
-type MathProgress = {
-  currentDay: number;
-  lastSessionDate: string | null;
-  completedSessions: MathSession[];
-};
-
-type MathSessionCompletion = {
-  session: MathSession;
-  day: number;
-  timestamp?: number;
-};
-
-type EquationsProgress = {
-  currentDay: number;
-  currentCategory: EquationCategory;
-  lastSessionDate: string | null;
-  completedSessions: EquationSession[];
-};
-
-type EquationsSessionCompletion = {
-  session: EquationSession;
-  day: number;
-  category: EquationCategory;
-  timestamp?: number;
 };
 
 export class CloudConfigurationError extends Error {
@@ -183,67 +143,6 @@ export class ConvexService {
       });
     } catch (error) {
       handleCloudFailure('save settings', error);
-    }
-  }
-
-  static async getMathProgress(): Promise<MathProgress> {
-    try {
-      return await getConvexClient().query(functions.mathGetProgress as any, {});
-    } catch (error) {
-      handleCloudFailure('load math progress', error);
-    }
-  }
-
-  static async updateMathProgress(progress: MathProgress) {
-    try {
-      await getConvexClient().mutation(functions.mathUpsertProgress as any, {
-        progress,
-      });
-    } catch (error) {
-      handleCloudFailure('save math progress', error);
-    }
-  }
-
-  static async saveMathSessionCompletion(completionData: MathSessionCompletion) {
-    try {
-      await getConvexClient().mutation(functions.mathInsertSessionCompletion as any, {
-        session: completionData.session,
-        day: completionData.day,
-        timestamp: completionData.timestamp ?? Date.now(),
-      });
-    } catch (error) {
-      handleCloudFailure('save math session completion', error);
-    }
-  }
-
-  static async getEquationsProgress(): Promise<EquationsProgress> {
-    try {
-      return await getConvexClient().query(functions.equationsGetProgress as any, {});
-    } catch (error) {
-      handleCloudFailure('load equations progress', error);
-    }
-  }
-
-  static async updateEquationsProgress(progress: EquationsProgress) {
-    try {
-      await getConvexClient().mutation(functions.equationsUpsertProgress as any, {
-        progress,
-      });
-    } catch (error) {
-      handleCloudFailure('save equations progress', error);
-    }
-  }
-
-  static async saveEquationsSessionCompletion(completionData: EquationsSessionCompletion) {
-    try {
-      await getConvexClient().mutation(functions.equationsInsertSessionCompletion as any, {
-        session: completionData.session,
-        day: completionData.day,
-        category: completionData.category,
-        timestamp: completionData.timestamp ?? Date.now(),
-      });
-    } catch (error) {
-      handleCloudFailure('save equations session completion', error);
     }
   }
 }

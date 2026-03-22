@@ -7,8 +7,6 @@ import { ThemedView } from '@/components/ThemedView';
 import { ForestCampTheme, forestCampTypography } from '@/constants/ForestCampTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { CloudConfigurationError, ConvexService, ignoreCloudFailure } from '@/services/convex';
-import { useEquationsStore } from './equations-store';
-import { useMathStore } from './math-store';
 import { resetAllStores } from './reset-stores';
 import { useSettingsStore } from './settings-store';
 
@@ -61,11 +59,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const syncStoresInBackground = useCallback(() => {
     void (async () => {
       await useSettingsStore.getState().syncFromCloud().catch(ignoreCloudFailure);
-
-      await Promise.all([
-        useMathStore.getState().syncFromCloud().catch(ignoreCloudFailure),
-        useEquationsStore.getState().syncFromCloud().catch(ignoreCloudFailure),
-      ]);
     })();
   }, []);
 

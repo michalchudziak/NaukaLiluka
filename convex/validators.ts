@@ -125,12 +125,6 @@ export const defaultMathProgress = {
   >,
 };
 
-export const mathSessionCompletionValidator = v.object({
-  session: mathSessionValidator,
-  day: v.number(),
-  timestamp: v.number(),
-});
-
 export const equationsProgressValidator = v.object({
   currentDay: v.number(),
   currentCategory: equationCategoryValidator,
@@ -144,10 +138,3 @@ export const defaultEquationsProgress = {
   lastSessionDate: null,
   completedSessions: [] as Array<'subitizing1' | 'subitizing2' | 'equations1' | 'equations2'>,
 };
-
-export const equationsSessionCompletionValidator = v.object({
-  session: equationSessionValidator,
-  day: v.number(),
-  category: equationCategoryValidator,
-  timestamp: v.number(),
-});

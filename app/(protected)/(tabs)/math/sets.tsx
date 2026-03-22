@@ -3,6 +3,7 @@ import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
+import { GuideCard } from '@/components/GuideCard';
 import { ShapePicker, type ShapeType } from '@/components/ShapePicker';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
@@ -12,12 +13,16 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { WordColors } from '@/constants/WordColors';
 import type { SessionContent } from '@/content/math/learning-scheme';
+import { type MathSession, useCompleteMathSession, useMathStatus } from '@/hooks/useMath';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useMathStore } from '@/store/math-store';
 import { useSettingsStore } from '@/store/settings-store';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const guideImage = require('@/assets/images/guides/math.png');
 
 export default function SetsScreen() {
   const { t } = useTranslation();
@@ -27,22 +32,18 @@ export default function SetsScreen() {
   const metrics = getForestCampMetrics(width);
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
-  const { getDailyData, markSessionCompleted, isSessionCompletedToday } = useMathStore();
+  const { currentDay, dailyData, isSessionCompletedToday } = useMathStatus();
+  const completeSession = useCompleteMathSession();
   const { math } = useSettingsStore();
 
-  const dailyData = getDailyData();
-
   const handleSessionPress = async (sessionContent: SessionContent) => {
-    if (!dailyData) return;
-
     const numbers = sessionContent.isOrdered
       ? dailyData.numbers
       : [...dailyData.numbers].sort(() => Math.random() - 0.5);
 
-    const sessionType =
-      `${sessionContent.type}${sessionContent.isOrdered ? 'Ordered' : 'Unordered'}` as Parameters<
-        typeof markSessionCompleted
-      >[0];
+    const sessionType = `${sessionContent.type}${
+      sessionContent.isOrdered ? 'Ordered' : 'Unordered'
+    }` as MathSession;
 
     if (sessionContent.type === 'subitizing') {
       router.push({
@@ -68,7 +69,7 @@ export default function SetsScreen() {
     }
 
     setTimeout(() => {
-      markSessionCompleted(sessionType);
+      void completeSession(sessionType);
     }, 1000);
   };
 
@@ -108,31 +109,26 @@ export default function SetsScreen() {
     );
   };
 
-  if (!dailyData) {
-    return (
-      <ThemedView
-        style={[styles.container, styles.centerContent, { marginBottom: bottomTabBarHeight }]}
-      >
-        <ThemedText style={styles.noContentText}>{t('booksDaily.noContent')}</ThemedText>
-      </ThemedView>
-    );
-  }
-
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: t('math.sets.dayTitle', { day: dailyData.activeDay }) }} />
+      <Stack.Screen options={{ title: t('math.sets.dayTitle', { day: currentDay }) }} />
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
           {
-            marginBottom: bottomTabBarHeight + 8,
+            paddingBottom: bottomTabBarHeight + spacing.lg,
             paddingHorizontal: metrics.screenPadding,
-            maxWidth: metrics.maxContentWidth,
           },
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.sessionsContainer}>
+        <GuideCard
+          image={guideImage}
+          title={t('math.sets.guideTitle')}
+          body={t('math.sets.guideBody')}
+        />
+
+        <View style={[styles.sessionsContainer, { maxWidth: metrics.maxContentWidth }]}>
           {renderSession(1)}
           {dailyData.sessionContent.length > 1 && renderSession(2)}
         </View>
@@ -160,29 +156,23 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
     width: '100%',
     alignSelf: 'center',
-    paddingTop: 14,
-    paddingBottom: 32,
-    gap: 14,
-  },
-  centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingTop: spacing.md,
+    gap: spacing.lg,
   },
   sessionsContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    gap: 18,
+    width: '100%',
+    alignSelf: 'center',
+    gap: spacing.lg,
   },
   sessionRow: {
-    gap: 10,
+    gap: spacing.sm,
     borderRadius: ForestCampTheme.radius.lg,
     backgroundColor: ForestCampTheme.colors.card,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
-    padding: 14,
+    padding: spacing.lg,
     ...forestCampSoftShadow,
   },
   sessionLabel: {
@@ -192,12 +182,6 @@ const styles = StyleSheet.create({
     color: ForestCampTheme.colors.title,
   },
   buttonsContainer: {
-    gap: 10,
-  },
-  noContentText: {
-    ...forestCampTypography.heading,
-    fontSize: 18,
-    color: ForestCampTheme.colors.textMuted,
-    textAlign: 'center',
+    gap: spacing.sm,
   },
 });

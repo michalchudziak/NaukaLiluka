@@ -3,6 +3,7 @@ import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
+import { GuideCard } from '@/components/GuideCard';
 import { ShapePicker, type ShapeType } from '@/components/ShapePicker';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
@@ -12,12 +13,19 @@ import {
   forestCampSoftShadow,
   forestCampTypography,
   getForestCampMetrics,
+  spacing,
 } from '@/constants/ForestCampTheme';
 import { WordColors } from '@/constants/WordColors';
-import type { DailyData } from '@/content/math/equation-scheme';
+import {
+  type EquationSession,
+  useCompleteEquationSession,
+  useEquationsStatus,
+} from '@/hooks/useMath';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useEquationsStore } from '@/store/equations-store';
 import { useSettingsStore } from '@/store/settings-store';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const guideImage = require('@/assets/images/guides/math.png');
 
 export default function EquationsScreen() {
   const { t } = useTranslation();
@@ -27,17 +35,12 @@ export default function EquationsScreen() {
   const metrics = getForestCampMetrics(width);
   const [selectedColor, setSelectedColor] = useState(WordColors[1].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
-  const { completedSessions, getDailyData, markSessionCompleted } = useEquationsStore();
+  const { currentDay, completedSessionsToday, dailyData } = useEquationsStatus();
+  const completeSession = useCompleteEquationSession();
   const { math } = useSettingsStore();
 
-  const dailyData: DailyData = getDailyData();
-
   const handleSessionPress = async (content: 'subitizing' | 'equations', sessionIndex: number) => {
-    if (!dailyData) return;
-
-    const token = `${content}${sessionIndex === 0 ? '1' : '2'}` as Parameters<
-      typeof markSessionCompleted
-    >[0];
+    const token = `${content}${sessionIndex === 0 ? '1' : '2'}` as EquationSession;
 
     if (content === 'subitizing') {
       router.push({
@@ -62,7 +65,7 @@ export default function EquationsScreen() {
     }
 
     setTimeout(() => {
-      markSessionCompleted(token);
+      void completeSession(token);
     }, 1000);
   };
 
@@ -71,7 +74,7 @@ export default function EquationsScreen() {
     const sessionIndex = sessionNumber - 1;
 
     const isRoutineCompleted = (routine: 'subitizing' | 'equations', index: number) =>
-      completedSessions.includes(`${routine}${index === 0 ? '1' : '2'}`);
+      completedSessionsToday.includes(`${routine}${index === 0 ? '1' : '2'}` as EquationSession);
 
     return (
       <View key={sessionKey} style={styles.sessionRow}>
@@ -97,33 +100,26 @@ export default function EquationsScreen() {
     );
   };
 
-  if (!dailyData) {
-    return (
-      <ThemedView
-        style={[styles.container, styles.centerContent, { marginBottom: bottomTabBarHeight }]}
-      >
-        <ThemedText style={styles.noContentText}>{t('booksDaily.noContent')}</ThemedText>
-      </ThemedView>
-    );
-  }
-
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen
-        options={{ title: t('math.equations.dayTitle', { day: dailyData.activeDay }) }}
-      />
+      <Stack.Screen options={{ title: t('math.equations.dayTitle', { day: currentDay }) }} />
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
           {
-            marginBottom: bottomTabBarHeight + 8,
+            paddingBottom: bottomTabBarHeight + spacing.lg,
             paddingHorizontal: metrics.screenPadding,
-            maxWidth: metrics.maxContentWidth,
           },
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.sessionsContainer}>
+        <GuideCard
+          image={guideImage}
+          title={t('math.equations.guideTitle')}
+          body={t('math.equations.guideBody')}
+        />
+
+        <View style={[styles.sessionsContainer, { maxWidth: metrics.maxContentWidth }]}>
           {renderSession(1)}
           {renderSession(2)}
         </View>
@@ -151,29 +147,23 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
     width: '100%',
     alignSelf: 'center',
-    paddingTop: 14,
-    paddingBottom: 32,
-    gap: 14,
-  },
-  centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingTop: spacing.md,
+    gap: spacing.lg,
   },
   sessionsContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    gap: 18,
+    width: '100%',
+    alignSelf: 'center',
+    gap: spacing.lg,
   },
   sessionRow: {
-    gap: 10,
+    gap: spacing.sm,
     borderRadius: ForestCampTheme.radius.lg,
     backgroundColor: ForestCampTheme.colors.card,
     borderWidth: 2,
     borderColor: ForestCampTheme.colors.border,
-    padding: 14,
+    padding: spacing.lg,
     ...forestCampSoftShadow,
   },
   sessionLabel: {
@@ -183,12 +173,6 @@ const styles = StyleSheet.create({
     color: ForestCampTheme.colors.title,
   },
   buttonsContainer: {
-    gap: 10,
-  },
-  noContentText: {
-    ...forestCampTypography.heading,
-    fontSize: 18,
-    color: ForestCampTheme.colors.textMuted,
-    textAlign: 'center',
+    gap: spacing.sm,
   },
 });

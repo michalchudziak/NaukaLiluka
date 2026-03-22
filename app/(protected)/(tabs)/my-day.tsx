@@ -15,10 +15,9 @@ import {
 } from '@/constants/ForestCampTheme';
 import { useBookStatus } from '@/hooks/useBooks';
 import { useDrawingsStatus } from '@/hooks/useDrawings';
+import { useEquationsStatus, useMathStatus } from '@/hooks/useMath';
 import { useNoRepStatus } from '@/hooks/useNoRep';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useEquationsStore } from '@/store/equations-store';
-import { useMathStore } from '@/store/math-store';
 
 type RoutineItem = {
   id: string;
@@ -86,8 +85,12 @@ export default function MyDayScreen() {
   const noRepStatus = useNoRepStatus();
   const bookStatus = useBookStatus();
   const drawingsStatus = useDrawingsStatus();
-  const { isSessionCompletedToday: isMathSessionCompletedToday, currentDay } = useMathStore();
-  const { isSessionCompletedToday: isEqSessionCompletedToday } = useEquationsStore();
+  const {
+    currentDay,
+    hasGraduatedToEquations,
+    isSessionCompletedToday: isMathSessionCompletedToday,
+  } = useMathStatus();
+  const { isSessionCompletedToday: isEqSessionCompletedToday } = useEquationsStatus();
 
   const [showCompleted, setShowCompleted] = useState(true);
 
@@ -112,10 +115,12 @@ export default function MyDayScreen() {
 
   const isDrawingsCompleted = drawingsStatus?.completedToday ?? false;
 
-  const isMathSession1Completed = currentDay <= 30 && isMathSessionCompletedToday('session1');
-  const isMathSession2Completed = currentDay <= 30 && isMathSessionCompletedToday('session2');
-  const isEqSession1Completed = currentDay > 30 && isEqSessionCompletedToday('session1');
-  const isEqSession2Completed = currentDay > 30 && isEqSessionCompletedToday('session2');
+  const isMathSession1Completed =
+    !hasGraduatedToEquations && isMathSessionCompletedToday('session1');
+  const isMathSession2Completed =
+    !hasGraduatedToEquations && isMathSessionCompletedToday('session2');
+  const isEqSession1Completed = hasGraduatedToEquations && isEqSessionCompletedToday('session1');
+  const isEqSession2Completed = hasGraduatedToEquations && isEqSessionCompletedToday('session2');
 
   type TabName = 'my-day' | 'reading' | 'math' | 'drawings' | 'settings';
 
@@ -227,36 +232,35 @@ export default function MyDayScreen() {
     },
   ];
 
-  const mathRoutines: RoutineItem[] =
-    currentDay > 30
-      ? [
-          {
-            id: 'eq-session-1',
-            title: t('myDay.equationsSet1'),
-            isCompleted: isEqSession1Completed,
-            onPress: navigateToEquations,
-          },
-          {
-            id: 'eq-session-2',
-            title: t('myDay.equationsSet2'),
-            isCompleted: isEqSession2Completed,
-            onPress: navigateToEquations,
-          },
-        ]
-      : [
-          {
-            id: 'math-session-1',
-            title: t('myDay.mathSet1'),
-            isCompleted: isMathSession1Completed,
-            onPress: navigateToSets,
-          },
-          {
-            id: 'math-session-2',
-            title: t('myDay.mathSet2'),
-            isCompleted: isMathSession2Completed,
-            onPress: navigateToSets,
-          },
-        ];
+  const mathRoutines: RoutineItem[] = hasGraduatedToEquations
+    ? [
+        {
+          id: 'eq-session-1',
+          title: t('myDay.equationsSet1'),
+          isCompleted: isEqSession1Completed,
+          onPress: navigateToEquations,
+        },
+        {
+          id: 'eq-session-2',
+          title: t('myDay.equationsSet2'),
+          isCompleted: isEqSession2Completed,
+          onPress: navigateToEquations,
+        },
+      ]
+    : [
+        {
+          id: 'math-session-1',
+          title: t('myDay.mathSet1'),
+          isCompleted: isMathSession1Completed,
+          onPress: navigateToSets,
+        },
+        {
+          id: 'math-session-2',
+          title: t('myDay.mathSet2'),
+          isCompleted: isMathSession2Completed,
+          onPress: navigateToSets,
+        },
+      ];
 
   const allRoutines = [...readingRoutines, ...drawingRoutines, ...mathRoutines];
   const completedCount = allRoutines.filter((r) => r.isCompleted).length;
