@@ -1,5 +1,5 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
@@ -112,6 +112,7 @@ export default function BooksDailyScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <Stack.Screen options={{ title: dailyPlan.activeBookTitle }} />
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
@@ -123,10 +124,6 @@ export default function BooksDailyScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText type="subtitle" style={styles.bookTitle}>
-          {dailyPlan.activeBookTitle}
-        </ThemedText>
-
         <GuideCard
           image={guideImage}
           title={t('booksDaily.guideTitle')}
@@ -185,13 +182,6 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     gap: spacing.md,
-  },
-  bookTitle: {
-    ...forestCampTypography.display,
-    fontSize: 34,
-    lineHeight: 38,
-    color: ForestCampTheme.colors.title,
-    textAlign: 'center',
   },
   noContentText: {
     ...forestCampTypography.heading,

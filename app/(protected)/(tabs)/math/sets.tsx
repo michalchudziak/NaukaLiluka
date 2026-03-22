@@ -1,5 +1,5 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { ColorPicker } from '@/components/ColorPicker';
@@ -120,6 +120,7 @@ export default function SetsScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <Stack.Screen options={{ title: t('math.sets.dayTitle', { day: dailyData.activeDay }) }} />
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
@@ -131,10 +132,6 @@ export default function SetsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText type="subtitle" style={styles.dayTitle}>
-          {t('math.sets.dayTitle', { day: dailyData.activeDay })}
-        </ThemedText>
-
         <View style={styles.sessionsContainer}>
           {renderSession(1)}
           {dailyData.sessionContent.length > 1 && renderSession(2)}
@@ -196,14 +193,6 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     gap: 10,
-  },
-  dayTitle: {
-    ...forestCampTypography.display,
-    fontSize: 34,
-    lineHeight: 38,
-    color: ForestCampTheme.colors.title,
-    textAlign: 'center',
-    marginBottom: 10,
   },
   noContentText: {
     ...forestCampTypography.heading,

@@ -31,6 +31,11 @@
       "sourceType": "github",
       "computedHash": "9ea9f16374765c1b16764a51bd43a64098921b33f48e94d9c5c1cce24b335c10"
     },
+    "expo-router": {
+      "source": "jchaselubitz/drill-app",
+      "sourceType": "github",
+      "computedHash": "f30acc3748b66dd22a7abb8655e25f4dd70267615394e09fba694e07cf07f741"
+    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",

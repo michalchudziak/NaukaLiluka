@@ -3,12 +3,10 @@ import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { GuideCard } from '@/components/GuideCard';
 import { StateActionRow } from '@/components/StateActionRow';
-import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import {
   ForestCampTheme,
   forestCampSoftShadow,
-  forestCampTypography,
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
@@ -64,10 +62,6 @@ export default function BookTrackScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText style={[styles.title, metrics.isTablet && styles.titleTablet]}>
-          {t('bookTrack.title')}
-        </ThemedText>
-
         <GuideCard
           image={guideImage}
           title={t('bookTrack.guideTitle')}
@@ -107,17 +101,6 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingTop: spacing.md,
     gap: spacing.lg,
-  },
-  title: {
-    ...forestCampTypography.display,
-    fontSize: 30,
-    lineHeight: 34,
-    color: ForestCampTheme.colors.title,
-    alignSelf: 'flex-start',
-  },
-  titleTablet: {
-    fontSize: 36,
-    lineHeight: 40,
   },
   actionsCard: {
     width: '100%',

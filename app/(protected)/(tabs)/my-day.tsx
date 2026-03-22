@@ -4,7 +4,6 @@ import { format } from 'date-fns';
 import { pl } from 'date-fns/locale';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { StateActionRow } from '@/components/StateActionRow';
 import { ThemedText } from '@/components/ThemedText';
 import {
@@ -267,7 +266,7 @@ export default function MyDayScreen() {
   const nextRoutine = allRoutines.find((r) => !r.isCompleted) ?? null;
 
   return (
-    <SafeAreaView edges={['top']} style={styles.container}>
+    <View style={styles.container}>
       <View style={[styles.canvas, { paddingHorizontal: metrics.screenPadding }]}>
         <ScrollView
           style={styles.scroll}
@@ -280,10 +279,6 @@ export default function MyDayScreen() {
             },
           ]}
         >
-          <ThemedText style={[styles.title, metrics.isTablet && styles.titleTablet]}>
-            {t('myDay.title')}
-          </ThemedText>
-
           <View style={styles.heroCard}>
             <View style={styles.heroHeader}>
               <View style={styles.heroHeaderCopy}>
@@ -362,7 +357,7 @@ export default function MyDayScreen() {
           />
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -377,17 +372,6 @@ const styles = StyleSheet.create({
   },
   scroll: {
     width: '100%',
-  },
-  title: {
-    ...forestCampTypography.display,
-    fontSize: 32,
-    lineHeight: 36,
-    color: ForestCampTheme.colors.title,
-    textAlign: 'left',
-  },
-  titleTablet: {
-    fontSize: 38,
-    lineHeight: 42,
   },
   content: {
     width: '100%',

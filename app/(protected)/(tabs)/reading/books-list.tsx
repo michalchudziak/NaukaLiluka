@@ -3,14 +3,8 @@ import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { BookListItem } from '@/components/BookListItem';
 import { GuideCard } from '@/components/GuideCard';
-import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import {
-  ForestCampTheme,
-  forestCampTypography,
-  getForestCampMetrics,
-  spacing,
-} from '@/constants/ForestCampTheme';
+import { ForestCampTheme, getForestCampMetrics, spacing } from '@/constants/ForestCampTheme';
 import { books } from '@/content/books';
 import { useBookListProgress, useBookStatus } from '@/hooks/useBooks';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -59,7 +53,6 @@ export default function BooksListScreen() {
 
   const listHeader = (
     <View style={styles.headerContent}>
-      <ThemedText style={styles.title}>{t('booksList.title')}</ThemedText>
       <GuideCard
         image={guideImage}
         title={t('booksList.guideTitle')}
@@ -98,12 +91,6 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
-  },
-  title: {
-    ...forestCampTypography.display,
-    fontSize: 30,
-    lineHeight: 34,
-    color: ForestCampTheme.colors.title,
   },
   listContent: {
     alignSelf: 'center',

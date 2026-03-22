@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import {
@@ -63,12 +62,8 @@ export default function DrawingsScreen() {
   };
 
   return (
-    <SafeAreaView edges={['top']} style={styles.container}>
+    <View style={styles.container}>
       <View style={[styles.content, { paddingHorizontal: metrics.screenPadding }]}>
-        <ThemedText style={[styles.title, metrics.isTablet && styles.titleTablet]}>
-          {t('tabs.pictures')}
-        </ThemedText>
-
         <ThemedView style={styles.header}>
           <View style={styles.headerTop}>
             <ThemedText type="subtitle" style={styles.totalCounter}>
@@ -99,7 +94,7 @@ export default function DrawingsScreen() {
           showsVerticalScrollIndicator={false}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -115,20 +110,6 @@ const styles = StyleSheet.create({
   },
   list: {
     width: '100%',
-  },
-  title: {
-    ...forestCampTypography.display,
-    fontSize: 30,
-    lineHeight: 34,
-    color: ForestCampTheme.colors.title,
-    marginTop: spacing.md,
-    marginBottom: spacing.md,
-  },
-  titleTablet: {
-    fontSize: 38,
-    lineHeight: 42,
-    marginTop: spacing.lg,
-    marginBottom: spacing.lg,
   },
   header: {
     width: '100%',

@@ -1,22 +1,27 @@
 import { Stack } from 'expo-router';
+import { ThemedTitle } from '@/components/ThemedTitle';
 import { ForestCampTheme } from '@/constants/ForestCampTheme';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function ReadingLayout() {
+  const { t } = useTranslation();
+
   return (
     <Stack
       screenOptions={{
-        headerTransparent: true,
-        headerTitle: '',
-        headerBackButtonDisplayMode: 'minimal',
         headerShadowVisible: false,
+        headerStyle: { backgroundColor: ForestCampTheme.colors.background },
+        headerTitleAlign: 'center',
+        headerBackButtonDisplayMode: 'minimal',
         headerTintColor: ForestCampTheme.colors.primaryStrong,
+        headerTitle: ({ children }) => <ThemedTitle>{children}</ThemedTitle>,
       }}
     >
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="no-rep-track" />
-      <Stack.Screen name="book-track" />
+      <Stack.Screen name="index" options={{ title: t('tabs.reading') }} />
+      <Stack.Screen name="no-rep-track" options={{ title: t('noRep.title') }} />
+      <Stack.Screen name="book-track" options={{ title: t('bookTrack.title') }} />
       <Stack.Screen name="books-daily" />
-      <Stack.Screen name="books-list" />
+      <Stack.Screen name="books-list" options={{ title: t('booksList.title') }} />
     </Stack>
   );
 }

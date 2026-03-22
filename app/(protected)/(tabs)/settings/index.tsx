@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/ThemedText';
 import {
   ForestCampTheme,
@@ -54,7 +53,7 @@ export default function SettingsScreen() {
   const metrics = getForestCampMetrics(width);
 
   return (
-    <SafeAreaView edges={['top']} style={styles.container}>
+    <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
@@ -67,10 +66,6 @@ export default function SettingsScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <ThemedText style={[styles.pageTitle, metrics.isTablet && styles.pageTitleTablet]}>
-          {t('tabs.settings')}
-        </ThemedText>
-
         <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>{t('settings.reading.sectionTitle')}</ThemedText>
 
@@ -150,7 +145,7 @@ export default function SettingsScreen() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -166,16 +161,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignSelf: 'center',
     paddingTop: spacing.md,
-  },
-  pageTitle: {
-    ...forestCampTypography.display,
-    fontSize: 30,
-    lineHeight: 34,
-    color: ForestCampTheme.colors.title,
-  },
-  pageTitleTablet: {
-    fontSize: 38,
-    lineHeight: 42,
   },
   section: {
     marginTop: spacing.xl,
