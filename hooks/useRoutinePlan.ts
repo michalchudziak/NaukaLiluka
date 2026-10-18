@@ -12,7 +12,6 @@ export function useRoutinePlan() {
     plan,
     activeBlockIds,
     commitmentMinutes: plan?.commitmentMinutes ?? null,
-    sameDayProgressRequired: plan?.sameDayProgressRequired ?? false,
     isLoaded: plan !== undefined,
     isRoutineActive: (blockId: RoutineBlockId) =>
       plan !== undefined && activeBlockIds.includes(blockId),

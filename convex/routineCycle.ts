@@ -1,28 +1,27 @@
 import { mutationGeneric as mutation, queryGeneric as query } from 'convex/server';
 import { v } from 'convex/values';
+import {
+  getNewlyCompletedRoutineBlockIds,
+  getTodayRoutineBlockIds,
+  type RoutineBlockId,
+  withRoutineBlockCompletions,
+} from '../shared/dailyCommitment';
 import type { Id } from './_generated/dataModel';
 import type { MutationCtx, QueryCtx } from './_generated/server';
 import { getResolvedBookStatus } from './books';
 import { getResolvedEquationsStatus } from './equations';
-import { getResolvedMathStatus } from './math';
 import { requireCurrentUser } from './lib/current_user';
+import { getRoutineProgress } from './lib/routineProgress';
+import { getResolvedMathStatus } from './math';
+import { getResolvedNoRepCompletion } from './noRep';
 import { defaultSettings } from './settingsSnapshot';
 import { dailyCommitmentMinutesValidator, routineBlockIdValidator } from './validators';
-import {
-  getActiveRoutineWindow,
-  isSameDayProgressRequired,
-  type DailyCommitmentMinutes,
-  type RoutineBlockId,
-} from '../shared/dailyCommitment';
 
 type RoutineCycleCtx = QueryCtx | MutationCtx;
 
 const routinePlanValidator = v.object({
   commitmentMinutes: v.union(dailyCommitmentMinutesValidator, v.null()),
-  sameDayProgressRequired: v.boolean(),
   activeBlockIds: v.array(routineBlockIdValidator),
-  completedWindowToday: v.boolean(),
-  completedWindowsBeforeToday: v.number(),
 });
 
 async function getSettingsSnapshot(ctx: RoutineCycleCtx, userId: Id<'users'>) {
@@ -34,75 +33,36 @@ async function getSettingsSnapshot(ctx: RoutineCycleCtx, userId: Id<'users'>) {
   return settings?.snapshot ?? defaultSettings;
 }
 
-async function getRoutineCycleState(
-  ctx: RoutineCycleCtx,
-  userId: Id<'users'>,
-  todayStartMs: number,
-  commitmentMinutes: DailyCommitmentMinutes
-) {
-  const completions = await ctx.db
-    .query('routineCycleCompletions')
-    .withIndex('by_user_commitment_completed_at', (q) =>
-      q.eq('userId', userId).eq('commitmentMinutes', commitmentMinutes)
-    )
-    .collect();
-  const completedWindowsBeforeToday = completions.filter(
-    (completion) => completion.completedAt < todayStartMs
-  ).length;
-
-  return {
-    completedWindowsBeforeToday,
-    completedWindowToday: completions.some((completion) => completion.completedAt >= todayStartMs),
-    activeBlockIds: getActiveRoutineWindow(commitmentMinutes, completedWindowsBeforeToday),
-  };
-}
-
+// Book and math blocks are done while their session is done for the current
+// set or day; that session cannot be repeated, so a block rotating back before
+// the set finishes counts as done. No-rep can always be repeated, so it only
+// counts work since the block last finished.
 async function getRoutineCompletionMap(
   ctx: RoutineCycleCtx,
   userId: Id<'users'>,
-  todayStartMs: number,
-  commitmentMinutes: DailyCommitmentMinutes
+  todayStartMs: number
 ) {
-  const sameDayProgressRequired = isSameDayProgressRequired(commitmentMinutes);
-  const [bookStatus, mathStatus, equationsStatus, wordsCompletion, sentencesCompletion, drawing] =
-    await Promise.all([
-      getResolvedBookStatus(ctx, userId, todayStartMs, sameDayProgressRequired),
-      getResolvedMathStatus(ctx, userId, todayStartMs, sameDayProgressRequired),
-      getResolvedEquationsStatus(ctx, userId, todayStartMs, sameDayProgressRequired),
-      ctx.db
-        .query('noRepCompletions')
-        .withIndex('by_user_and_content_type_and_completed_at', (q) => q.eq('userId', userId))
-        .filter((q) =>
-          q.and(
-            q.eq(q.field('contentType'), 'words'),
-            q.gte(q.field('completedAt'), todayStartMs)
-          )
-        )
-        .first(),
-      ctx.db
-        .query('noRepCompletions')
-        .withIndex('by_user_and_content_type_and_completed_at', (q) => q.eq('userId', userId))
-        .filter((q) =>
-          q.and(
-            q.eq(q.field('contentType'), 'sentences'),
-            q.gte(q.field('completedAt'), todayStartMs)
-          )
-        )
-        .first(),
-      ctx.db
-        .query('drawingPresentations')
-        .withIndex('by_user_and_presented_at', (q) => q.eq('userId', userId))
-        .filter((q) => q.gte(q.field('presentedAt'), todayStartMs))
-        .first(),
-    ]);
+  const [noRepCompletion, bookStatus, mathStatus, equationsStatus, drawing] = await Promise.all([
+    getResolvedNoRepCompletion(ctx, userId, todayStartMs),
+    getResolvedBookStatus(ctx, userId, todayStartMs),
+    getResolvedMathStatus(ctx, userId, todayStartMs),
+    getResolvedEquationsStatus(ctx, userId, todayStartMs),
+    ctx.db
+      .query('drawingPresentations')
+      .withIndex('by_user_and_presented_at', (q) =>
+        q.eq('userId', userId).gte('presentedAt', todayStartMs)
+      )
+      .first(),
+  ]);
 
   return {
-    noRep: wordsCompletion !== null && sentencesCompletion !== null,
+    noRep: noRepCompletion.isWordsCompleted && noRepCompletion.isSentencesCompleted,
     bookSession1: bookStatus.sessions.session1.isWordsCompleted,
     bookSession2: bookStatus.sessions.session2.isWordsCompleted,
     bookSession3:
       bookStatus.sessions.session3.isWordsCompleted &&
-      (!bookStatus.sessions.session3.hasSentences || bookStatus.sessions.session3.isSentencesCompleted),
+      (!bookStatus.sessions.session3.hasSentences ||
+        bookStatus.sessions.session3.isSentencesCompleted),
     drawings: drawing !== null,
     mathSession1: mathStatus.hasGraduatedToEquations
       ? equationsStatus.sessions.session1
@@ -124,26 +84,18 @@ export const getTodayPlan = query({
     const commitmentMinutes = settingsSnapshot.onboarding.dailyCommitmentMinutes;
 
     if (commitmentMinutes === null) {
-      return {
-        commitmentMinutes: null,
-        sameDayProgressRequired: false,
-        activeBlockIds: [],
-        completedWindowToday: false,
-        completedWindowsBeforeToday: 0,
-      };
+      return { commitmentMinutes: null, activeBlockIds: [] };
     }
 
-    const routineCycleState = await getRoutineCycleState(
-      ctx,
-      user._id,
-      args.todayStartMs,
-      commitmentMinutes
-    );
+    const routineProgress = await getRoutineProgress(ctx, user._id);
 
     return {
       commitmentMinutes,
-      sameDayProgressRequired: isSameDayProgressRequired(commitmentMinutes),
-      ...routineCycleState,
+      activeBlockIds: getTodayRoutineBlockIds(
+        commitmentMinutes,
+        routineProgress?.lastCompletions ?? [],
+        args.todayStartMs
+      ),
     };
   },
 });
@@ -162,36 +114,31 @@ export const syncTodayCompletion = mutation({
       return null;
     }
 
-    const routineCycleState = await getRoutineCycleState(
-      ctx,
-      user._id,
-      args.todayStartMs,
-      commitmentMinutes
-    );
-
-    if (routineCycleState.completedWindowToday) {
-      return null;
-    }
-
-    const completionMap = await getRoutineCompletionMap(
-      ctx,
-      user._id,
-      args.todayStartMs,
-      commitmentMinutes
-    );
-    const isActiveWindowCompleted = routineCycleState.activeBlockIds.every(
-      (blockId) => completionMap[blockId]
-    );
-
-    if (!isActiveWindowCompleted) {
-      return null;
-    }
-
-    await ctx.db.insert('routineCycleCompletions', {
-      userId: user._id,
+    const routineProgress = await getRoutineProgress(ctx, user._id);
+    const lastCompletions = routineProgress?.lastCompletions ?? [];
+    const newlyCompletedBlockIds = getNewlyCompletedRoutineBlockIds(
       commitmentMinutes,
-      completedAt: Date.now(),
-    });
+      lastCompletions,
+      args.todayStartMs,
+      await getRoutineCompletionMap(ctx, user._id, args.todayStartMs)
+    );
+    const nextCompletions = withRoutineBlockCompletions(
+      lastCompletions,
+      newlyCompletedBlockIds,
+      Date.now()
+    );
+
+    // Created on the first sync even with nothing finished, which fixes the
+    // day from which no-rep completions start counting.
+    if (!routineProgress) {
+      await ctx.db.insert('routineProgress', {
+        userId: user._id,
+        trackingStartMs: args.todayStartMs,
+        lastCompletions: nextCompletions,
+      });
+    } else if (newlyCompletedBlockIds.length > 0) {
+      await ctx.db.patch(routineProgress._id, { lastCompletions: nextCompletions });
+    }
 
     return null;
   },

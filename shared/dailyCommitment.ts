@@ -28,37 +28,68 @@ export function isOnboardingProfileComplete(profile: OnboardingProfile) {
   return profile.childAgeMonths !== null && profile.childAgeMonths >= 0 && profile.dailyCommitmentMinutes !== null;
 }
 
-export function isSameDayProgressRequired(minutes: DailyCommitmentMinutes) {
-  return minutes === 10 || minutes === 15;
+export type RoutineBlockCompletion = {
+  blockId: RoutineBlockId;
+  completedAt: number;
+};
+
+const DAILY_BLOCK_COUNTS: Record<DailyCommitmentMinutes, number> = {
+  2: 1,
+  5: 2,
+  10: 4,
+  15: ROUTINE_BLOCK_IDS.length,
+};
+
+export function getDailyBlockCount(minutes: DailyCommitmentMinutes) {
+  return DAILY_BLOCK_COUNTS[minutes];
 }
 
-export function getRoutineWindows(minutes: DailyCommitmentMinutes): RoutineBlockId[][] {
-  switch (minutes) {
-    case 2:
-      return ROUTINE_BLOCK_IDS.map((blockId) => [blockId]);
-    case 5:
-      return [
-        ['noRep', 'bookSession1'],
-        ['bookSession2', 'bookSession3'],
-        ['drawings', 'mathSession1'],
-        ['mathSession2'],
-      ];
-    case 10:
-      return [
-        ['noRep', 'bookSession1', 'bookSession2', 'bookSession3'],
-        ['drawings', 'mathSession1', 'mathSession2'],
-      ];
-    case 15:
-      return [Array.from(ROUTINE_BLOCK_IDS)];
-  }
-}
-
-export function getActiveRoutineWindow(
+// Blocks rotate in a fixed order. Finishing a block sends it to the back of the
+// queue, so unfinished blocks stay in front and carry over to the next day.
+export function getTodayRoutineBlockIds(
   minutes: DailyCommitmentMinutes,
-  completedWindowCount: number
-) {
-  const windows = getRoutineWindows(minutes);
-  return windows[completedWindowCount % windows.length];
+  lastCompletions: readonly RoutineBlockCompletion[],
+  todayStartMs: number
+): RoutineBlockId[] {
+  const lastCompletedAt = new Map(
+    lastCompletions.map((completion) => [completion.blockId, completion.completedAt])
+  );
+  const queue = [...ROUTINE_BLOCK_IDS].sort(
+    (a, b) => (lastCompletedAt.get(a) ?? -1) - (lastCompletedAt.get(b) ?? -1)
+  );
+  const completedToday = queue.filter(
+    (blockId) => (lastCompletedAt.get(blockId) ?? -1) >= todayStartMs
+  );
+  const pending = queue.filter((blockId) => (lastCompletedAt.get(blockId) ?? -1) < todayStartMs);
+  const openSlots = Math.max(0, getDailyBlockCount(minutes) - completedToday.length);
+
+  return [...pending.slice(0, openSlots), ...completedToday];
+}
+
+export function getNewlyCompletedRoutineBlockIds(
+  minutes: DailyCommitmentMinutes,
+  lastCompletions: readonly RoutineBlockCompletion[],
+  todayStartMs: number,
+  isBlockDone: Record<RoutineBlockId, boolean>
+): RoutineBlockId[] {
+  return getTodayRoutineBlockIds(minutes, lastCompletions, todayStartMs).filter(
+    (blockId) =>
+      isBlockDone[blockId] &&
+      !lastCompletions.some(
+        (completion) => completion.blockId === blockId && completion.completedAt >= todayStartMs
+      )
+  );
+}
+
+export function withRoutineBlockCompletions(
+  lastCompletions: readonly RoutineBlockCompletion[],
+  blockIds: readonly RoutineBlockId[],
+  completedAt: number
+): RoutineBlockCompletion[] {
+  return [
+    ...lastCompletions.filter((completion) => !blockIds.includes(completion.blockId)),
+    ...blockIds.map((blockId) => ({ blockId, completedAt })),
+  ];
 }
 
 export function getBookRoutineId(session: 'session1' | 'session2' | 'session3'): RoutineBlockId {

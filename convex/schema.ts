@@ -3,10 +3,10 @@ import { v } from 'convex/values';
 import {
   bookSessionTokenValidator,
   contentTypeValidator,
-  dailyCommitmentMinutesValidator,
   equationCategoryValidator,
   equationSessionValidator,
   mathSessionValidator,
+  routineBlockIdValidator,
   settingsSnapshotValidator,
 } from './validators';
 
@@ -34,18 +34,18 @@ export default defineSchema({
     isCompleted: v.boolean(),
   }).index('by_user_and_book_index', ['userId', 'bookIndex']),
 
-  routineCycleCompletions: defineTable({
+  routineProgress: defineTable({
     userId: v.id('users'),
-    commitmentMinutes: dailyCommitmentMinutesValidator,
-    completedAt: v.number(),
-  }).index('by_user_commitment_completed_at', ['userId', 'commitmentMinutes', 'completedAt']),
-
-  bookTrackSessions: defineTable({
-    userId: v.id('users'),
-    sessionName: v.union(v.literal('session1'), v.literal('session2'), v.literal('session3')),
-    contentType: contentTypeValidator,
-    completedAt: v.number(),
-  }).index('by_user_and_completed_at', ['userId', 'completedAt']),
+    // Start of the local day on which tracking began; earlier no-rep
+    // completions never count toward the routine.
+    trackingStartMs: v.number(),
+    lastCompletions: v.array(
+      v.object({
+        blockId: routineBlockIdValidator,
+        completedAt: v.number(),
+      })
+    ),
+  }).index('by_user', ['userId']),
 
   noRepProgress: defineTable({
     userId: v.id('users'),

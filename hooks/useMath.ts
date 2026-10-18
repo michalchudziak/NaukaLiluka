@@ -27,11 +27,10 @@ export function useMathStatus() {
     status,
     currentDay,
     dailyData: getNumbersLearningScheme(currentDay, numberCount || 10),
-    completedSessionsToday: status?.completedSessionsToday ?? [],
+    completedSessions: status?.completedSessions ?? [],
     hasGraduatedToEquations: status?.hasGraduatedToEquations ?? currentDay > 30,
     isDayCompleted: status?.isDayCompleted ?? false,
-    isSessionCompletedToday: (session: 'session1' | 'session2') =>
-      status?.sessions[session] ?? false,
+    isSessionCompleted: (session: 'session1' | 'session2') => status?.sessions[session] ?? false,
   };
 }
 
@@ -72,10 +71,9 @@ export function useEquationsStatus() {
     currentDay,
     currentCategory,
     dailyData: buildEquationScheme(currentDay, 100, equationCount || 5, currentCategory),
-    completedSessionsToday: status?.completedSessionsToday ?? [],
+    completedSessions: status?.completedSessions ?? [],
     isDayCompleted: status?.isDayCompleted ?? false,
-    isSessionCompletedToday: (session: 'session1' | 'session2') =>
-      status?.sessions[session] ?? false,
+    isSessionCompleted: (session: 'session1' | 'session2') => status?.sessions[session] ?? false,
   };
 }
 

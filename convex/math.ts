@@ -3,9 +3,7 @@ import { v } from 'convex/values';
 import type { Id } from './_generated/dataModel';
 import type { MutationCtx, QueryCtx } from './_generated/server';
 import { requireCurrentUser } from './lib/current_user';
-import { defaultSettings } from './settingsSnapshot';
 import { defaultMathProgress, mathSessionValidator } from './validators';
-import { isSameDayProgressRequired } from '../shared/dailyCommitment';
 
 type MathSession =
   | 'subitizingOrdered'
@@ -21,7 +19,7 @@ type MathCtx = QueryCtx | MutationCtx;
 
 const mathStatusValidator = v.object({
   currentDay: v.number(),
-  completedSessionsToday: v.array(mathSessionValidator),
+  completedSessions: v.array(mathSessionValidator),
   isDayCompleted: v.boolean(),
   sessions: v.object({
     session1: v.boolean(),
@@ -53,37 +51,24 @@ const areAllRequiredSessionsCompleted = (
   completedSessions: MathSession[]
 ) => sessionGroups.flat().every((session) => completedSessions.includes(session));
 
-async function getMathSettingsSnapshot(ctx: MathCtx, userId: Id<'users'>) {
-  const settings = await ctx.db
-    .query('settings')
-    .withIndex('by_user', (q) => q.eq('userId', userId))
-    .first();
-
-  return settings?.snapshot ?? defaultSettings;
-}
-
-export function resolveMathStatus(
-  progress: StoredMathProgress,
-  todayStartMs: number,
-  sameDayRequired: boolean
-) {
+export function resolveMathStatus(progress: StoredMathProgress, todayStartMs: number) {
   const progressIsFromToday = isProgressFromToday(progress.lastSessionDate, todayStartMs);
   const previousDayGroups = getSessionGroupsForDay(progress.currentDay);
-  const previousDayCompleted = areAllRequiredSessionsCompleted(previousDayGroups, progress.completedSessions);
-  const shouldAdvanceDay = progress.lastSessionDate !== null && !progressIsFromToday && previousDayCompleted;
+  const previousDayCompleted = areAllRequiredSessionsCompleted(
+    previousDayGroups,
+    progress.completedSessions
+  );
+  const shouldAdvanceDay =
+    progress.lastSessionDate !== null && !progressIsFromToday && previousDayCompleted;
   const currentDay = shouldAdvanceDay ? progress.currentDay + 1 : progress.currentDay;
   const sessionGroups = getSessionGroupsForDay(currentDay);
-  const completedSessionsToday = shouldAdvanceDay
-    ? []
-    : sameDayRequired
-      ? progressIsFromToday
-        ? progress.completedSessions
-        : []
-      : progress.completedSessions;
+  // Sessions done on earlier calendar days still count, so an unfinished day
+  // carries over instead of resetting.
+  const completedSessions = shouldAdvanceDay ? [] : progress.completedSessions;
 
   return {
     currentDay,
-    completedSessionsToday,
+    completedSessions,
     sessionGroups,
   };
 }
@@ -91,8 +76,7 @@ export function resolveMathStatus(
 export async function getResolvedMathStatus(
   ctx: MathCtx,
   userId: Id<'users'>,
-  todayStartMs: number,
-  sameDayRequired: boolean
+  todayStartMs: number
 ) {
   const progress = await ctx.db
     .query('mathProgress')
@@ -106,21 +90,20 @@ export async function getResolvedMathStatus(
           completedSessions: progress.completedSessions,
         }
       : defaultMathProgress,
-    todayStartMs,
-    sameDayRequired
+    todayStartMs
   );
   const [session1, session2] = effectiveProgress.sessionGroups;
 
   return {
     currentDay: effectiveProgress.currentDay,
-    completedSessionsToday: effectiveProgress.completedSessionsToday,
+    completedSessions: effectiveProgress.completedSessions,
     isDayCompleted: areAllRequiredSessionsCompleted(
       effectiveProgress.sessionGroups,
-      effectiveProgress.completedSessionsToday
+      effectiveProgress.completedSessions
     ),
     sessions: {
-      session1: areAllRequiredSessionsCompleted([session1], effectiveProgress.completedSessionsToday),
-      session2: areAllRequiredSessionsCompleted([session2], effectiveProgress.completedSessionsToday),
+      session1: areAllRequiredSessionsCompleted([session1], effectiveProgress.completedSessions),
+      session2: areAllRequiredSessionsCompleted([session2], effectiveProgress.completedSessions),
     },
     hasGraduatedToEquations: effectiveProgress.currentDay > 30,
   };
@@ -133,12 +116,8 @@ export const getStatus = query({
   returns: mathStatusValidator,
   handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);
-    const settingsSnapshot = await getMathSettingsSnapshot(ctx, user._id);
-    const sameDayRequired = isSameDayProgressRequired(
-      settingsSnapshot.onboarding.dailyCommitmentMinutes ?? 15
-    );
 
-    return await getResolvedMathStatus(ctx, user._id, args.todayStartMs, sameDayRequired);
+    return await getResolvedMathStatus(ctx, user._id, args.todayStartMs);
   },
 });
 
@@ -150,10 +129,6 @@ export const completeSession = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);
-    const settingsSnapshot = await getMathSettingsSnapshot(ctx, user._id);
-    const sameDayRequired = isSameDayProgressRequired(
-      settingsSnapshot.onboarding.dailyCommitmentMinutes ?? 15
-    );
     const existing = await ctx.db
       .query('mathProgress')
       .withIndex('by_user', (q) => q.eq('userId', user._id))
@@ -166,16 +141,16 @@ export const completeSession = mutation({
           completedSessions: existing.completedSessions,
         }
       : defaultMathProgress;
-    const effectiveProgress = resolveMathStatus(storedProgress, args.todayStartMs, sameDayRequired);
+    const effectiveProgress = resolveMathStatus(storedProgress, args.todayStartMs);
 
-    if (effectiveProgress.completedSessionsToday.includes(args.session)) {
+    if (effectiveProgress.completedSessions.includes(args.session)) {
       return null;
     }
 
     const nextProgress = {
       currentDay: effectiveProgress.currentDay,
       lastSessionDate: new Date().toISOString(),
-      completedSessions: [...effectiveProgress.completedSessionsToday, args.session],
+      completedSessions: [...effectiveProgress.completedSessions, args.session],
     };
 
     if (existing) {

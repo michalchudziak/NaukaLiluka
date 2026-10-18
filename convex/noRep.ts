@@ -1,9 +1,56 @@
 import { mutationGeneric as mutation, queryGeneric as query } from 'convex/server';
 import { ConvexError, v } from 'convex/values';
+import type { Id } from './_generated/dataModel';
+import type { MutationCtx, QueryCtx } from './_generated/server';
 import { requireCurrentUser } from './lib/current_user';
 import { getContentPool } from './lib/noRepContent';
+import { getRoutineProgress } from './lib/routineProgress';
 import { defaultSettings } from './settingsSnapshot';
 import { contentTypeValidator } from './validators';
+
+type NoRepCtx = QueryCtx | MutationCtx;
+
+async function findCompletionSince(
+  ctx: NoRepCtx,
+  userId: Id<'users'>,
+  contentType: 'words' | 'sentences',
+  sinceMs: number
+) {
+  return await ctx.db
+    .query('noRepCompletions')
+    .withIndex('by_user_and_content_type_and_completed_at', (q) =>
+      q.eq('userId', userId).eq('contentType', contentType).gte('completedAt', sinceMs)
+    )
+    .first();
+}
+
+export async function getResolvedNoRepCompletion(
+  ctx: NoRepCtx,
+  userId: Id<'users'>,
+  todayStartMs: number
+) {
+  const routineProgress = await getRoutineProgress(ctx, userId);
+  const blockCompletedAt = routineProgress?.lastCompletions.find(
+    (completion) => completion.blockId === 'noRep'
+  )?.completedAt;
+
+  if (blockCompletedAt !== undefined && blockCompletedAt >= todayStartMs) {
+    return { isWordsCompleted: true, isSentencesCompleted: true };
+  }
+
+  // Words and sentences count once done after the block last finished, so
+  // doing one part today and the other tomorrow still completes the block.
+  const sinceMs = blockCompletedAt ?? routineProgress?.trackingStartMs ?? todayStartMs;
+  const [wordsCompletion, sentencesCompletion] = await Promise.all([
+    findCompletionSince(ctx, userId, 'words', sinceMs),
+    findCompletionSince(ctx, userId, 'sentences', sinceMs),
+  ]);
+
+  return {
+    isWordsCompleted: wordsCompletion !== null,
+    isSentencesCompleted: sentencesCompletion !== null,
+  };
+}
 
 export const getStatus = query({
   args: {
@@ -14,13 +61,13 @@ export const getStatus = query({
     displayedSentencesCount: v.number(),
     totalWordsCount: v.number(),
     totalSentencesCount: v.number(),
-    isWordsCompletedToday: v.boolean(),
-    isSentencesCompletedToday: v.boolean(),
+    isWordsCompleted: v.boolean(),
+    isSentencesCompleted: v.boolean(),
   }),
   handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);
 
-    const [wordsProgress, sentencesProgress] = await Promise.all([
+    const [wordsProgress, sentencesProgress, completion] = await Promise.all([
       ctx.db
         .query('noRepProgress')
         .withIndex('by_user_and_content_type', (q) => q.eq('userId', user._id))
@@ -31,29 +78,7 @@ export const getStatus = query({
         .withIndex('by_user_and_content_type', (q) => q.eq('userId', user._id))
         .filter((q) => q.eq(q.field('contentType'), 'sentences'))
         .first(),
-    ]);
-
-    const [wordsCompletion, sentencesCompletion] = await Promise.all([
-      ctx.db
-        .query('noRepCompletions')
-        .withIndex('by_user_and_content_type_and_completed_at', (q) => q.eq('userId', user._id))
-        .filter((q) =>
-          q.and(
-            q.eq(q.field('contentType'), 'words'),
-            q.gte(q.field('completedAt'), args.todayStartMs)
-          )
-        )
-        .first(),
-      ctx.db
-        .query('noRepCompletions')
-        .withIndex('by_user_and_content_type_and_completed_at', (q) => q.eq('userId', user._id))
-        .filter((q) =>
-          q.and(
-            q.eq(q.field('contentType'), 'sentences'),
-            q.gte(q.field('completedAt'), args.todayStartMs)
-          )
-        )
-        .first(),
+      getResolvedNoRepCompletion(ctx, user._id, args.todayStartMs),
     ]);
 
     return {
@@ -61,8 +86,7 @@ export const getStatus = query({
       displayedSentencesCount: sentencesProgress?.displayedItems.length ?? 0,
       totalWordsCount: getContentPool('words').length,
       totalSentencesCount: getContentPool('sentences').length,
-      isWordsCompletedToday: wordsCompletion !== null,
-      isSentencesCompletedToday: sentencesCompletion !== null,
+      ...completion,
     };
   },
 });

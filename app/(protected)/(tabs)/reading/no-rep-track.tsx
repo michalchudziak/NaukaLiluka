@@ -34,8 +34,8 @@ export default function NoRepScreen() {
   const { isRoutineActive } = useRoutinePlan();
   const tabBarHeight = useBottomTabBarHeight();
 
-  const wordsCompletedToday = status?.isWordsCompletedToday ?? false;
-  const sentencesCompletedToday = status?.isSentencesCompletedToday ?? false;
+  const wordsCompleted = status?.isWordsCompleted ?? false;
+  const sentencesCompleted = status?.isSentencesCompleted ?? false;
 
   const imageSize = Math.min(width * 0.35, 160);
 
@@ -69,15 +69,15 @@ export default function NoRepScreen() {
     {
       id: 'words',
       title: t('noRep.words'),
-      subtitle: wordsCompletedToday ? t('myDay.doneStatus') : t('myDay.pendingStatus'),
-      isCompleted: wordsCompletedToday,
+      subtitle: wordsCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus'),
+      isCompleted: wordsCompleted,
       onPress: () => void handlePress('words'),
     },
     {
       id: 'sentences',
       title: t('noRep.sentences'),
-      subtitle: sentencesCompletedToday ? t('myDay.doneStatus') : t('myDay.pendingStatus'),
-      isCompleted: sentencesCompletedToday,
+      subtitle: sentencesCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus'),
+      isCompleted: sentencesCompleted,
       onPress: () => void handlePress('sentences'),
     },
   ] as const;

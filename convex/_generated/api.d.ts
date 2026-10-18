@@ -16,6 +16,7 @@ import type * as http from "../http.js";
 import type * as lib_bookContent from "../lib/bookContent.js";
 import type * as lib_current_user from "../lib/current_user.js";
 import type * as lib_noRepContent from "../lib/noRepContent.js";
+import type * as lib_routineProgress from "../lib/routineProgress.js";
 import type * as math from "../math.js";
 import type * as noRep from "../noRep.js";
 import type * as routineCycle from "../routineCycle.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   "lib/bookContent": typeof lib_bookContent;
   "lib/current_user": typeof lib_current_user;
   "lib/noRepContent": typeof lib_noRepContent;
+  "lib/routineProgress": typeof lib_routineProgress;
   math: typeof math;
   noRep: typeof noRep;
   routineCycle: typeof routineCycle;

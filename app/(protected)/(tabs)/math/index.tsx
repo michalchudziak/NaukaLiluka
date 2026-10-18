@@ -28,11 +28,11 @@ export default function MathScreen() {
     isDayCompleted,
     currentDay,
     hasGraduatedToEquations,
-    isSessionCompletedToday: isNumberSessionCompleted,
+    isSessionCompleted: isNumberSessionCompleted,
   } = useMathStatus();
   const {
     isDayCompleted: isEquationsDayCompleted,
-    isSessionCompletedToday: isEquationSessionCompleted,
+    isSessionCompleted: isEquationSessionCompleted,
   } = useEquationsStatus();
   const { isRoutineActive } = useRoutinePlan();
 

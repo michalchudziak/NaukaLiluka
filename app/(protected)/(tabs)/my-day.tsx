@@ -99,9 +99,9 @@ export default function MyDayScreen() {
   const {
     currentDay,
     hasGraduatedToEquations,
-    isSessionCompletedToday: isMathSessionCompletedToday,
+    isSessionCompleted: isMathSessionCompleted,
   } = useMathStatus();
-  const { isSessionCompletedToday: isEqSessionCompletedToday } = useEquationsStatus();
+  const { isSessionCompleted: isEqSessionCompleted } = useEquationsStatus();
 
   const [showCompleted, setShowCompleted] = useState(true);
 
@@ -113,7 +113,7 @@ export default function MyDayScreen() {
   // Derived completion state - computed during render, no polling needed.
   // Zustand subscriptions trigger re-renders when store data changes.
   const isNoRepCompleted =
-    (noRepStatus?.isWordsCompletedToday && noRepStatus?.isSentencesCompletedToday) ?? false;
+    (noRepStatus?.isWordsCompleted && noRepStatus?.isSentencesCompleted) ?? false;
 
   const s1 = bookStatus?.sessions.session1;
   const s2 = bookStatus?.sessions.session2;
@@ -126,12 +126,10 @@ export default function MyDayScreen() {
 
   const isDrawingsCompleted = drawingsStatus?.completedToday ?? false;
 
-  const isMathSession1Completed =
-    !hasGraduatedToEquations && isMathSessionCompletedToday('session1');
-  const isMathSession2Completed =
-    !hasGraduatedToEquations && isMathSessionCompletedToday('session2');
-  const isEqSession1Completed = hasGraduatedToEquations && isEqSessionCompletedToday('session1');
-  const isEqSession2Completed = hasGraduatedToEquations && isEqSessionCompletedToday('session2');
+  const isMathSession1Completed = !hasGraduatedToEquations && isMathSessionCompleted('session1');
+  const isMathSession2Completed = !hasGraduatedToEquations && isMathSessionCompleted('session2');
+  const isEqSession1Completed = hasGraduatedToEquations && isEqSessionCompleted('session1');
+  const isEqSession2Completed = hasGraduatedToEquations && isEqSessionCompleted('session2');
 
   type TabName = 'my-day' | 'reading' | 'math' | 'drawings' | 'settings';
 

@@ -36,7 +36,7 @@ export default function SetsScreen() {
   const metrics = getForestCampMetrics(width);
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
-  const { currentDay, dailyData, isSessionCompletedToday } = useMathStatus();
+  const { currentDay, dailyData, isSessionCompleted } = useMathStatus();
   const { launch, isLaunching } = usePresentationLaunch();
   const { math } = useAppSettings();
   const { isRoutineActive } = useRoutinePlan();
@@ -98,7 +98,7 @@ export default function SetsScreen() {
         </ThemedText>
         <View style={styles.buttonsContainer}>
           {dailyData.sessionContent[sessionIndex].map((item) => {
-            const isCompleted = isSessionCompletedToday(sessionKey as 'session1' | 'session2');
+            const isCompleted = isSessionCompleted(sessionKey as 'session1' | 'session2');
             const title =
               t(`math.sets.${item.type}`) +
               ' - ' +

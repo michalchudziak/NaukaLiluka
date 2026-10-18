@@ -35,7 +35,7 @@ export default function EquationsScreen() {
   const metrics = getForestCampMetrics(width);
   const [selectedColor, setSelectedColor] = useState(WordColors[1].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
-  const { currentDay, completedSessionsToday, dailyData } = useEquationsStatus();
+  const { currentDay, completedSessions, dailyData } = useEquationsStatus();
   const { launch, isLaunching } = usePresentationLaunch();
   const { math } = useAppSettings();
   const { isRoutineActive } = useRoutinePlan();
@@ -80,7 +80,7 @@ export default function EquationsScreen() {
     }
 
     const isRoutineCompleted = (routine: 'subitizing' | 'equations', index: number) =>
-      completedSessionsToday.includes(`${routine}${index === 0 ? '1' : '2'}` as EquationSession);
+      completedSessions.includes(`${routine}${index === 0 ? '1' : '2'}` as EquationSession);
 
     return (
       <View key={sessionKey} style={styles.sessionRow}>

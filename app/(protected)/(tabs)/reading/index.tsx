@@ -27,7 +27,7 @@ export default function ReadingScreen() {
   const noRepStatus = useNoRepStatus();
   const bookStatus = useBookStatus();
   const isNoRepPathCompleted =
-    (noRepStatus?.isWordsCompletedToday && noRepStatus?.isSentencesCompletedToday) ?? false;
+    (noRepStatus?.isWordsCompleted && noRepStatus?.isSentencesCompleted) ?? false;
   const isBookTrackCompleted = bookStatus?.isDayCompleted ?? false;
 
   const modules = [
