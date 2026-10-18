@@ -15,8 +15,12 @@ import {
   spacing,
 } from '@/constants/ForestCampTheme';
 import { WordColors } from '@/constants/WordColors';
-import { useBookDailyContent, useCompleteBookSession } from '@/hooks/useBooks';
+import { useBookDailyContent } from '@/hooks/useBooks';
+import { usePresentationLaunch } from '@/hooks/usePresentationLaunch';
+import { useRoutinePlan } from '@/hooks/useRoutinePlan';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getBookRoutineId } from '@/shared/dailyCommitment';
+import { serializeCompletion } from '@/shared/presentation';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const guideImage = require('@/assets/images/guides/book.png');
@@ -29,34 +33,47 @@ export default function BooksDailyScreen() {
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const dailyPlan = useBookDailyContent();
-  const completeSession = useCompleteBookSession();
+  const { launch, isLaunching } = usePresentationLaunch();
+  const { isRoutineActive } = useRoutinePlan();
 
   const handleTrackPress = (
     sessionId: 'session1' | 'session2' | 'session3',
     type: 'words' | 'sentences'
-  ) => {
-    if (!dailyPlan) {
-      return;
-    }
+  ) =>
+    launch(() => {
+      if (!dailyPlan) {
+        return false;
+      }
 
-    const sessionContent = dailyPlan.content[sessionId];
-    const items = type === 'words' ? sessionContent.words : sessionContent.sentences;
+      const sessionContent = dailyPlan.content[sessionId];
+      const items = type === 'words' ? sessionContent.words : sessionContent.sentences;
 
-    router.push({
-      pathname: '/display',
-      params: {
-        items: JSON.stringify(items),
-        type,
-        color: selectedColor,
-      },
+      router.push({
+        pathname: '/display',
+        params: {
+          items: JSON.stringify(items),
+          type,
+          color: selectedColor,
+          completion: serializeCompletion({
+            kind: 'book',
+            session: sessionId,
+            contentType: type,
+            bookIndex: dailyPlan.activeBookIndex,
+            tripleIndex: dailyPlan.currentTripleIndex,
+          }),
+        },
+      });
+
+      return true;
     });
-
-    void completeSession(sessionId, type);
-  };
 
   const renderSession = (sessionNumber: number) => {
     const sessionKey = `session${sessionNumber}` as 'session1' | 'session2' | 'session3';
     const sessionStatus = dailyPlan?.sessions[sessionKey];
+
+    if (!isRoutineActive(getBookRoutineId(sessionKey))) {
+      return null;
+    }
 
     const actions = [
       sessionStatus?.hasWords
@@ -95,6 +112,7 @@ export default function BooksDailyScreen() {
               subtitle={action.isCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus')}
               isCompleted={action.isCompleted}
               onPress={action.onPress}
+              disabled={isLaunching}
             />
           ))}
         </View>

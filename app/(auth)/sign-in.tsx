@@ -1,6 +1,6 @@
-import { useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { AuthFormShell } from '@/components/auth/auth-form-shell';
 import { AuthInput } from '@/components/auth/auth-input';
 import { Button } from '@/components/Button';
@@ -14,7 +14,6 @@ function isValidEmail(email: string) {
 }
 
 export default function SignInScreen() {
-  const router = useRouter();
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -50,14 +49,12 @@ export default function SignInScreen() {
       },
     });
 
-    setIsSubmitting(false);
-
     if (result.error) {
+      setIsSubmitting(false);
       setError(result.error.message ?? t('auth.signInError'));
-      return;
     }
-
-    router.replace('/my-day');
+    // On success, stay in the submitting state; the (auth) layout redirects
+    // once useConvexAuth() reflects the new session.
   };
 
   return (
@@ -92,6 +89,16 @@ export default function SignInScreen() {
         placeholder={t('auth.passwordPlaceholder')}
       />
 
+      <View style={styles.forgotPasswordRow}>
+        <Link href="./forgot-password" asChild>
+          <TouchableOpacity activeOpacity={0.7}>
+            <ThemedText style={styles.forgotPasswordLink}>
+              {t('auth.forgotPasswordLink')}
+            </ThemedText>
+          </TouchableOpacity>
+        </Link>
+      </View>
+
       {error ? (
         <View style={styles.errorBox}>
           <ThemedText selectable style={styles.errorText}>
@@ -124,6 +131,15 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: ForestCampTheme.colors.danger,
     textAlign: 'center',
+  },
+  forgotPasswordRow: {
+    alignItems: 'flex-end',
+  },
+  forgotPasswordLink: {
+    ...forestCampTypography.body,
+    fontSize: 14,
+    lineHeight: 20,
+    color: ForestCampTheme.colors.primaryStrong,
   },
   button: {
     width: '100%',

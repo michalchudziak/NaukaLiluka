@@ -16,13 +16,13 @@ import {
   spacing,
 } from '@/constants/ForestCampTheme';
 import { WordColors } from '@/constants/WordColors';
-import {
-  type EquationSession,
-  useCompleteEquationSession,
-  useEquationsStatus,
-} from '@/hooks/useMath';
+import { type EquationSession, useEquationsStatus } from '@/hooks/useMath';
+import { usePresentationLaunch } from '@/hooks/usePresentationLaunch';
+import { useRoutinePlan } from '@/hooks/useRoutinePlan';
 import { useAppSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getMathRoutineId } from '@/shared/dailyCommitment';
+import { serializeCompletion } from '@/shared/presentation';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const guideImage = require('@/assets/images/guides/math.png');
@@ -36,42 +36,48 @@ export default function EquationsScreen() {
   const [selectedColor, setSelectedColor] = useState(WordColors[1].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { currentDay, completedSessionsToday, dailyData } = useEquationsStatus();
-  const completeSession = useCompleteEquationSession();
+  const { launch, isLaunching } = usePresentationLaunch();
   const { math } = useAppSettings();
+  const { isRoutineActive } = useRoutinePlan();
 
-  const handleSessionPress = async (content: 'subitizing' | 'equations', sessionIndex: number) => {
-    const token = `${content}${sessionIndex === 0 ? '1' : '2'}` as EquationSession;
+  const handleSessionPress = (content: 'subitizing' | 'equations', sessionIndex: number) =>
+    launch(() => {
+      const token = `${content}${sessionIndex === 0 ? '1' : '2'}` as EquationSession;
 
-    if (content === 'subitizing') {
-      router.push({
-        pathname: '/set-display',
-        params: {
-          numbers: JSON.stringify(
-            [...new Array(math.numbers.numberCount)].map(() => Math.floor(Math.random() * 150))
-          ),
-          shape: selectedShape,
-          color: selectedColor,
-          showNumberFollowups: 'true',
-        },
-      });
-    } else {
-      router.push({
-        pathname: '/equations-display',
-        params: {
-          pairs: JSON.stringify(dailyData.equations),
-          color: selectedColor,
-        },
-      });
-    }
+      if (content === 'subitizing') {
+        router.push({
+          pathname: '/set-display',
+          params: {
+            numbers: JSON.stringify(
+              [...new Array(math.numbers.numberCount)].map(() => Math.floor(Math.random() * 150))
+            ),
+            shape: selectedShape,
+            color: selectedColor,
+            showNumberFollowups: 'true',
+            completion: serializeCompletion({ kind: 'equation', session: token }),
+          },
+        });
+      } else {
+        router.push({
+          pathname: '/equations-display',
+          params: {
+            pairs: JSON.stringify(dailyData.equations),
+            color: selectedColor,
+            completion: serializeCompletion({ kind: 'equation', session: token }),
+          },
+        });
+      }
 
-    setTimeout(() => {
-      void completeSession(token);
-    }, 1000);
-  };
+      return true;
+    });
 
   const renderSession = (sessionNumber: number) => {
     const sessionKey = `session${sessionNumber}`;
     const sessionIndex = sessionNumber - 1;
+
+    if (!isRoutineActive(getMathRoutineId(sessionKey as 'session1' | 'session2'))) {
+      return null;
+    }
 
     const isRoutineCompleted = (routine: 'subitizing' | 'equations', index: number) =>
       completedSessionsToday.includes(`${routine}${index === 0 ? '1' : '2'}` as EquationSession);
@@ -93,6 +99,7 @@ export default function EquationsScreen() {
               }
               isCompleted={isRoutineCompleted(item, sessionIndex)}
               onPress={() => handleSessionPress(item, sessionIndex)}
+              disabled={isLaunching}
             />
           ))}
         </View>

@@ -10,6 +10,7 @@ import {
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
+import { useAppSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface SettingItemProps {
@@ -51,6 +52,14 @@ export default function SettingsScreen() {
   const tabBarHeight = useBottomTabBarHeight();
   const { width } = useWindowDimensions();
   const metrics = getForestCampMetrics(width);
+  const settings = useAppSettings();
+  const childPlanSubtitle =
+    settings.onboarding.dailyCommitmentMinutes === null
+      ? t('settings.childProfile.manageSubtitle')
+      : t('settings.childProfile.summary', {
+          age: settings.onboarding.childAgeMonths ?? 0,
+          minutes: settings.onboarding.dailyCommitmentMinutes,
+        });
 
   return (
     <View style={styles.container}>
@@ -133,6 +142,19 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
+          <ThemedText style={styles.sectionTitle}>{t('settings.childProfile.sectionTitle')}</ThemedText>
+
+          <View style={styles.sectionContent}>
+            <SettingItem
+              title={t('settings.childProfile.manage')}
+              subtitle={childPlanSubtitle}
+              icon="time-outline"
+              onPress={() => router.push('/settings/child-profile')}
+            />
+          </View>
+        </View>
+
+        <View style={styles.section}>
           <ThemedText style={styles.sectionTitle}>{t('settings.account.sectionTitle')}</ThemedText>
 
           <View style={styles.sectionContent}>
@@ -140,7 +162,7 @@ export default function SettingsScreen() {
               title={t('settings.account.manage')}
               subtitle={t('settings.account.manageSubtitle')}
               icon="shield-checkmark-outline"
-              onPress={() => router.push('./account')}
+              onPress={() => router.push('/settings/account')}
             />
           </View>
         </View>

@@ -1,5 +1,5 @@
 import { mutationGeneric as mutation, queryGeneric as query } from 'convex/server';
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 import { requireCurrentUser } from './lib/current_user';
 import { getContentPool } from './lib/noRepContent';
 import { defaultSettings } from './settingsSnapshot';
@@ -67,7 +67,7 @@ export const getStatus = query({
   },
 });
 
-export const chooseAndMark = mutation({
+export const choose = query({
   args: {
     contentType: contentTypeValidator,
   },
@@ -110,7 +110,30 @@ export const chooseAndMark = mutation({
       selected.push(copy[i]);
     }
 
-    const newDisplayedItems = [...displayedItems, ...selected];
+    return selected;
+  },
+});
+
+export const complete = mutation({
+  args: {
+    contentType: contentTypeValidator,
+    items: v.array(v.string()),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const user = await requireCurrentUser(ctx);
+    const pool = new Set(getContentPool(args.contentType));
+    if (args.items.length === 0 || args.items.some((item) => !pool.has(item))) {
+      throw new ConvexError('Invalid presentation content.');
+    }
+    const progress = await ctx.db
+      .query('noRepProgress')
+      .withIndex('by_user_and_content_type', (q) => q.eq('userId', user._id))
+      .filter((q) => q.eq(q.field('contentType'), args.contentType))
+      .first();
+    const displayedItems = progress?.displayedItems ?? [];
+    const newDisplayedItems = Array.from(new Set([...displayedItems, ...args.items]));
+    if (newDisplayedItems.length === displayedItems.length) return null;
     if (progress) {
       await ctx.db.patch(progress._id, { displayedItems: newDisplayedItems });
     } else {
@@ -127,6 +150,6 @@ export const chooseAndMark = mutation({
       completedAt: Date.now(),
     });
 
-    return selected;
+    return null;
   },
 });

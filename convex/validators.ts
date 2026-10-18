@@ -3,10 +3,34 @@ import { defaultSettings } from './settingsSnapshot';
 
 export const contentTypeValidator = v.union(v.literal('words'), v.literal('sentences'));
 
+export const dailyCommitmentMinutesValidator = v.union(
+  v.literal(2),
+  v.literal(5),
+  v.literal(10),
+  v.literal(15)
+);
+
 export const bookSessionNameValidator = v.union(
   v.literal('session1'),
   v.literal('session2'),
   v.literal('session3')
+);
+
+export const bookSessionTokenValidator = v.union(
+  v.literal('session1:words'),
+  v.literal('session2:words'),
+  v.literal('session3:words'),
+  v.literal('session3:sentences')
+);
+
+export const routineBlockIdValidator = v.union(
+  v.literal('noRep'),
+  v.literal('bookSession1'),
+  v.literal('bookSession2'),
+  v.literal('bookSession3'),
+  v.literal('drawings'),
+  v.literal('mathSession1'),
+  v.literal('mathSession2')
 );
 
 export const mathSessionValidator = v.union(
@@ -32,6 +56,10 @@ export const equationCategoryValidator = v.union(
 );
 
 export const settingsSnapshotValidator = v.object({
+  onboarding: v.object({
+    childAgeMonths: v.union(v.number(), v.null()),
+    dailyCommitmentMinutes: v.union(dailyCommitmentMinutesValidator, v.null()),
+  }),
   reading: v.object({
     noRep: v.object({
       words: v.number(),

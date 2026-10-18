@@ -6,6 +6,7 @@ interface StateActionRowProps {
   title: string;
   subtitle: string;
   isCompleted?: boolean;
+  disabled?: boolean;
   onPress: () => void;
 }
 
@@ -13,14 +14,19 @@ export function StateActionRow({
   title,
   subtitle,
   isCompleted = false,
+  disabled = false,
   onPress,
 }: StateActionRowProps) {
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       style={({ pressed }) => [
         styles.row,
         isCompleted && styles.rowDone,
         pressed && styles.rowPressed,
+        disabled && styles.rowPressed,
       ]}
       onPress={onPress}
     >

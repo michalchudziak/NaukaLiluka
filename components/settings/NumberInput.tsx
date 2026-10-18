@@ -1,7 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ForestCampTheme, forestCampTypography, spacing } from '@/constants/ForestCampTheme';
+import { parseNumberDraft } from '@/shared/numberInput';
 
 interface NumberInputProps {
   label: string;
@@ -22,42 +31,61 @@ export function NumberInput({
   step = 1,
   suffix,
 }: NumberInputProps) {
+  const { width, fontScale } = useWindowDimensions();
+  const [draft, setDraft] = useState<string | null>(null);
+  const commitDraft = () => {
+    const next = draft === null ? null : parseNumberDraft(draft, min, max);
+    if (next !== null && next !== value) onChangeValue(next);
+    setDraft(null);
+  };
+  const stepValue = draft === null ? value : (parseNumberDraft(draft, min, max) ?? value);
   const handleDecrement = () => {
-    if (value > min) onChangeValue(Math.max(min, value - step));
+    setDraft(null);
+    if (stepValue > min) onChangeValue(Math.max(min, stepValue - step));
   };
 
   const handleIncrement = () => {
-    if (value < max) onChangeValue(Math.min(max, value + step));
+    setDraft(null);
+    if (stepValue < max) onChangeValue(Math.min(max, stepValue + step));
   };
 
-  const handleTextChange = (text: string) => {
-    const num = parseInt(text, 10) || min;
-    if (num >= min && num <= max) onChangeValue(num);
-  };
+  const inputWidth = Math.max(62, String(max).length * 12 * fontScale + spacing.lg);
+  const controlSize = Math.max(34, 30 * fontScale);
+  const stacked = fontScale > 1.4 || width < 400;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, stacked && styles.containerStacked]}>
       <ThemedText style={styles.label}>{label}</ThemedText>
       <View style={styles.controls}>
         <TouchableOpacity
-          style={[styles.button, value <= min && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            { minWidth: controlSize, minHeight: controlSize },
+            stepValue <= min && styles.buttonDisabled,
+          ]}
           onPress={handleDecrement}
-          disabled={value <= min}
+          disabled={stepValue <= min}
+          accessibilityLabel={`${label}: −`}
         >
           <Ionicons
             name="remove"
             size={20}
             color={
-              value <= min ? ForestCampTheme.colors.textMuted : ForestCampTheme.colors.primaryStrong
+              stepValue <= min
+                ? ForestCampTheme.colors.textMuted
+                : ForestCampTheme.colors.primaryStrong
             }
           />
         </TouchableOpacity>
 
         <View style={styles.inputWrapper}>
           <TextInput
-            style={styles.input}
-            value={value.toString()}
-            onChangeText={handleTextChange}
+            style={[styles.input, { width: inputWidth, minHeight: controlSize }]}
+            value={draft ?? value.toString()}
+            onChangeText={setDraft}
+            onBlur={commitDraft}
+            onSubmitEditing={commitDraft}
+            accessibilityLabel={label}
             keyboardType="number-pad"
             selectTextOnFocus
           />
@@ -65,15 +93,22 @@ export function NumberInput({
         </View>
 
         <TouchableOpacity
-          style={[styles.button, value >= max && styles.buttonDisabled]}
+          style={[
+            styles.button,
+            { minWidth: controlSize, minHeight: controlSize },
+            stepValue >= max && styles.buttonDisabled,
+          ]}
           onPress={handleIncrement}
-          disabled={value >= max}
+          disabled={stepValue >= max}
+          accessibilityLabel={`${label}: +`}
         >
           <Ionicons
             name="add"
             size={20}
             color={
-              value >= max ? ForestCampTheme.colors.textMuted : ForestCampTheme.colors.primaryStrong
+              stepValue >= max
+                ? ForestCampTheme.colors.textMuted
+                : ForestCampTheme.colors.primaryStrong
             }
           />
         </TouchableOpacity>
@@ -91,6 +126,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     backgroundColor: ForestCampTheme.colors.card,
   },
+  containerStacked: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
   label: {
     ...forestCampTypography.heading,
     fontSize: 16,
@@ -102,8 +142,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    width: 34,
-    height: 34,
+    minWidth: 34,
+    minHeight: 34,
     borderRadius: 10,
     backgroundColor: ForestCampTheme.colors.cardMuted,
     justifyContent: 'center',
@@ -119,7 +159,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: 62,
-    height: 34,
+    minHeight: 34,
     textAlign: 'center',
     fontSize: 17,
     borderRadius: 10,

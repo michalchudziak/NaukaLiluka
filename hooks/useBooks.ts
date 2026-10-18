@@ -3,6 +3,8 @@ import { startOfDay } from 'date-fns';
 import { books } from '@/content/books';
 import { api } from '@/convex/_generated/api';
 import { EXPECTED_BOOK_COUNT } from '@/convex/lib/bookContent';
+import { useRoutinePlan, useSyncRoutineCycle } from '@/hooks/useRoutinePlan';
+import { getBookRoutineId } from '@/shared/dailyCommitment';
 
 if (books.length !== EXPECTED_BOOK_COUNT) {
   throw new Error(
@@ -45,8 +47,18 @@ export function useBookDailyContent() {
 export function useCompleteBookSession() {
   const todayStartMs = startOfDay(new Date()).getTime();
   const mutate = useMutation(api.books.completeSession);
-  return (session: 'session1' | 'session2' | 'session3', type: 'words' | 'sentences') =>
-    mutate({ session, type, todayStartMs });
+  const { isRoutineActive } = useRoutinePlan();
+  const syncRoutineCycle = useSyncRoutineCycle();
+
+  return async (session: 'session1' | 'session2' | 'session3', type: 'words' | 'sentences') => {
+    if (!isRoutineActive(getBookRoutineId(session))) {
+      return null;
+    }
+
+    const result = await mutate({ session, type, todayStartMs });
+    await syncRoutineCycle();
+    return result;
+  };
 }
 
 export function useBookListProgress() {

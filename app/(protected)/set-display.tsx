@@ -1,12 +1,7 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import { useMemo } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AutoSizeText } from '@/components/AutoSizeText';
 import type { ShapeType } from '@/components/ShapePicker';
@@ -26,6 +21,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { spacing } from '@/constants/ForestCampTheme';
 import { useAppSettings } from '@/hooks/useSettings';
+import { useTimedPresentation } from '@/hooks/useTimedPresentation';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
@@ -34,14 +30,22 @@ interface ShapePosition {
   y: number;
 }
 
+type SetParams = {
+  numbers: string;
+  shape: ShapeType;
+  color: string;
+  showNumberFollowups?: string;
+  completion?: string;
+};
+
 export default function SetDisplayScreen() {
-  const params = useLocalSearchParams();
-  const router = useRouter();
+  const params = useLocalSearchParams<SetParams>();
+  return <SetPresentation key={`${params.numbers}:${params.completion ?? ''}`} params={params} />;
+}
+
+function SetPresentation({ params }: { params: SetParams }) {
   const insets = useSafeAreaInsets();
   const { math } = useAppSettings();
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const currentIndexRef = useRef(-1);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { width, height } = useWindowDimensions();
 
   const showNumberFollowups = (params.showNumberFollowups as string) === 'true';
@@ -73,12 +77,10 @@ export default function SetDisplayScreen() {
     return Math.max(8, Math.min(25, calculatedSize));
   }, [width, height, insets, numbers]);
 
-  const opacity = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-    };
+  const { currentIndex, animatedStyle } = useTimedPresentation({
+    itemCount: numbers.length,
+    interval: math.numbers.interval,
+    completion: params.completion,
   });
 
   const shape = params.shape as ShapeType;
@@ -149,40 +151,6 @@ export default function SetDisplayScreen() {
         return <Plus {...shapeProps} />;
     }
   };
-
-  const fadeTransition = useCallback(
-    (callback: () => void) => {
-      'worklet';
-      opacity.value = withTiming(0, { duration: 200 }, () => {
-        runOnJS(callback)();
-        opacity.value = withTiming(1, { duration: 200 });
-      });
-    },
-    [opacity]
-  );
-
-  useEffect(() => {
-    if (numbers.length === 0) return;
-
-    intervalRef.current = setInterval(() => {
-      fadeTransition(() => {
-        const next = currentIndexRef.current + 1;
-        currentIndexRef.current = next;
-        if (next >= numbers.length) {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          router.back();
-        } else {
-          setCurrentIndex(next);
-        }
-      });
-    }, math.numbers.interval);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [numbers.length, fadeTransition, math.numbers.interval, router]);
 
   if (numbers.length === 0) {
     return <AnimatedThemedView style={[styles.container, animatedStyle]} />;

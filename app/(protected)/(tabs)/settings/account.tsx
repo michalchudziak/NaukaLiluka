@@ -16,23 +16,7 @@ import {
 import { useTranslation } from '@/hooks/useTranslation';
 import { authClient } from '@/services/auth-client';
 import { ConvexService } from '@/services/convex';
-
-function formatDateLabel(value: unknown) {
-  if (!value) {
-    return null;
-  }
-
-  const date = value instanceof Date ? value : new Date(String(value));
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  return new Intl.DateTimeFormat('pl-PL', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(date);
-}
+import { formatAccountDate } from '@/shared/accountDate';
 
 function isValidEmail(email: string) {
   return /\S+@\S+\.\S+/.test(email);
@@ -105,7 +89,7 @@ export default function AccountSettingsScreen() {
   const profileName = user?.name ?? accountProfile?.name ?? '';
   const profileEmail = accountProfile?.email ?? user?.email ?? null;
   const profileCreatedAt = accountProfile?.createdAt ?? user?.createdAt ?? null;
-  const memberSince = useMemo(() => formatDateLabel(profileCreatedAt), [profileCreatedAt]);
+  const memberSince = useMemo(() => formatAccountDate(profileCreatedAt), [profileCreatedAt]);
   const [displayName, setDisplayName] = useState('');
   const [prevProfileName, setPrevProfileName] = useState('');
   if (profileName !== prevProfileName) {

@@ -3,7 +3,9 @@ import { startOfDay } from 'date-fns';
 import { buildEquationScheme } from '@/content/math/equation-scheme';
 import { getNumbersLearningScheme } from '@/content/math/learning-scheme';
 import { api } from '@/convex/_generated/api';
+import { useRoutinePlan, useSyncRoutineCycle } from '@/hooks/useRoutinePlan';
 import { useAppSettings } from '@/hooks/useSettings';
+import { getMathRoutineId } from '@/shared/dailyCommitment';
 
 export type MathSession =
   | 'subitizingOrdered'
@@ -36,12 +38,25 @@ export function useMathStatus() {
 export function useCompleteMathSession() {
   const todayStartMs = startOfDay(new Date()).getTime();
   const mutate = useMutation(api.math.completeSession);
+  const { isRoutineActive } = useRoutinePlan();
+  const syncRoutineCycle = useSyncRoutineCycle();
 
-  return (session: MathSession) =>
-    mutate({
+  return async (session: MathSession) => {
+    const routineId = getMathRoutineId(
+      session === 'subitizingOrdered' || session === 'numbersOrdered' ? 'session1' : 'session2'
+    );
+
+    if (!isRoutineActive(routineId)) {
+      return null;
+    }
+
+    const result = await mutate({
       session,
       todayStartMs,
     });
+    await syncRoutineCycle();
+    return result;
+  };
 }
 
 export function useEquationsStatus() {
@@ -67,10 +82,23 @@ export function useEquationsStatus() {
 export function useCompleteEquationSession() {
   const todayStartMs = startOfDay(new Date()).getTime();
   const mutate = useMutation(api.equations.completeSession);
+  const { isRoutineActive } = useRoutinePlan();
+  const syncRoutineCycle = useSyncRoutineCycle();
 
-  return (session: EquationSession) =>
-    mutate({
+  return async (session: EquationSession) => {
+    const routineId = getMathRoutineId(
+      session === 'subitizing1' || session === 'equations1' ? 'session1' : 'session2'
+    );
+
+    if (!isRoutineActive(routineId)) {
+      return null;
+    }
+
+    const result = await mutate({
       session,
       todayStartMs,
     });
+    await syncRoutineCycle();
+    return result;
+  };
 }

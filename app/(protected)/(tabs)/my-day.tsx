@@ -17,10 +17,13 @@ import { useBookStatus } from '@/hooks/useBooks';
 import { useDrawingsStatus } from '@/hooks/useDrawings';
 import { useEquationsStatus, useMathStatus } from '@/hooks/useMath';
 import { useNoRepStatus } from '@/hooks/useNoRep';
+import { useRoutinePlan } from '@/hooks/useRoutinePlan';
 import { useTranslation } from '@/hooks/useTranslation';
+import type { RoutineBlockId } from '@/shared/dailyCommitment';
 
 type RoutineItem = {
   id: string;
+  blockId: RoutineBlockId;
   title: string;
   isCompleted: boolean;
   onPress: () => void;
@@ -76,6 +79,13 @@ function RoutineSection({
   );
 }
 
+function filterActiveRoutines(
+  routines: RoutineItem[],
+  isRoutineActive: (blockId: RoutineBlockId) => boolean
+) {
+  return routines.filter((routine) => isRoutineActive(routine.blockId));
+}
+
 export default function MyDayScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
@@ -85,6 +95,7 @@ export default function MyDayScreen() {
   const noRepStatus = useNoRepStatus();
   const bookStatus = useBookStatus();
   const drawingsStatus = useDrawingsStatus();
+  const { isLoaded: isRoutinePlanLoaded, isRoutineActive } = useRoutinePlan();
   const {
     currentDay,
     hasGraduatedToEquations,
@@ -196,71 +207,80 @@ export default function MyDayScreen() {
     });
   };
 
-  const readingRoutines: RoutineItem[] = [
+  const readingRoutines = filterActiveRoutines([
     {
       id: 'routine-1',
+      blockId: 'noRep',
       title: t('myDay.routine1'),
       isCompleted: isNoRepCompleted,
       onPress: navigateToNoRep,
     },
     {
       id: 'routine-2',
+      blockId: 'bookSession1',
       title: t('myDay.routine2'),
       isCompleted: isSession1Completed,
       onPress: navigateToBooksDaily,
     },
     {
       id: 'routine-3',
+      blockId: 'bookSession2',
       title: t('myDay.routine3'),
       isCompleted: isSession2Completed,
       onPress: navigateToBooksDaily,
     },
     {
       id: 'routine-4',
+      blockId: 'bookSession3',
       title: t('myDay.routine4'),
       isCompleted: isSession3Completed,
       onPress: navigateToBooksDaily,
     },
-  ];
+  ], isRoutineActive);
 
-  const drawingRoutines: RoutineItem[] = [
+  const drawingRoutines = filterActiveRoutines([
     {
       id: 'routine-5',
+      blockId: 'drawings',
       title: t('myDay.routine5'),
       isCompleted: isDrawingsCompleted,
       onPress: navigateToDrawings,
     },
-  ];
+  ], isRoutineActive);
 
-  const mathRoutines: RoutineItem[] = hasGraduatedToEquations
-    ? [
+  const mathRoutines = hasGraduatedToEquations
+    ? filterActiveRoutines([
         {
           id: 'eq-session-1',
+          blockId: 'mathSession1',
           title: t('myDay.equationsSet1'),
           isCompleted: isEqSession1Completed,
           onPress: navigateToEquations,
         },
         {
           id: 'eq-session-2',
+          blockId: 'mathSession2',
           title: t('myDay.equationsSet2'),
           isCompleted: isEqSession2Completed,
           onPress: navigateToEquations,
         },
-      ]
-    : [
+      ], isRoutineActive)
+      : filterActiveRoutines([
         {
           id: 'math-session-1',
+          blockId: 'mathSession1',
           title: t('myDay.mathSet1'),
           isCompleted: isMathSession1Completed,
           onPress: navigateToSets,
         },
         {
           id: 'math-session-2',
+          blockId: 'mathSession2',
           title: t('myDay.mathSet2'),
           isCompleted: isMathSession2Completed,
           onPress: navigateToSets,
         },
-      ];
+      ], isRoutineActive);
 
   const allRoutines = [...readingRoutines, ...drawingRoutines, ...mathRoutines];
   const completedCount = allRoutines.filter((r) => r.isCompleted).length;
@@ -268,6 +288,10 @@ export default function MyDayScreen() {
   const remainingCount = totalCount - completedCount;
   const completionPercent = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
   const nextRoutine = allRoutines.find((r) => !r.isCompleted) ?? null;
+
+  if (!isRoutinePlanLoaded) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

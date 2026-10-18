@@ -18,6 +18,10 @@ export default function SettingsLayout() {
       }}
     >
       <Stack.Screen name="index" options={{ title: t('tabs.settings') }} />
+      <Stack.Screen
+        name="child-profile"
+        options={{ title: t('settings.childProfile.manage') }}
+      />
       <Stack.Screen name="reading-norep" options={{ title: t('settings.reading.noRepSettings') }} />
       <Stack.Screen
         name="reading-interval"

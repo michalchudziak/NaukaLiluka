@@ -1,72 +1,41 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { AutoSizeText } from '@/components/AutoSizeText';
 import { ThemedView } from '@/components/ThemedView';
 import { useAppSettings } from '@/hooks/useSettings';
+import { useTimedPresentation } from '@/hooks/useTimedPresentation';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
+type EquationParams = { pairs: string; color: string; completion?: string };
+
 export default function EquationsDisplayScreen() {
-  const params = useLocalSearchParams();
-  const router = useRouter();
+  const params = useLocalSearchParams<EquationParams>();
+  return (
+    <EquationsPresentation key={`${params.pairs}:${params.completion ?? ''}`} params={params} />
+  );
+}
+
+function EquationsPresentation({ params }: { params: EquationParams }) {
   const { math } = useAppSettings();
-
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const currentIndexRef = useRef(-1);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const opacity = useSharedValue(1);
-  const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
-
   const equations = useMemo(() => {
     try {
       const pairs = JSON.parse(params.pairs as string) as string[][];
       return pairs.flatMap((pair: string[]) => pair);
     } catch {
-      return [] as string[][];
+      return [] as string[];
     }
   }, [params.pairs]);
 
   const color = (params.color as string) || '#000000';
 
-  const fadeTransition = useCallback(
-    (callback: () => void) => {
-      'worklet';
-      opacity.value = withTiming(0, { duration: 100 }, () => {
-        runOnJS(callback)();
-        opacity.value = withTiming(1, { duration: 100 });
-      });
-    },
-    [opacity]
-  );
-
-  useEffect(() => {
-    if (equations.length === 0) return;
-
-    intervalRef.current = setInterval(() => {
-      fadeTransition(() => {
-        const next = currentIndexRef.current + 1;
-        currentIndexRef.current = next;
-        if (next >= equations.length) {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          router.back();
-        } else {
-          setCurrentIndex(next);
-        }
-      });
-    }, math.equations.interval);
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [equations.length, fadeTransition, math.equations.interval, router]);
+  const { currentIndex, animatedStyle } = useTimedPresentation({
+    itemCount: equations.length,
+    interval: math.equations.interval,
+    completion: params.completion,
+  });
 
   if (equations.length === 0 || currentIndex === -1) {
     return <AnimatedThemedView style={[styles.container, animatedStyle]} />;

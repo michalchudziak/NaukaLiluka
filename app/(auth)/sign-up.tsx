@@ -1,4 +1,3 @@
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { AuthFormShell } from '@/components/auth/auth-form-shell';
@@ -14,7 +13,6 @@ function isValidEmail(email: string) {
 }
 
 export default function SignUpScreen() {
-  const router = useRouter();
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -64,14 +62,12 @@ export default function SignUpScreen() {
       },
     });
 
-    setIsSubmitting(false);
-
     if (result.error) {
+      setIsSubmitting(false);
       setError(result.error.message ?? t('auth.signUpError'));
-      return;
     }
-
-    router.replace('/my-day');
+    // On success, stay in the submitting state; the (auth) layout redirects
+    // once useConvexAuth() reflects the new session.
   };
 
   return (

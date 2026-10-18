@@ -28,6 +28,50 @@ export const createAuth = (ctx: GenericCtx<DataModel>) =>
     trustedOrigins,
     emailAndPassword: {
       enabled: true,
+      resetPasswordTokenExpiresIn: 3600,
+      sendResetPassword: async ({ user, token }) => {
+        const resendApiKey = process.env.RESEND_API_KEY;
+        const emailFrom = process.env.EMAIL_FROM ?? 'NaukaLiluka <noreply@naukaliluka.pl>';
+
+        console.log(`[Password Reset] Token for ${user.email}: ${token}`);
+
+        if (!resendApiKey) {
+          console.warn(
+            '[Password Reset] RESEND_API_KEY not configured — email not sent. Use the token from Convex logs.'
+          );
+          return;
+        }
+
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${resendApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: emailFrom,
+            to: user.email,
+            subject: 'Resetowanie hasła – NaukaLiluka',
+            html: [
+              '<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">',
+              `<h2 style="color:#15432d">Cześć${user.name ? `, ${user.name}` : ''}!</h2>`,
+              '<p>Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta w <strong>NaukaLiluka</strong>.</p>',
+              '<p>Twój kod resetowania:</p>',
+              '<div style="background:#eef6e7;padding:20px;text-align:center;font-size:28px;',
+              'font-weight:bold;letter-spacing:3px;border-radius:12px;border:2px solid #c5d9b5;',
+              `margin:16px 0;color:#1f3a29">${token}</div>`,
+              '<p>Otwórz aplikację NaukaLiluka i wpisz ten kod na ekranie resetowania hasła.</p>',
+              '<p style="color:#5b735f;font-size:13px">Kod wygasa za 1 godzinę. Jeśli nie prosiłeś',
+              ' o reset hasła, zignoruj tę wiadomość.</p>',
+              '</div>',
+            ].join(''),
+          }),
+        });
+
+        if (!response.ok) {
+          console.error('[Password Reset] Resend API error:', await response.text());
+        }
+      },
     },
     plugins: [
       convexPlugin({

@@ -17,7 +17,8 @@
     "lint": "biome check --write .",
     "lint:check": "biome check .",
     "format": "biome format --write .",
-    "format:check": "biome format ."
+    "format:check": "biome format .",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs"
   },
   "dependencies": {
     "@better-auth/expo": "1.5.3",

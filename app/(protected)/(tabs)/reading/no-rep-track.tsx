@@ -13,8 +13,11 @@ import {
   getForestCampMetrics,
   spacing,
 } from '@/constants/ForestCampTheme';
-import { useChooseAndMark, useNoRepStatus } from '@/hooks/useNoRep';
+import { useChooseNoRepItems, useNoRepStatus } from '@/hooks/useNoRep';
+import { usePresentationLaunch } from '@/hooks/usePresentationLaunch';
+import { useRoutinePlan } from '@/hooks/useRoutinePlan';
 import { useTranslation } from '@/hooks/useTranslation';
+import { type ContentType, serializeCompletion } from '@/shared/presentation';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const guideImage = require('@/assets/images/guides/no-rep.png');
@@ -26,7 +29,9 @@ export default function NoRepScreen() {
   const router = useRouter();
   const [selectedColor, setSelectedColor] = useState('#000000');
   const status = useNoRepStatus();
-  const chooseAndMark = useChooseAndMark();
+  const chooseItems = useChooseNoRepItems();
+  const { launch, isLaunching } = usePresentationLaunch();
+  const { isRoutineActive } = useRoutinePlan();
   const tabBarHeight = useBottomTabBarHeight();
 
   const wordsCompletedToday = status?.isWordsCompletedToday ?? false;
@@ -34,41 +39,31 @@ export default function NoRepScreen() {
 
   const imageSize = Math.min(width * 0.35, 160);
 
-  const handleWordsPress = async () => {
-    const selected = await chooseAndMark({ contentType: 'words' });
+  const handlePress = (contentType: ContentType) =>
+    launch(async () => {
+      if (!isRoutineActive('noRep')) {
+        Alert.alert(t('common.ok'), t('common.availableLater'));
+        return false;
+      }
 
-    if (selected.length === 0) {
-      Alert.alert(t('noRep.noMoreWords'));
-      return;
-    }
+      const selected = await chooseItems({ contentType });
 
-    router.push({
-      pathname: '/display',
-      params: {
-        items: JSON.stringify(selected),
-        color: selectedColor,
-        type: 'words',
-      },
+      if (selected.length === 0) {
+        Alert.alert(t(contentType === 'words' ? 'noRep.noMoreWords' : 'noRep.noMoreSentences'));
+        return false;
+      }
+
+      router.push({
+        pathname: '/display',
+        params: {
+          items: JSON.stringify(selected),
+          color: selectedColor,
+          type: contentType,
+          completion: serializeCompletion({ kind: 'noRep', contentType }),
+        },
+      });
+      return true;
     });
-  };
-
-  const handleSentencesPress = async () => {
-    const selected = await chooseAndMark({ contentType: 'sentences' });
-
-    if (selected.length === 0) {
-      Alert.alert(t('noRep.noMoreSentences'));
-      return;
-    }
-
-    router.push({
-      pathname: '/display',
-      params: {
-        items: JSON.stringify(selected),
-        color: selectedColor,
-        type: 'sentences',
-      },
-    });
-  };
 
   const actions = [
     {
@@ -76,14 +71,14 @@ export default function NoRepScreen() {
       title: t('noRep.words'),
       subtitle: wordsCompletedToday ? t('myDay.doneStatus') : t('myDay.pendingStatus'),
       isCompleted: wordsCompletedToday,
-      onPress: handleWordsPress,
+      onPress: () => void handlePress('words'),
     },
     {
       id: 'sentences',
       title: t('noRep.sentences'),
       subtitle: sentencesCompletedToday ? t('myDay.doneStatus') : t('myDay.pendingStatus'),
       isCompleted: sentencesCompletedToday,
-      onPress: handleSentencesPress,
+      onPress: () => void handlePress('sentences'),
     },
   ] as const;
 
@@ -144,6 +139,7 @@ export default function NoRepScreen() {
               subtitle={action.subtitle}
               isCompleted={action.isCompleted}
               onPress={action.onPress}
+              disabled={isLaunching}
             />
           ))}
         </ThemedView>

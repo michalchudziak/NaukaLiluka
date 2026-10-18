@@ -17,9 +17,13 @@ import {
 } from '@/constants/ForestCampTheme';
 import { WordColors } from '@/constants/WordColors';
 import type { SessionContent } from '@/content/math/learning-scheme';
-import { type MathSession, useCompleteMathSession, useMathStatus } from '@/hooks/useMath';
+import { type MathSession, useMathStatus } from '@/hooks/useMath';
+import { usePresentationLaunch } from '@/hooks/usePresentationLaunch';
+import { useRoutinePlan } from '@/hooks/useRoutinePlan';
 import { useAppSettings } from '@/hooks/useSettings';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getMathRoutineId } from '@/shared/dailyCommitment';
+import { serializeCompletion } from '@/shared/presentation';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const guideImage = require('@/assets/images/guides/math.png');
@@ -33,49 +37,55 @@ export default function SetsScreen() {
   const [selectedColor, setSelectedColor] = useState(WordColors[0].hex);
   const [selectedShape, setSelectedShape] = useState<ShapeType>('circle');
   const { currentDay, dailyData, isSessionCompletedToday } = useMathStatus();
-  const completeSession = useCompleteMathSession();
+  const { launch, isLaunching } = usePresentationLaunch();
   const { math } = useAppSettings();
+  const { isRoutineActive } = useRoutinePlan();
 
-  const handleSessionPress = async (sessionContent: SessionContent) => {
-    const numbers = sessionContent.isOrdered
-      ? dailyData.numbers
-      : [...dailyData.numbers].sort(() => Math.random() - 0.5);
+  const handleSessionPress = (sessionContent: SessionContent) =>
+    launch(() => {
+      const numbers = sessionContent.isOrdered
+        ? dailyData.numbers
+        : [...dailyData.numbers].sort(() => Math.random() - 0.5);
 
-    const sessionType = `${sessionContent.type}${
-      sessionContent.isOrdered ? 'Ordered' : 'Unordered'
-    }` as MathSession;
+      const sessionType = `${sessionContent.type}${
+        sessionContent.isOrdered ? 'Ordered' : 'Unordered'
+      }` as MathSession;
 
-    if (sessionContent.type === 'subitizing') {
-      router.push({
-        pathname: '/set-display',
-        params: {
-          numbers: JSON.stringify(numbers),
-          shape: selectedShape,
-          color: selectedColor,
-          sessionType,
-        },
-      });
-    } else {
-      router.push({
-        pathname: '/display',
-        params: {
-          items: JSON.stringify(numbers.map((n) => n.toString())),
-          type: 'words',
-          color: selectedColor,
-          interval: String(math.numbers.interval),
-          sessionType,
-        },
-      });
-    }
+      if (sessionContent.type === 'subitizing') {
+        router.push({
+          pathname: '/set-display',
+          params: {
+            numbers: JSON.stringify(numbers),
+            shape: selectedShape,
+            color: selectedColor,
+            sessionType,
+            completion: serializeCompletion({ kind: 'math', session: sessionType }),
+          },
+        });
+      } else {
+        router.push({
+          pathname: '/display',
+          params: {
+            items: JSON.stringify(numbers.map((n) => n.toString())),
+            type: 'words',
+            color: selectedColor,
+            interval: String(math.numbers.interval),
+            sessionType,
+            completion: serializeCompletion({ kind: 'math', session: sessionType }),
+          },
+        });
+      }
 
-    setTimeout(() => {
-      void completeSession(sessionType);
-    }, 1000);
-  };
+      return true;
+    });
 
   const renderSession = (sessionNumber: number) => {
     const sessionKey = `session${sessionNumber}`;
     const sessionIndex = sessionNumber - 1;
+
+    if (!isRoutineActive(getMathRoutineId(sessionKey as 'session1' | 'session2'))) {
+      return null;
+    }
 
     if (!dailyData?.sessionContent[sessionIndex]) {
       return null;
@@ -101,6 +111,7 @@ export default function SetsScreen() {
                 subtitle={isCompleted ? t('myDay.doneStatus') : t('myDay.pendingStatus')}
                 isCompleted={isCompleted}
                 onPress={() => handleSessionPress(item)}
+                disabled={isLaunching}
               />
             );
           })}

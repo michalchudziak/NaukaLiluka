@@ -12,6 +12,7 @@ import {
   spacing,
 } from '@/constants/ForestCampTheme';
 import { useEquationsStatus, useMathStatus } from '@/hooks/useMath';
+import { useRoutinePlan } from '@/hooks/useRoutinePlan';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -23,8 +24,17 @@ export default function MathScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const tabBarHeight = useBottomTabBarHeight();
-  const { isDayCompleted, currentDay, hasGraduatedToEquations } = useMathStatus();
-  const { isDayCompleted: isEquationsDayCompleted } = useEquationsStatus();
+  const {
+    isDayCompleted,
+    currentDay,
+    hasGraduatedToEquations,
+    isSessionCompletedToday: isNumberSessionCompleted,
+  } = useMathStatus();
+  const {
+    isDayCompleted: isEquationsDayCompleted,
+    isSessionCompletedToday: isEquationSessionCompleted,
+  } = useEquationsStatus();
+  const { isRoutineActive } = useRoutinePlan();
 
   const modules = [
     {
@@ -41,9 +51,16 @@ export default function MathScreen() {
     },
   ] as const;
 
-  const doneCount = modules.filter((module) => module.isCompleted).length;
-  const percent = Math.round((doneCount / modules.length) * 100);
-  const nextModule = modules.find((module) => !module.isCompleted) ?? modules[0];
+  const sessions = (['session1', 'session2'] as const).filter((session) =>
+    isRoutineActive(session === 'session1' ? 'mathSession1' : 'mathSession2')
+  );
+  const isSessionCompleted = hasGraduatedToEquations
+    ? isEquationSessionCompleted
+    : isNumberSessionCompleted;
+  const doneCount = sessions.filter(isSessionCompleted).length;
+  const percent = sessions.length === 0 ? 0 : Math.round((doneCount / sessions.length) * 100);
+  const hasNextSession = sessions.some((session) => !isSessionCompleted(session));
+  const nextModule = hasGraduatedToEquations ? modules[1] : modules[0];
 
   return (
     <View style={styles.container}>
@@ -72,10 +89,12 @@ export default function MathScreen() {
           <View style={styles.heroStats}>
             <ThemedText
               style={styles.heroStatsText}
-            >{`${doneCount}/2 ${t('myDay.completedLabel')} · ${t('myDay.currentStageLabel')} ${currentDay}`}</ThemedText>
-            <Pressable style={styles.nextButton} onPress={nextModule.onPress}>
-              <ThemedText style={styles.nextButtonText}>{t('myDay.openNextStep')}</ThemedText>
-            </Pressable>
+            >{`${doneCount}/${sessions.length} ${t('myDay.completedLabel')} · ${t('myDay.currentStageLabel')} ${currentDay}`}</ThemedText>
+            {hasNextSession && (
+              <Pressable style={styles.nextButton} onPress={nextModule.onPress}>
+                <ThemedText style={styles.nextButtonText}>{t('myDay.openNextStep')}</ThemedText>
+              </Pressable>
+            )}
           </View>
         </View>
 

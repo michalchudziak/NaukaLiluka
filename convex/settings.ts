@@ -4,6 +4,7 @@ import type { Id } from './_generated/dataModel';
 import type { MutationCtx, QueryCtx } from './_generated/server';
 import { requireCurrentUser } from './lib/current_user';
 import {
+  applyOnboardingProfilePatch,
   applyDrawingsPatch,
   applyMathEquationsPatch,
   applyMathNumbersPatch,
@@ -53,6 +54,19 @@ export const get = query({
     const settings = await getCurrentSettings(ctx, user._id);
 
     return settings?.snapshot ?? defaultSettings;
+  },
+});
+
+export const completeOnboardingProfile = mutation({
+  args: {
+    childAgeMonths: v.number(),
+    dailyCommitmentMinutes: v.union(v.literal(2), v.literal(5), v.literal(10), v.literal(15)),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    return await updateSettingsSnapshot(ctx, (settings) =>
+      applyOnboardingProfilePatch(settings, args)
+    );
   },
 });
 

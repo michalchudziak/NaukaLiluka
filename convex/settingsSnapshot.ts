@@ -1,4 +1,13 @@
+import {
+  defaultOnboardingProfile,
+  type DailyCommitmentMinutes,
+} from '../shared/dailyCommitment';
+
 export type SettingsSnapshot = {
+  onboarding: {
+    childAgeMonths: number | null;
+    dailyCommitmentMinutes: DailyCommitmentMinutes | null;
+  };
   reading: {
     noRep: {
       words: number;
@@ -34,11 +43,13 @@ export type SettingsSnapshot = {
 export type ReadingNoRepPatch = Partial<SettingsSnapshot['reading']['noRep']>;
 export type ReadingIntervalPatch = Partial<SettingsSnapshot['reading']['interval']>;
 export type ReadingBooksPatch = Partial<SettingsSnapshot['reading']['books']>;
+export type OnboardingProfilePatch = Partial<SettingsSnapshot['onboarding']>;
 export type DrawingsPatch = Partial<SettingsSnapshot['drawings']>;
 export type MathEquationsPatch = Partial<SettingsSnapshot['math']['equations']>;
 export type MathNumbersPatch = Partial<SettingsSnapshot['math']['numbers']>;
 
 export const defaultSettings = {
+  onboarding: defaultOnboardingProfile,
   reading: {
     noRep: {
       words: 3,
@@ -70,6 +81,19 @@ export const defaultSettings = {
     },
   },
 } satisfies SettingsSnapshot;
+
+export function applyOnboardingProfilePatch(
+  settings: SettingsSnapshot,
+  patch: OnboardingProfilePatch
+): SettingsSnapshot {
+  return {
+    ...settings,
+    onboarding: {
+      ...settings.onboarding,
+      ...patch,
+    },
+  };
+}
 
 export function applyReadingNoRepPatch(
   settings: SettingsSnapshot,

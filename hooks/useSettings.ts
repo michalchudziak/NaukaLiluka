@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import {
+  applyOnboardingProfilePatch,
   applyDrawingsPatch,
   applyMathEquationsPatch,
   applyMathNumbersPatch,
@@ -11,6 +12,7 @@ import {
   defaultSettings,
   type SettingsSnapshot,
 } from '@/convex/settingsSnapshot';
+import type { DailyCommitmentMinutes } from '@/shared/dailyCommitment';
 
 interface SettingsLocalStore {
   getQuery(query: typeof api.settings.get, args: {}): SettingsSnapshot | undefined;
@@ -31,6 +33,15 @@ export function useAppSettings(): SettingsSnapshot {
 }
 
 export function useSettingsActions() {
+  const completeOnboardingProfile = useMutation(
+    api.settings.completeOnboardingProfile
+  ).withOptimisticUpdate((localStore, args) => {
+    localStore.setQuery(
+      api.settings.get,
+      {},
+      applyOnboardingProfilePatch(getCurrentSettings(localStore), args)
+    );
+  });
   const updateReadingNoRep = useMutation(api.settings.updateReadingNoRep).withOptimisticUpdate(
     (localStore, args) => {
       localStore.setQuery(
@@ -96,6 +107,16 @@ export function useSettingsActions() {
   );
 
   return {
+    completeOnboardingProfile: (
+      childAgeMonths: number,
+      dailyCommitmentMinutes: DailyCommitmentMinutes
+    ) =>
+      fireAndForgetSettingsMutation(
+        completeOnboardingProfile({
+          childAgeMonths,
+          dailyCommitmentMinutes,
+        })
+      ),
     updateReadingNoRepWords: (value: number) =>
       fireAndForgetSettingsMutation(updateReadingNoRep({ words: value })),
     updateReadingNoRepSentences: (value: number) =>

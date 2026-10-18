@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from 'convex/react';
+import { useConvex, useQuery } from 'convex/react';
 import { startOfDay } from 'date-fns';
 import { api } from '@/convex/_generated/api';
 
@@ -7,6 +7,7 @@ export function useNoRepStatus() {
   return useQuery(api.noRep.getStatus, { todayStartMs });
 }
 
-export function useChooseAndMark() {
-  return useMutation(api.noRep.chooseAndMark);
+export function useChooseNoRepItems() {
+  const convex = useConvex();
+  return (args: { contentType: 'words' | 'sentences' }) => convex.query(api.noRep.choose, args);
 }

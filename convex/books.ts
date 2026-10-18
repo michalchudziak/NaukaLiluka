@@ -1,7 +1,12 @@
 import { mutationGeneric as mutation, queryGeneric as query } from 'convex/server';
 import { v } from 'convex/values';
+import { resolveTripleIndex } from '../shared/bookProgress';
+import { isSameDayProgressRequired } from '../shared/dailyCommitment';
+import type { Id } from './_generated/dataModel';
+import type { MutationCtx, QueryCtx } from './_generated/server';
 import { BOOK_METADATA, getRequiredDays, tripleHasSentences } from './lib/bookContent';
 import { requireCurrentUser } from './lib/current_user';
+import { defaultSettings } from './settingsSnapshot';
 import { bookSessionNameValidator, contentTypeValidator } from './validators';
 
 const sessionStatusValidator = v.object({
@@ -24,197 +29,285 @@ const todayStatusValidator = v.object({
   }),
 });
 
+type BookSessionName = 'session1' | 'session2' | 'session3';
+type BookSessionToken =
+  | 'session1:words'
+  | 'session2:words'
+  | 'session3:words'
+  | 'session3:sentences';
+type BooksCtx = QueryCtx | MutationCtx;
 type BookProgressDoc = {
-  _id: any;
+  _id: Id<'bookProgress'>;
   bookIndex: number;
   isCompleted: boolean;
   completedTriples: number[];
+  currentTripleSessionCompletions?: BookSessionToken[];
   progressTimestamp: number;
 };
 
-/** Find the first non-completed book. Returns index 0 if all are done. */
 function findActiveBook(allProgress: BookProgressDoc[]) {
   for (let i = 0; i < BOOK_METADATA.length; i++) {
-    const prog = allProgress.find((p) => p.bookIndex === i);
+    const prog = allProgress.find((progress) => progress.bookIndex === i);
     if (!prog?.isCompleted) {
       return { activeBookIndex: i, activeProgress: prog, allCompleted: false };
     }
   }
+
   return {
     activeBookIndex: 0,
-    activeProgress: allProgress.find((p) => p.bookIndex === 0),
+    activeProgress: allProgress.find((progress) => progress.bookIndex === 0),
     allCompleted: true,
   };
 }
 
-/** Resolve which triple index to show today for the given book. */
-function resolveTripleIndex(
-  completedTriples: number[],
-  progressTimestamp: number | undefined,
-  todayStartMs: number,
-  tripleCount: number
-): number {
-  const progressUpdatedToday = progressTimestamp != null && progressTimestamp >= todayStartMs;
-
-  if (progressUpdatedToday && completedTriples.length > 0) {
-    // Reuse today's completed triple for the rest of the day
-    return completedTriples[completedTriples.length - 1];
+function getBookSessionToken(
+  session: BookSessionName,
+  type: 'words' | 'sentences'
+): BookSessionToken {
+  if (session === 'session1') {
+    return 'session1:words';
   }
 
-  // Find first uncompleted triple
-  for (let i = 0; i < tripleCount; i++) {
-    if (!completedTriples.includes(i)) return i;
+  if (session === 'session2') {
+    return 'session2:words';
   }
 
-  // All triples done (book complete) — use the last one
-  return Math.max(0, tripleCount - 1);
+  return type === 'sentences' ? 'session3:sentences' : 'session3:words';
 }
 
-/**
- * Returns today's book status: active book, current triple, session completions.
- * This is the primary query for all book-related UI.
- */
+function getRequiredSessionTokens(hasSentences: boolean): BookSessionToken[] {
+  return hasSentences
+    ? ['session1:words', 'session2:words', 'session3:words', 'session3:sentences']
+    : ['session1:words', 'session2:words', 'session3:words'];
+}
+
+async function getBookSettingsSnapshot(ctx: BooksCtx, userId: Id<'users'>) {
+  const settings = await ctx.db
+    .query('settings')
+    .withIndex('by_user', (q) => q.eq('userId', userId))
+    .first();
+
+  return settings?.snapshot ?? defaultSettings;
+}
+
+export async function getResolvedBookStatus(
+  ctx: BooksCtx,
+  userId: Id<'users'>,
+  todayStartMs: number,
+  sameDayRequired: boolean
+) {
+  const allProgress = await ctx.db
+    .query('bookProgress')
+    .withIndex('by_user_and_book_index', (q) => q.eq('userId', userId))
+    .collect();
+
+  const { activeBookIndex, activeProgress, allCompleted } = findActiveBook(
+    allProgress as BookProgressDoc[]
+  );
+  const meta = BOOK_METADATA[activeBookIndex];
+  const completedTriples = activeProgress?.completedTriples ?? [];
+  const currentTripleIndex = resolveTripleIndex(
+    completedTriples,
+    activeProgress?.progressTimestamp,
+    todayStartMs,
+    meta.tripleCount,
+    activeProgress?.currentTripleSessionCompletions
+  );
+  const hasSentences = tripleHasSentences(activeBookIndex, currentTripleIndex);
+  const requiredSessionTokens = getRequiredSessionTokens(hasSentences);
+  const completedSessionTokens = new Set<BookSessionToken>();
+
+  if (sameDayRequired) {
+    const todaySessions = await ctx.db
+      .query('bookTrackSessions')
+      .withIndex('by_user_and_completed_at', (q) => q.eq('userId', userId))
+      .filter((q) => q.gte(q.field('completedAt'), todayStartMs))
+      .collect();
+
+    for (const session of todaySessions) {
+      completedSessionTokens.add(
+        getBookSessionToken(session.sessionName, session.contentType) as BookSessionToken
+      );
+    }
+  } else {
+    const tripleCompletedToday =
+      activeProgress?.progressTimestamp != null &&
+      activeProgress.progressTimestamp >= todayStartMs &&
+      completedTriples.includes(currentTripleIndex);
+
+    if (tripleCompletedToday) {
+      for (const token of requiredSessionTokens) {
+        completedSessionTokens.add(token);
+      }
+    } else {
+      for (const token of activeProgress?.currentTripleSessionCompletions ?? []) {
+        completedSessionTokens.add(token);
+      }
+    }
+  }
+
+  const sessions = {
+    session1: {
+      hasWords: true,
+      hasSentences: false,
+      isWordsCompleted: completedSessionTokens.has('session1:words'),
+      isSentencesCompleted: false,
+    },
+    session2: {
+      hasWords: true,
+      hasSentences: false,
+      isWordsCompleted: completedSessionTokens.has('session2:words'),
+      isSentencesCompleted: false,
+    },
+    session3: {
+      hasWords: true,
+      hasSentences,
+      isWordsCompleted: completedSessionTokens.has('session3:words'),
+      isSentencesCompleted: completedSessionTokens.has('session3:sentences'),
+    },
+  };
+
+  const isDayCompleted = requiredSessionTokens.every((token) => completedSessionTokens.has(token));
+
+  return {
+    activeBookIndex,
+    activeBookTitle: meta.title,
+    activeBookCompleted: allCompleted || (activeProgress?.isCompleted ?? false),
+    currentTripleIndex,
+    isDayCompleted,
+    sessions,
+  };
+}
+
 export const getTodayStatus = query({
   args: { todayStartMs: v.number() },
   returns: todayStatusValidator,
   handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);
-
-    const allProgress = await ctx.db
-      .query('bookProgress')
-      .withIndex('by_user_and_book_index', (q) => q.eq('userId', user._id))
-      .collect();
-
-    const { activeBookIndex, activeProgress, allCompleted } = findActiveBook(allProgress);
-
-    const meta = BOOK_METADATA[activeBookIndex];
-    const completedTriples = activeProgress?.completedTriples ?? [];
-
-    const currentTripleIndex = resolveTripleIndex(
-      completedTriples,
-      activeProgress?.progressTimestamp,
-      args.todayStartMs,
-      meta.tripleCount
+    const settingsSnapshot = await getBookSettingsSnapshot(ctx, user._id);
+    const sameDayRequired = isSameDayProgressRequired(
+      settingsSnapshot.onboarding.dailyCommitmentMinutes ?? 15
     );
 
-    // Get today's session completions
-    const todaySessions = await ctx.db
-      .query('bookTrackSessions')
-      .withIndex('by_user_and_completed_at', (q) => q.eq('userId', user._id))
-      .filter((q) => q.gte(q.field('completedAt'), args.todayStartMs))
-      .collect();
-
-    const isSessionDone = (session: string, type: string) =>
-      todaySessions.some((s) => s.sessionName === session && s.contentType === type);
-
-    const hasSentences = tripleHasSentences(activeBookIndex, currentTripleIndex);
-
-    const sessions = {
-      session1: {
-        hasWords: true,
-        hasSentences: false,
-        isWordsCompleted: isSessionDone('session1', 'words'),
-        isSentencesCompleted: false,
-      },
-      session2: {
-        hasWords: true,
-        hasSentences: false,
-        isWordsCompleted: isSessionDone('session2', 'words'),
-        isSentencesCompleted: false,
-      },
-      session3: {
-        hasWords: true,
-        hasSentences,
-        isWordsCompleted: isSessionDone('session3', 'words'),
-        isSentencesCompleted: isSessionDone('session3', 'sentences'),
-      },
-    };
-
-    const isDayCompleted =
-      sessions.session1.isWordsCompleted &&
-      sessions.session2.isWordsCompleted &&
-      sessions.session3.isWordsCompleted &&
-      (!hasSentences || sessions.session3.isSentencesCompleted);
-
-    return {
-      activeBookIndex,
-      activeBookTitle: meta.title,
-      activeBookCompleted: allCompleted || (activeProgress?.isCompleted ?? false),
-      currentTripleIndex,
-      isDayCompleted,
-      sessions,
-    };
+    return await getResolvedBookStatus(ctx, user._id, args.todayStartMs, sameDayRequired);
   },
 });
 
-/**
- * Records a session completion and handles book advancement.
- * All business logic (day completion, triple advancement, book advancement) runs atomically.
- */
 export const completeSession = mutation({
   args: {
     session: bookSessionNameValidator,
     type: contentTypeValidator,
     todayStartMs: v.number(),
+    bookIndex: v.optional(v.number()),
+    tripleIndex: v.optional(v.number()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);
+    const settingsSnapshot = await getBookSettingsSnapshot(ctx, user._id);
+    const sameDayRequired = isSameDayProgressRequired(
+      settingsSnapshot.onboarding.dailyCommitmentMinutes ?? 15
+    );
 
-    // Check if already completed today
-    const existing = await ctx.db
+    const existingTodaySessions = await ctx.db
       .query('bookTrackSessions')
       .withIndex('by_user_and_completed_at', (q) => q.eq('userId', user._id))
       .filter((q) => q.gte(q.field('completedAt'), args.todayStartMs))
       .collect();
-
-    const alreadyDone = existing.some(
-      (s) => s.sessionName === args.session && s.contentType === args.type
+    const alreadyMarkedToday = existingTodaySessions.some(
+      (session) => session.sessionName === args.session && session.contentType === args.type
     );
-    if (alreadyDone) return null;
 
-    // Insert the session completion
-    await ctx.db.insert('bookTrackSessions', {
-      userId: user._id,
-      sessionName: args.session,
-      contentType: args.type,
-      completedAt: Date.now(),
-    });
-
-    // Determine active book
     const allProgress = await ctx.db
       .query('bookProgress')
       .withIndex('by_user_and_book_index', (q) => q.eq('userId', user._id))
       .collect();
-
-    const { activeBookIndex, activeProgress } = findActiveBook(allProgress);
-
+    const { activeBookIndex, activeProgress } = findActiveBook(allProgress as BookProgressDoc[]);
     const meta = BOOK_METADATA[activeBookIndex];
     const completedTriples = activeProgress?.completedTriples ?? [];
-
     const currentTripleIndex = resolveTripleIndex(
       completedTriples,
       activeProgress?.progressTimestamp,
       args.todayStartMs,
-      meta.tripleCount
+      meta.tripleCount,
+      activeProgress?.currentTripleSessionCompletions
     );
+    if (
+      (args.bookIndex !== undefined && args.bookIndex !== activeBookIndex) ||
+      (args.tripleIndex !== undefined && args.tripleIndex !== currentTripleIndex)
+    )
+      return null;
 
-    // Check if day is now complete (including the session we just inserted)
-    const allTodaySessions = [...existing, { sessionName: args.session, contentType: args.type }];
-    const isDone = (session: string, type: string) =>
-      allTodaySessions.some((s) => s.sessionName === session && s.contentType === type);
-
+    if (!alreadyMarkedToday) {
+      await ctx.db.insert('bookTrackSessions', {
+        userId: user._id,
+        sessionName: args.session,
+        contentType: args.type,
+        completedAt: Date.now(),
+      });
+    }
     const hasSentences = tripleHasSentences(activeBookIndex, currentTripleIndex);
-    const isDayCompleted =
-      isDone('session1', 'words') &&
-      isDone('session2', 'words') &&
-      isDone('session3', 'words') &&
-      (!hasSentences || isDone('session3', 'sentences'));
+    const requiredSessionTokens = getRequiredSessionTokens(hasSentences);
+    const newToken = getBookSessionToken(args.session, args.type);
 
-    if (!isDayCompleted) return null;
+    if (sameDayRequired) {
+      const completedTokens = new Set<BookSessionToken>(
+        existingTodaySessions.map((session) =>
+          getBookSessionToken(session.sessionName, session.contentType)
+        ) as BookSessionToken[]
+      );
 
-    // Day is complete - mark triple as done
-    if (completedTriples.includes(currentTripleIndex)) return null;
+      completedTokens.add(newToken);
+
+      if (!requiredSessionTokens.every((token) => completedTokens.has(token))) {
+        return null;
+      }
+    } else {
+      const tripleCompletedToday =
+        activeProgress?.progressTimestamp != null &&
+        activeProgress.progressTimestamp >= args.todayStartMs &&
+        completedTriples.includes(currentTripleIndex);
+
+      if (tripleCompletedToday) {
+        return null;
+      }
+
+      const persistedTokens = new Set<BookSessionToken>(
+        activeProgress?.currentTripleSessionCompletions ?? []
+      );
+
+      if (persistedTokens.has(newToken)) {
+        return null;
+      }
+
+      persistedTokens.add(newToken);
+      const nextCompletedTokens = Array.from(persistedTokens);
+
+      if (!requiredSessionTokens.every((token) => persistedTokens.has(token))) {
+        if (activeProgress) {
+          await ctx.db.patch(activeProgress._id, {
+            currentTripleSessionCompletions: nextCompletedTokens,
+          });
+        } else {
+          await ctx.db.insert('bookProgress', {
+            userId: user._id,
+            bookKey: meta.title,
+            bookIndex: activeBookIndex,
+            bookTitle: meta.title,
+            completedTriples: [],
+            currentTripleSessionCompletions: nextCompletedTokens,
+            progressTimestamp: 0,
+            isCompleted: false,
+          });
+        }
+
+        return null;
+      }
+    }
+
+    if (completedTriples.includes(currentTripleIndex)) {
+      return null;
+    }
 
     const newCompletedTriples = [...completedTriples, currentTripleIndex];
     const isBookCompleted = newCompletedTriples.length >= getRequiredDays(activeBookIndex);
@@ -222,6 +315,7 @@ export const completeSession = mutation({
     if (activeProgress) {
       await ctx.db.patch(activeProgress._id, {
         completedTriples: newCompletedTriples,
+        currentTripleSessionCompletions: [] satisfies BookSessionToken[],
         progressTimestamp: Date.now(),
         isCompleted: isBookCompleted,
       });
@@ -232,6 +326,7 @@ export const completeSession = mutation({
         bookIndex: activeBookIndex,
         bookTitle: meta.title,
         completedTriples: newCompletedTriples,
+        currentTripleSessionCompletions: [] satisfies BookSessionToken[],
         progressTimestamp: Date.now(),
         isCompleted: isBookCompleted,
       });
@@ -241,9 +336,6 @@ export const completeSession = mutation({
   },
 });
 
-/**
- * Returns book progress for all books (used by books-list screen).
- */
 export const listProgress = query({
   args: {},
   returns: v.array(

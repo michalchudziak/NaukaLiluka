@@ -27,7 +27,7 @@ export function AuthFormShell({
   title: string;
   description: string;
   children: React.ReactNode;
-  switchHref: './sign-in' | './sign-up';
+  switchHref: './sign-in' | './sign-up' | './forgot-password' | './reset-password';
   switchPrompt: string;
   switchLabel: string;
 }) {

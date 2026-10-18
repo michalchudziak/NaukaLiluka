@@ -1,34 +1,29 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { AutoSizeText } from '@/components/AutoSizeText';
 import { ThemedView } from '@/components/ThemedView';
 import { useAppSettings } from '@/hooks/useSettings';
+import { useTimedPresentation } from '@/hooks/useTimedPresentation';
 
 const AnimatedThemedView = Animated.createAnimatedComponent(ThemedView);
 
+type DisplayParams = {
+  items: string;
+  color: string;
+  type: 'words' | 'sentences';
+  interval?: string;
+  completion?: string;
+};
+
 export default function DisplayScreen() {
-  const params = useLocalSearchParams();
-  const router = useRouter();
+  const params = useLocalSearchParams<DisplayParams>();
+  return <DisplayPresentation key={`${params.items}:${params.completion ?? ''}`} params={params} />;
+}
+
+function DisplayPresentation({ params }: { params: DisplayParams }) {
   const settings = useAppSettings();
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const currentIndexRef = useRef(-1);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const opacity = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-    };
-  });
-
   const parsedItems = useMemo(() => JSON.parse(params.items as string) as string[], [params.items]);
   const color = params.color as string;
 
@@ -43,45 +38,18 @@ export default function DisplayScreen() {
     return Math.max(...itemsWithSpacing.map((item) => item.length), 0);
   }, [itemsWithSpacing]);
 
-  const fadeTransition = useCallback(
-    (callback: () => void) => {
-      'worklet';
-      opacity.value = withTiming(0, { duration: 100 }, () => {
-        runOnJS(callback)();
-        opacity.value = withTiming(1, { duration: 100 });
-      });
-    },
-    [opacity]
-  );
-
   const displayInterval = (() => {
     const override = parseInt((params.interval as string) || '', 10);
     const fallback = settings.reading.interval[params.type as 'words' | 'sentences'];
     return Number.isFinite(override) && override > 0 ? override : fallback;
   })();
 
-  useEffect(() => {
-    if (itemsWithSpacing.length === 0) return;
-
-    intervalRef.current = setInterval(() => {
-      fadeTransition(() => {
-        const next = currentIndexRef.current + 1;
-        currentIndexRef.current = next;
-        if (next >= itemsWithSpacing.length) {
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          router.back();
-        } else {
-          setCurrentIndex(next);
-        }
-      });
-    }, displayInterval);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [fadeTransition, itemsWithSpacing.length, displayInterval, router]);
+  const { currentIndex, animatedStyle } = useTimedPresentation({
+    itemCount: itemsWithSpacing.length,
+    interval: displayInterval,
+    completion: params.completion,
+    items: parsedItems,
+  });
 
   if (itemsWithSpacing.length === 0 || currentIndex === -1) {
     return <AnimatedThemedView style={[styles.container, animatedStyle]} />;

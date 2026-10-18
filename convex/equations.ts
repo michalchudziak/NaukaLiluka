@@ -1,11 +1,15 @@
 import { mutationGeneric as mutation, queryGeneric as query } from 'convex/server';
 import { v } from 'convex/values';
+import type { Id } from './_generated/dataModel';
+import type { MutationCtx, QueryCtx } from './_generated/server';
 import { requireCurrentUser } from './lib/current_user';
+import { defaultSettings } from './settingsSnapshot';
 import {
   defaultEquationsProgress,
   equationCategoryValidator,
   equationSessionValidator,
 } from './validators';
+import { isSameDayProgressRequired } from '../shared/dailyCommitment';
 
 type EquationSession = 'subitizing1' | 'subitizing2' | 'equations1' | 'equations2';
 type EquationCategory = 'integer' | 'fraction' | 'decimal' | 'negative' | 'percentage';
@@ -15,6 +19,7 @@ type StoredEquationsProgress = {
   lastSessionDate: string | null;
   completedSessions: EquationSession[];
 };
+type EquationsCtx = QueryCtx | MutationCtx;
 
 const equationsStatusValidator = v.object({
   currentDay: v.number(),
@@ -79,17 +84,37 @@ const areAllRequiredSessionsCompleted = (
   completedSessions: EquationSession[]
 ) => sessionGroups.flat().every((session) => completedSessions.includes(session));
 
-const resolveEquationsStatus = (progress: StoredEquationsProgress, todayStartMs: number) => {
+async function getEquationsSettingsSnapshot(ctx: EquationsCtx, userId: Id<'users'>) {
+  const settings = await ctx.db
+    .query('settings')
+    .withIndex('by_user', (q) => q.eq('userId', userId))
+    .first();
+
+  return settings?.snapshot ?? defaultSettings;
+}
+
+export function resolveEquationsStatus(
+  progress: StoredEquationsProgress,
+  todayStartMs: number,
+  sameDayRequired: boolean
+) {
   const progressIsFromToday = isProgressFromToday(progress.lastSessionDate, todayStartMs);
   const previousDayGroups = getSessionGroupsForDay(progress.currentDay, progress.currentCategory);
-  const shouldAdvanceDay =
-    progress.lastSessionDate !== null &&
-    !progressIsFromToday &&
-    areAllRequiredSessionsCompleted(previousDayGroups, progress.completedSessions);
+  const previousDayCompleted = areAllRequiredSessionsCompleted(
+    previousDayGroups,
+    progress.completedSessions
+  );
+  const shouldAdvanceDay = progress.lastSessionDate !== null && !progressIsFromToday && previousDayCompleted;
   const nextProgress = shouldAdvanceDay
     ? nextDayAndCategory(progress.currentDay, progress.currentCategory)
     : { day: progress.currentDay, category: progress.currentCategory };
-  const completedSessionsToday = progressIsFromToday ? progress.completedSessions : [];
+  const completedSessionsToday = shouldAdvanceDay
+    ? []
+    : sameDayRequired
+      ? progressIsFromToday
+        ? progress.completedSessions
+        : []
+      : progress.completedSessions;
   const sessionGroups = getSessionGroupsForDay(nextProgress.day, nextProgress.category);
 
   return {
@@ -98,7 +123,58 @@ const resolveEquationsStatus = (progress: StoredEquationsProgress, todayStartMs:
     completedSessionsToday,
     sessionGroups,
   };
-};
+}
+
+export async function getResolvedEquationsStatus(
+  ctx: EquationsCtx,
+  userId: Id<'users'>,
+  todayStartMs: number,
+  sameDayRequired: boolean
+) {
+  const progress = await ctx.db
+    .query('equationsProgress')
+    .withIndex('by_user', (q) => q.eq('userId', userId))
+    .first();
+  const storedProgress: StoredEquationsProgress = progress
+    ? {
+        currentDay: progress.currentDay,
+        currentCategory: progress.currentCategory,
+        lastSessionDate: progress.lastSessionDate,
+        completedSessions: progress.completedSessions,
+      }
+    : {
+        currentDay: defaultEquationsProgress.currentDay,
+        currentCategory: 'integer',
+        lastSessionDate: defaultEquationsProgress.lastSessionDate,
+        completedSessions: defaultEquationsProgress.completedSessions,
+      };
+  const effectiveProgress = resolveEquationsStatus(
+    storedProgress,
+    todayStartMs,
+    sameDayRequired
+  );
+  const [session1, session2] = effectiveProgress.sessionGroups;
+
+  return {
+    currentDay: effectiveProgress.currentDay,
+    currentCategory: effectiveProgress.currentCategory,
+    completedSessionsToday: effectiveProgress.completedSessionsToday,
+    isDayCompleted: areAllRequiredSessionsCompleted(
+      effectiveProgress.sessionGroups,
+      effectiveProgress.completedSessionsToday
+    ),
+    sessions: {
+      session1: areAllRequiredSessionsCompleted(
+        [session1],
+        effectiveProgress.completedSessionsToday
+      ),
+      session2: areAllRequiredSessionsCompleted(
+        [session2],
+        effectiveProgress.completedSessionsToday
+      ),
+    },
+  };
+}
 
 export const getStatus = query({
   args: {
@@ -107,47 +183,12 @@ export const getStatus = query({
   returns: equationsStatusValidator,
   handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);
-    const progress = await ctx.db
-      .query('equationsProgress')
-      .withIndex('by_user', (q) => q.eq('userId', user._id))
-      .first();
-    const storedProgress: StoredEquationsProgress = progress
-      ? {
-          currentDay: progress.currentDay,
-          currentCategory: progress.currentCategory,
-          lastSessionDate: progress.lastSessionDate,
-          completedSessions: progress.completedSessions,
-        }
-      : {
-          currentDay: defaultEquationsProgress.currentDay,
-          currentCategory: 'integer',
-          lastSessionDate: defaultEquationsProgress.lastSessionDate,
-          completedSessions: defaultEquationsProgress.completedSessions,
-        };
+    const settingsSnapshot = await getEquationsSettingsSnapshot(ctx, user._id);
+    const sameDayRequired = isSameDayProgressRequired(
+      settingsSnapshot.onboarding.dailyCommitmentMinutes ?? 15
+    );
 
-    const effectiveProgress = resolveEquationsStatus(storedProgress, args.todayStartMs);
-
-    const [session1, session2] = effectiveProgress.sessionGroups;
-
-    return {
-      currentDay: effectiveProgress.currentDay,
-      currentCategory: effectiveProgress.currentCategory,
-      completedSessionsToday: effectiveProgress.completedSessionsToday,
-      isDayCompleted: areAllRequiredSessionsCompleted(
-        effectiveProgress.sessionGroups,
-        effectiveProgress.completedSessionsToday
-      ),
-      sessions: {
-        session1: areAllRequiredSessionsCompleted(
-          [session1],
-          effectiveProgress.completedSessionsToday
-        ),
-        session2: areAllRequiredSessionsCompleted(
-          [session2],
-          effectiveProgress.completedSessionsToday
-        ),
-      },
-    };
+    return await getResolvedEquationsStatus(ctx, user._id, args.todayStartMs, sameDayRequired);
   },
 });
 
@@ -159,6 +200,10 @@ export const completeSession = mutation({
   returns: v.null(),
   handler: async (ctx, args) => {
     const user = await requireCurrentUser(ctx);
+    const settingsSnapshot = await getEquationsSettingsSnapshot(ctx, user._id);
+    const sameDayRequired = isSameDayProgressRequired(
+      settingsSnapshot.onboarding.dailyCommitmentMinutes ?? 15
+    );
     const existing = await ctx.db
       .query('equationsProgress')
       .withIndex('by_user', (q) => q.eq('userId', user._id))
@@ -176,7 +221,11 @@ export const completeSession = mutation({
           lastSessionDate: defaultEquationsProgress.lastSessionDate,
           completedSessions: defaultEquationsProgress.completedSessions,
         };
-    const effectiveProgress = resolveEquationsStatus(storedProgress, args.todayStartMs);
+    const effectiveProgress = resolveEquationsStatus(
+      storedProgress,
+      args.todayStartMs,
+      sameDayRequired
+    );
 
     if (effectiveProgress.completedSessionsToday.includes(args.session)) {
       return null;

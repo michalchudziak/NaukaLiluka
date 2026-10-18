@@ -11,6 +11,9 @@ export function ThemedTitle({ style, ...props }: TextProps) {
 
   return (
     <Text
+      numberOfLines={1}
+      adjustsFontSizeToFit
+      maxFontSizeMultiplier={1.2}
       style={[
         {
           ...forestCampTypography.display,

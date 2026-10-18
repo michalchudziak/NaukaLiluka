@@ -11,7 +11,13 @@
     "confirm": "Potwierdź",
     "ok": "OK",
     "enable": "Włącz",
-    "retry": "Spróbuj ponownie"
+    "retry": "Spróbuj ponownie",
+    "availableLater": "Ten blok wróci w kolejnych dniach."
+  },
+  "presentation": {
+    "errorTitle": "Problem z prezentacją",
+    "startError": "Nie udało się rozpocząć prezentacji. Spróbuj ponownie.",
+    "saveError": "Prezentacja się zakończyła, ale nie udało się zapisać postępu. Spróbuj ponownie."
   },
   "auth": {
     "loadingTitle": "Sprawdzanie sesji",
@@ -45,7 +51,32 @@
     "noAccount": "Nie masz jeszcze konta?",
     "haveAccount": "Masz już konto?",
     "goToSignUp": "Przejdź do rejestracji",
-    "goToSignIn": "Przejdź do logowania"
+    "goToSignIn": "Przejdź do logowania",
+    "forgotPasswordLink": "Nie pamiętasz hasła?",
+    "forgotPasswordTitle": "Resetowanie hasła",
+    "forgotPasswordDescription": "Wpisz adres e-mail powiązany z kontem. Wyślemy kod do zresetowania hasła.",
+    "forgotPasswordCta": "Wyślij kod",
+    "forgotPasswordSending": "Wysyłanie...",
+    "forgotPasswordSuccess": "Kod resetowania został wysłany na podany adres e-mail. Sprawdź skrzynkę pocztową.",
+    "forgotPasswordError": "Nie udało się wysłać kodu. Spróbuj ponownie.",
+    "forgotPasswordPrompt": "Pamiętasz hasło?",
+    "forgotPasswordBack": "Wróć do logowania",
+    "goToResetPassword": "Mam kod — ustaw nowe hasło",
+    "resetPasswordTitle": "Nowe hasło",
+    "resetPasswordDescription": "Wpisz kod z e-maila i ustaw nowe hasło do konta.",
+    "resetTokenLabel": "Kod z e-maila",
+    "resetTokenPlaceholder": "Wklej kod resetowania",
+    "newPasswordLabel": "Nowe hasło",
+    "newPasswordPlaceholder": "Wpisz nowe hasło",
+    "confirmNewPasswordLabel": "Powtórz nowe hasło",
+    "confirmNewPasswordPlaceholder": "Powtórz nowe hasło",
+    "resetPasswordCta": "Ustaw nowe hasło",
+    "resettingPassword": "Resetowanie hasła...",
+    "resetPasswordSuccess": "Hasło zostało zmienione. Możesz się teraz zalogować.",
+    "resetPasswordError": "Nie udało się zresetować hasła. Sprawdź kod i spróbuj ponownie.",
+    "resetTokenRequired": "Wpisz kod resetowania z e-maila.",
+    "resetPasswordPrompt": "Pamiętasz hasło?",
+    "resetPasswordBack": "Wróć do logowania"
   },
   "reading": {
     "bookTrack": "Ścieżka książkowa",
@@ -148,6 +179,15 @@
       "equationsInterval": "Czas wyświetlania równań",
       "equationsCount": "Ilość równań na sesję"
     },
+    "childProfile": {
+      "sectionTitle": "Plan dziecka",
+      "manage": "Wiek i plan dnia",
+      "manageSubtitle": "Ustaw wiek dziecka i dzienny rytm pracy",
+      "summary": "{{age}} mies. · {{minutes}} min dziennie",
+      "title": "Wiek dziecka i plan dnia",
+      "description": "Tutaj możesz później zmienić wiek dziecka oraz czas, który chcecie poświęcić każdego dnia. To wpływa na ekran Mój dzień i tempo przechodzenia przez bloki.",
+      "save": "Zapisz zmiany"
+    },
     "account": {
       "sectionTitle": "Konto",
       "manage": "Konto i bezpieczeństwo",
@@ -245,6 +285,27 @@
     "next": "Dalej",
     "skip": "Pomiń",
     "start": "Rozpocznij"
+  },
+  "profileSetup": {
+    "eyebrow": "Po rejestracji",
+    "title": "Ustaw rytm dnia dziecka",
+    "description": "Dopasuj plan do wieku dziecka i czasu, który chcecie poświęcić każdego dnia. Te ustawienia wpływają na ekran Mój dzień i sposób przechodzenia przez bloki.",
+    "ageTitle": "Ile miesięcy ma dziecko?",
+    "ageDescription": "Zapisujemy wiek dziecka w profilu, żeby później lepiej dopasować aplikację.",
+    "ageLabel": "Wiek dziecka",
+    "ageSuffix": "mies.",
+    "commitmentTitle": "Ile czasu dziennie chcecie przeznaczyć?",
+    "commitmentDescription": "Każda opcja zmienia liczbę bloków pokazywanych w danym dniu i tempo całej ścieżki.",
+    "optionTitle": "{{minutes}} minut dziennie",
+    "selected": "Wybrane",
+    "continue": "Zapisz i przejdź dalej",
+    "saving": "Zapisywanie...",
+    "commitmentOptions": {
+      "2": "Najłagodniejszy start. Pokazujemy 1 z 7 bloków dziennie, żeby łatwo utrzymać regularność.",
+      "5": "2 z 7 bloków dziennie. Dzieci rozwijają czytanie i matematykę około 1,5x szybciej.",
+      "10": "4 z 7 bloków dziennie. Dzieci rozwijają czytanie i matematykę około 3x szybciej.",
+      "15": "Pełny plan jak dotąd. 7 z 7 bloków dziennie. Dzieci rozwijają czytanie i matematykę 4x szybciej."
+    }
   },
   "math": {
     "numberSets": "Liczby",
